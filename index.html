@@ -32,7 +32,6 @@
     
     * { box-sizing: border-box; }
     
-    /* Scrollbar mystique */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
@@ -106,7 +105,12 @@
       background: rgba(10, 10, 10, 0.85); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     .topbar { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; padding: .8rem 0; }
-    .brand h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); }
+    
+    /* BOUTON RETOUR AU MENU (Le Logo) */
+    .brand { cursor: pointer; transition: transform 0.3s ease; }
+    .brand:hover { transform: scale(1.02); }
+    .brand:hover h1 { text-shadow: 0 0 15px var(--tarot-gold); }
+    .brand h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); transition: text-shadow 0.3s;}
     .brand p { margin: .2rem 0 0; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: 2px;}
     
     .nav-wrapper { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -317,7 +321,8 @@
 <div id="app-dashboard">
     <header>
       <div class="container topbar">
-        <div class="brand">
+        <!-- LE LOGO EST MAINTENANT UN BOUTON RETOUR AU MENU -->
+        <div class="brand" onclick="retourMenuPrincipale()" title="Retour au menu de sélection">
           <h1>KÆOS PROJECT</h1>
           <p id="brandTagline">L'Académie des Oracles</p>
         </div>
@@ -341,24 +346,58 @@
 
 <script>
 // ==========================================
-// TRANSITION MENU -> DASHBOARD
+// ETAT GLOBAL (Avec Filtre d'Équipe)
+// ==========================================
+const state = {
+ data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
+ latestRound: "PRERANK", selectedRankingsRound: null, rankingView: "official", votesRound: "PRERANK", votesTimer: null,
+ activeTeam: "Global" // <-- Le Cercle choisi dans le menu
+};
+
+// ==========================================
+// TRANSITIONS MENU <-> DASHBOARD
 // ==========================================
 function entrerAcademie(teamFilter) {
+    state.activeTeam = teamFilter; // On enregistre le choix !
+    
     const menu = document.getElementById('landing-menu');
     const dashboard = document.getElementById('app-dashboard');
     
-    // Animation de disparition douce
     menu.style.opacity = '0';
     menu.style.transform = 'scale(0.95)';
     
     setTimeout(() => {
         menu.style.display = 'none';
         dashboard.style.display = 'block';
-        setTimeout(() => dashboard.style.opacity = '1', 50); // Fade in
-        
-        // Optionnel : on pourrait filtrer par équipe ici si on veut
-        if (!location.hash) location.hash = '#contestants';
+        setTimeout(() => {
+            dashboard.style.opacity = '1';
+            // Force le rafraîchissement avec le nouveau filtre
+            renderContestants(); 
+            renderRankings();
+            renderVotes();
+            location.hash = '#contestants';
+        }, 50); 
     }, 800);
+}
+
+function retourMenuPrincipale() {
+    const menu = document.getElementById('landing-menu');
+    const dashboard = document.getElementById('app-dashboard');
+    
+    dashboard.style.opacity = '0';
+    
+    setTimeout(() => {
+        dashboard.style.display = 'none';
+        menu.style.display = 'flex';
+        
+        // Retire le '#' de l'URL pour ne pas bloquer au rafraichissement
+        history.replaceState(null, null, ' ');
+        
+        setTimeout(() => {
+            menu.style.opacity = '1';
+            menu.style.transform = 'scale(1)';
+        }, 50);
+    }, 500);
 }
 
 // ==========================================
@@ -404,15 +443,15 @@ function t(key) { return I18N[currentLang][key] || key; }
 // 2. CONFIGURATION SAISON 3
 // ==========================================
 const CONFIG = {
- SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI", // <-- TON NOUVEAU GOOGLE SHEET ID
- VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI", // <-- ID POUR LES VOTES
+ SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
+ VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
  ROUND_TABS: { PRERANK: "PRERANK", ROUND_1: "R1", ROUND_2: "R2", ROUND_3: "R3", ROUND_4: "R4", ROUND_5: "R5", FINAL: "FINAL" },
  VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
  REFRESH_MS: 30000
 };
 
 const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "ROUND_5", "FINAL"];
-const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"]; // <-- 4 JUGES SEULEMENT
+const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"]; 
 const EXCLUDED_NAMES = new Set(['official_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle', 'overall_rank']);
 
 // ==========================================
@@ -431,14 +470,6 @@ function getRoundLabel(id) {
  const map = { PRERANK: 'r_prerank', ROUND_1: 'r_r1', ROUND_2: 'r_r2', ROUND_3: 'r_r3', ROUND_4: 'r_r4', ROUND_5: 'r_r5', FINAL: 'r_final' };
  return t(map[id] || id);
 }
-
-let rankingChart = null;
-let profileChart = null;
-
-const state = {
- data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
- latestRound: "PRERANK", selectedRankingsRound: null, rankingView: "official", votesRound: "PRERANK", votesTimer: null
-};
 
 function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
 function canonicalRoundId(value) {
@@ -467,7 +498,7 @@ function handleImageFallback(img) {
  const contestantId = String(img.dataset.contestantId || '').trim();
  if (step === 0 && contestantId) {
      img.dataset.fallbackStep = '1';
-     img.src = `${contestantId}.png`; // Tente de trouver le PNG dans le dossier courant
+     img.src = `${contestantId}.png`; 
      return;
  }
  img.onerror = null;
@@ -657,7 +688,6 @@ async function loadDataFromRoundTabs() {
      const country = String(pickValue(row, ['country', 'pays', 'origine']) || '').trim();
      const pronouns = String(pickValue(row, ['pronouns', 'pronoms']) || '').trim();
      
-     // 🔴 MAGIE TAROT : Détection automatique du Cercle via la colonne "Team" ou "Cercle"
      const teamRaw = String(pickValue(row, ['team', 'equipe', 'cercle', 'groupe', 'team_name']) || '').toLowerCase();
      let teamClass = 'theme-global';
      if (teamRaw.includes('sun') || teamRaw.includes('soleil') || teamRaw.includes('neitsu') || teamRaw.includes('rouge')) teamClass = 'theme-sun';
@@ -689,7 +719,7 @@ async function loadDataFromRoundTabs() {
          if (country && !c.country) c.country = country;
          if (pronouns && !c.pronouns) c.pronouns = pronouns;
          if (instagram && !c.instagram) c.instagram = instagram;
-         if (teamClass !== 'theme-global' && c.teamClass === 'theme-global') c.teamClass = teamClass; // Met à jour le Cercle si trouvé
+         if (teamClass !== 'theme-global' && c.teamClass === 'theme-global') c.teamClass = teamClass; 
      }
      
      if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
@@ -782,10 +812,17 @@ function getLatestRound() {
  return 'PRERANK';
 }
 
+// 🔴 LE FILTRE GLOBAL DU CERCLE (S'applique aux grilles, classements, profil suivant/précédent...)
 function sortedContestants() {
  const officialByRound = getOfficialRankingByRound();
  const current = officialByRound[state.latestRound] || {};
- return [...state.data.contestants].sort((a, b) => {
+ 
+ let filtered = state.data.contestants;
+ if (state.activeTeam === 'Soleil') filtered = filtered.filter(c => c.teamClass === 'theme-sun');
+ if (state.activeTeam === 'Lune') filtered = filtered.filter(c => c.teamClass === 'theme-moon');
+ if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => c.teamClass === 'theme-star');
+ 
+ return [...filtered].sort((a, b) => {
    const aElim = getStatus(state.latestRound, a.id) === 'eliminated' ? 1 : 0;
    const bElim = getStatus(state.latestRound, b.id) === 'eliminated' ? 1 : 0;
    if (aElim !== bElim) return aElim - bElim;
@@ -810,8 +847,13 @@ function renderContestants() {
  const officialByRound = getOfficialRankingByRound();
  const currentRanks = officialByRound[state.latestRound] || {};
  
+ let teamTitle = "";
+ if(state.activeTeam === 'Soleil') teamTitle = " - Cercle du Soleil ✹";
+ if(state.activeTeam === 'Lune') teamTitle = " - Cercle de la Lune ☾";
+ if(state.activeTeam === 'Etoile') teamTitle = " - Cercle de l'Étoile ✦";
+
  root.innerHTML = '<div class="card-paper">' +
- '<h2>' + t('welcome_title') + '</h2>' +
+ '<h2>' + t('welcome_title') + teamTitle + '</h2>' +
  '<p class="small" style="color:var(--tarot-gold)">' + t('auto_updated') + ' <span class="chip" style="font-weight:bold; color:var(--bg); background:var(--tarot-gold)">' + getRoundLabel(state.latestRound) + '</span></p>' +
  '<div class="filters" style="margin-top:1.5rem;">' +
  '<input id="searchContestant" placeholder="' + t('search_ph') + '" />' +
@@ -830,6 +872,8 @@ function renderContestants() {
  const draw = () => {
    const q = document.getElementById('searchContestant').value.toLowerCase().trim();
    const f = document.getElementById('statusFilter').value;
+   
+   // sortedContestants() applique déjà le filtre de l'équipe active
    const list = sortedContestants().filter(c => c.name.toLowerCase().includes(q)).filter(c => {
      let status = getStatus(state.latestRound, c.id);
      if (!status && getFirstEliminatedRoundIndex(c.id) !== -1 && getFirstEliminatedRoundIndex(c.id) <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
@@ -853,22 +897,18 @@ function renderContestants() {
        if (status === 'eliminated') extraClass = 'eliminated';
        else if (status === 'nominee') extraClass = 'danger-zone';
        
-       const teamClass = c.teamClass || 'theme-global'; // Le thème Tarot (Soleil, Lune, Etoile)
+       const teamClass = c.teamClass || 'theme-global'; 
 
        return `
        <div class="tarot-card ${teamClass} ${extraClass}" onclick="location.hash='#profile/${c.id}'">
            <div class="tarot-inner-border">
                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
-               
                <div class="tarot-top-icon"></div>
-               
                <div class="tarot-name">${getContestantName(c.id)}</div>
-               
                <div class="tarot-image-container">
                    <img src="${c.photo_url}" alt="${c.name}" onerror="handleImageFallback(this)" />
                </div>
-               
                <div class="tarot-rank">${rankDisplay}</div>
            </div>
        </div>`;
@@ -888,11 +928,10 @@ function renderRankings() {
  const viewOptions = getRankingViewOptions();
  const rankingMap = getRankingMapByView(state.rankingView);
  const isPerformance = state.rankingView === 'performance_score';
- const officialByRound = getOfficialRankingByRound();
- 
  const activeRound = state.selectedRankingsRound || state.latestRound;
 
- const list = [...state.data.contestants].sort((a, b) => {
+ // list ne contient QUE les filles de l'équipe sélectionnée
+ const list = sortedContestants().sort((a, b) => {
    const aElim = getStatus(activeRound, a.id) === 'eliminated' ? 1 : 0;
    const bElim = getStatus(activeRound, b.id) === 'eliminated' ? 1 : 0;
    if (aElim !== bElim) return aElim - bElim;
@@ -902,12 +941,14 @@ function renderRankings() {
    if (Number.isFinite(va)) return -1; if (Number.isFinite(vb)) return 1;
    return String(a.name || '').localeCompare(String(b.name || ''));
  });
+ 
+ const teamIds = list.map(c => c.id);
 
  const nominations = {
-   nominee: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'nominee'),
-   saved_judges: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_judges'),
-   saved_public: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_public'),
-   eliminated: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'eliminated')
+   nominee: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'nominee' && teamIds.includes(r.contestant_id)),
+   saved_judges: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_judges' && teamIds.includes(r.contestant_id)),
+   saved_public: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_public' && teamIds.includes(r.contestant_id)),
+   eliminated: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'eliminated' && teamIds.includes(r.contestant_id))
  };
 
  let optionsHtml = viewOptions.map(o => '<option value="' + o.value + '" ' + (o.value===state.rankingView?'selected':'') + '>' + o.label + '</option>').join('');
@@ -971,7 +1012,6 @@ function renderRankings() {
 
  if (rankingChart) rankingChart.destroy();
  const ctx = document.getElementById('rankingChart');
- 
  Chart.defaults.color = '#888888';
  Chart.defaults.borderColor = '#333333';
 
@@ -979,7 +1019,7 @@ function renderRankings() {
  type: 'line',
  data: {
  labels: ROUND_ORDER.map(r => getRoundLabel(r)),
- datasets: state.data.contestants.map((c, idx) => {
+ datasets: list.map((c, idx) => {
    const elimIndex = getFirstEliminatedRoundIndex(c.id);
    const isEliminated = getStatus(activeRound, c.id) === 'eliminated';
    const baseColor = colorForIndex(idx);
@@ -1006,7 +1046,7 @@ function renderRankings() {
      const hoveredIdx = elements[0].datasetIndex;
      chart.data.datasets.forEach((ds, i) => {
        const isHovered = i === hoveredIdx;
-       const isElim = getStatus(activeRound, state.data.contestants[i].id) === 'eliminated';
+       const isElim = getStatus(activeRound, list[i].id) === 'eliminated';
        ds.borderColor = isHovered ? colorForIndex(i) : 'rgba(136, 136, 136, 0.1)';
        ds.borderWidth = isHovered ? 5 : (isElim ? 1 : 2);
        ds.order = isHovered ? 0 : 1;
@@ -1014,7 +1054,7 @@ function renderRankings() {
      chart.update('none');
    } else {
      chart.data.datasets.forEach((ds, i) => {
-       const isElim = getStatus(activeRound, state.data.contestants[i].id) === 'eliminated';
+       const isElim = getStatus(activeRound, list[i].id) === 'eliminated';
        const baseCol = colorForIndex(i);
        ds.borderColor = isElim ? baseCol.replace('hsl', 'hsla').replace(')', ', 0.2)') : baseCol;
        ds.borderWidth = isElim ? 1 : 3;
@@ -1025,7 +1065,7 @@ function renderRankings() {
  },
  plugins: { legend: { display: true, position: 'bottom', labels: { color: '#F0EDE5', boxWidth: 10, usePointStyle: true, pointStyle: 'circle' } } },
  scales: isPerformance ? { x: { ticks: { color: '#888' } }, y: { ticks: { color: '#888' }, title: { display: true, text: t('perf_score'), color: '#888' } } }
- : { x: { ticks: { color: '#888' } }, y: { reverse: true, min: 1, max: Math.max(22, state.data.contestants.length), ticks: { color: '#888', stepSize: 1 } } }
+ : { x: { ticks: { color: '#888' } }, y: { reverse: true, min: 1, max: Math.max(22, list.length), ticks: { color: '#888', stepSize: 1 } } }
  }
  });
 }
@@ -1148,7 +1188,10 @@ function renderVotes() {
 
  const nominees = state.data.round_status.filter(r => r.round_id === state.votesRound && r.status === 'nominee').map(r => r.contestant_id);
  const votedCandidates = state.data.votes_live.filter(v => v.round_id === state.votesRound).map(v => v.contestant_id);
- const targets = [...new Set([...nominees, ...votedCandidates])];
+ 
+ // On ne garde que les candidates qui sont dans le Cercle actuellement affiché
+ const activeTeamIds = sortedContestants().map(c => c.id);
+ const targets = [...new Set([...nominees, ...votedCandidates])].filter(id => activeTeamIds.includes(id));
 
  const rows = targets.map(id => {
    const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
@@ -1187,10 +1230,17 @@ function setupNav() {
  nav.innerHTML = tabs.map(t => '<a class="nav-link" href="#' + t.id + '">' + t.label + '</a>').join('');
 
  const onHash = () => {
-   const hash = location.hash || ''; // Si pas de hash, ne rien forcer, pour rester sur le menu
+   const hash = location.hash || ''; 
    
-   // Si on est sur une ancre (ex: #contestants), on est sûr de vouloir afficher le dashboard !
-   if(hash !== '') {
+   // Si on arrive sans ancre (ou si on retourne au menu), on force l'affichage du menu
+   if(hash === '' || hash === '#') {
+       document.getElementById('app-dashboard').style.display = 'none';
+       document.getElementById('app-dashboard').style.opacity = '0';
+       document.getElementById('landing-menu').style.display = 'flex';
+       document.getElementById('landing-menu').style.opacity = '1';
+       document.getElementById('landing-menu').style.transform = 'scale(1)';
+       return;
+   } else {
        document.getElementById('landing-menu').style.display = 'none';
        document.getElementById('app-dashboard').style.display = 'block';
        document.getElementById('app-dashboard').style.opacity = '1';
