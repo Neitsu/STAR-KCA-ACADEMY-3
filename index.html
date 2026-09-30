@@ -8,9 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* =========================================
-         PALETTE TAROT & MYSTIQUE
-         ========================================= */
       --tarot-bg: #222222;      
       --tarot-gold: #E2B961;    
       --tarot-gold-dim: rgba(226, 185, 97, 0.2);
@@ -19,7 +16,6 @@
       --tarot-ash: #555555;
       --tarot-ash-dark: #151515;
 
-      /* Couleurs globales du site */
       --bg: #0A0A0A;
       --panel: #1A1A1A;
       --panel2: #2A2A2A;
@@ -32,7 +28,6 @@
     
     * { box-sizing: border-box; }
     
-    /* Scrollbar mystique */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
@@ -51,17 +46,9 @@
     h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--tarot-gold); font-weight: 600; letter-spacing: 2px;}
     .container { width: min(1300px, 94vw); margin: 0 auto; }
     
-    /* =========================================
-       1. MENU PRINCIPAL (ÉCRAN D'ACCUEIL)
-       ========================================= */
     #landing-menu {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem 0;
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 2rem 0; transition: opacity 0.8s ease, transform 0.8s ease;
     }
     .menu-header { text-align: center; margin-bottom: 3rem; color: var(--tarot-gold); }
     .menu-header h1 { font-size: 3.5rem; letter-spacing: 6px; text-transform: uppercase; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(226, 185, 97, 0.3); }
@@ -96,9 +83,6 @@
     .card-back { transform: rotateY(180deg); }
     .card-container:hover .card-back { box-shadow: 0 0 30px rgba(226, 185, 97, 0.2), 0 20px 40px rgba(0,0,0,0.9); }
 
-    /* =========================================
-       2. TABLEAU DE BORD PRINCIPAL
-       ========================================= */
     #app-dashboard { display: none; opacity: 0; transition: opacity 0.8s ease; }
     
     header {
@@ -107,7 +91,6 @@
     }
     .topbar { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; padding: .8rem 0; }
     
-    /* BOUTON RETOUR AU MENU (Le Logo) */
     .brand { cursor: pointer; transition: transform 0.3s ease; }
     .brand:hover { transform: scale(1.02); }
     .brand:hover h1 { text-shadow: 0 0 15px var(--tarot-gold); }
@@ -145,9 +128,6 @@
     input, select { border-radius: 4px; border: 1px solid var(--line); outline: none; background: var(--bg); color: var(--text); padding: .6rem .8rem; transition: all 0.3s; font-family: 'Poppins'; }
     input:focus, select:focus { border-color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
     
-    /* =========================================
-       DESIGN DES CARTES DANS LE DASHBOARD
-       ========================================= */
     .contestants-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: center; justify-items: center; padding: 1rem 0; }
     
     .tarot-card {
@@ -179,7 +159,6 @@
         font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
     }
 
-    /* Les Thèmes (Symboles pour Menu et Dashboard) */
     .theme-sun .front-symbol::before { content: '✹'; font-size: 2.8rem; }
     .theme-sun .tarot-top-icon::before { content: '✹'; }
     .theme-sun .tarot-rank::before, .theme-sun .tarot-rank::after { content: '✹'; font-size: 0.7rem; }
@@ -197,7 +176,6 @@
     .theme-global .tarot-top-icon::before { content: '☉'; font-size: 16px;}
     .theme-global .tarot-rank::before, .theme-global .tarot-rank::after { content: '☉'; font-size: 0.9rem; }
 
-    /* Modificateurs de drame */
     .danger-zone { border-color: var(--tarot-danger); }
     .danger-zone:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 25px var(--tarot-danger-dim); }
     .danger-zone .tarot-inner-border { border-color: var(--tarot-danger); }
@@ -211,7 +189,6 @@
     .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
     .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(50%); opacity: 0.8; }
 
-    /* Badges (Pills) textuels */
     .pill { display: inline-block; padding: .3rem .8rem; border-radius: 4px; font-size: .75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
     .safe { background: transparent; color: var(--tarot-gold); border-color: var(--tarot-gold); }
     .nominee { background: var(--tarot-danger); color: white; border-color: var(--tarot-danger); }
@@ -220,7 +197,6 @@
     .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
     .winner { background: var(--tarot-gold); color: var(--bg); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.4); }
     
-    /* Layouts du profil */
     .row { display: grid; grid-template-columns: 1fr; gap: 1rem; }
     @media (min-width: 840px) { .row.two { grid-template-columns: 350px 1fr; gap: 3rem; align-items: start; } }
     
@@ -244,17 +220,21 @@
     .vote-row { margin-bottom: 1.5rem; }
     .bar { width: 100%; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 0.5rem;}
     .bar > span { display: block; height: 100%; background: var(--tarot-gold); transition: width 0.5s ease; box-shadow: 0 0 10px var(--tarot-gold);}
+
+    @media (max-width: 680px) {
+      .brand h1 { font-size: 1.2rem; }
+      .nav-link { font-size: .76rem; padding: .35rem .6rem; }
+      .filters { flex-direction: column; align-items: stretch; gap: .6rem; }
+      .card-paper, .card { padding: 1.2rem; }
+    }
   </style>
 </head>
 <body>
 
-<!-- =========================================
-     LE MENU PRINCIPAL 3D (ÉCRAN D'ACCUEIL)
-     ========================================= -->
 <div id="landing-menu">
     <div class="menu-header">
         <h1>Star KCA Academy</h1>
-        <p id="menuTagline">KÆOS PROJECT • Choisissez votre destinée</p>
+        <p id="menuTagline">KÆOS PROJECT • Choose your destiny</p>
     </div>
 
     <div class="cards-layout">
@@ -316,20 +296,15 @@
     </div>
 </div>
 
-<!-- =========================================
-     LE TABLEAU DE BORD (L'ACADÉMIE)
-     ========================================= -->
 <div id="app-dashboard">
     <header>
       <div class="container topbar">
-        <!-- BOUTON RETOUR AU MENU -->
         <div class="brand" onclick="retourMenuPrincipale()" title="Return to Selection">
           <h1>KÆOS PROJECT</h1>
           <p id="brandTagline">The Oracles' Academy</p>
         </div>
         <div class="nav-wrapper">
           <nav id="nav"></nav>
-          <!-- 7 LANGUES DISPONIBLES -->
           <select id="langSelect" class="lang-select">
             <option value="en">🇬🇧 EN</option>
             <option value="fr">🇫🇷 FR</option>
@@ -353,11 +328,11 @@
 
 <script>
 // ==========================================
-// ETAT GLOBAL (Filtre d'Équipe)
+// ETAT GLOBAL 
 // ==========================================
 const state = {
  data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
- latestRound: "PRERANK", selectedRankingsRound: null, rankingView: "official", votesRound: "PRERANK", votesTimer: null,
+ latestRound: "PRERANK", selectedRankingsRound: null, rankingView: "default", votesRound: "PRERANK", votesTimer: null,
  activeTeam: "Global" 
 };
 
@@ -366,6 +341,7 @@ const state = {
 // ==========================================
 function entrerAcademie(teamFilter) {
     state.activeTeam = teamFilter; 
+    state.rankingView = 'default';
     
     const menu = document.getElementById('landing-menu');
     const dashboard = document.getElementById('app-dashboard');
@@ -394,7 +370,7 @@ function retourMenuPrincipale() {
     setTimeout(() => {
         dashboard.style.display = 'none';
         menu.style.display = 'flex';
-        history.replaceState(null, null, ' '); // Retire le #
+        history.replaceState(null, null, ' '); 
         setTimeout(() => {
             menu.style.opacity = '1';
             menu.style.transform = 'scale(1)';
@@ -413,7 +389,7 @@ const I18N = {
     auto_updated: "The stars are aligned for the cycle:", no_contestants: "No card found.",
     rank: "Arcana", pos: "Pos", name: "Initiate", rankings_desc: "Aura evolution across cycles.",
     nominations: "The Oracles' Judgment", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Grace (Oracles)", saved_public_lbl: "Grace (Scale)", eliminated_lbl: "Consumed",
-    global_chart: "Web of Destiny", perf_score: "Power", official_rank: "Official Arcana",
+    global_chart: "Web of Destiny", perf_score: "Power", official_rank: "Official Arcana", overall_rank: "Global Arcana",
     back_contestants: "← Back to cards", contestant_not_found: "Card lost in limbo.", rounds_overview: "Book of Cycles", round: "Cycle", official: "Arcana", status: "Destiny",
     performances: "Rituals (Performances)", song: "Work", links: "Visions", link_perf: "Observe", no_links: "No visions.",
     indiv_chart: "Aura Fluctuation", country: "Land", pronouns: "Identity", instagram: "Grimoire (Insta)",
@@ -428,7 +404,7 @@ const I18N = {
     auto_updated: "Les astres sont alignés pour le cycle :", no_contestants: "Aucune carte trouvée.",
     rank: "Arcane", pos: "Pos", name: "Initié", rankings_desc: "Évolution de l'Aura au fil des cycles.",
     nominations: "Le Jugement des Oracles", nominee_lbl: "Zone d'Ombre", saved_judges_lbl: "Grâce (Oracles)", saved_public_lbl: "Grâce (Balance)", eliminated_lbl: "Consumées",
-    global_chart: "La Toile du Destin", perf_score: "Puissance", official_rank: "Arcane Officiel",
+    global_chart: "La Toile du Destin", perf_score: "Puissance", official_rank: "Arcane Officiel", overall_rank: "Arcane Global",
     back_contestants: "← Retourner aux cartes", contestant_not_found: "Carte perdue dans les limbes.", rounds_overview: "Livre des Cycles", round: "Cycle", official: "Arcane", status: "Destinée",
     performances: "Rituels (Performances)", song: "Œuvre", links: "Visions", link_perf: "Observer", no_links: "Aucune vision.",
     indiv_chart: "Fluctuation de l'Aura", country: "Terre", pronouns: "Identité", instagram: "Grimoire (Insta)",
@@ -443,7 +419,7 @@ const I18N = {
     auto_updated: "Los astros están alineados para el ciclo:", no_contestants: "Ninguna carta encontrada.",
     rank: "Arcano", pos: "Pos", name: "Iniciada", rankings_desc: "Evolución del Aura a través de los ciclos.",
     nominations: "El Juicio de los Oráculos", nominee_lbl: "Zona de Sombras", saved_judges_lbl: "Gracia (Oráculos)", saved_public_lbl: "Gracia (Balanza)", eliminated_lbl: "Consumidas",
-    global_chart: "La Red del Destino", perf_score: "Poder", official_rank: "Arcano Oficial",
+    global_chart: "La Red del Destino", perf_score: "Poder", official_rank: "Arcano Oficial", overall_rank: "Arcano Global",
     back_contestants: "← Volver a las cartas", contestant_not_found: "Carta perdida en el limbo.", rounds_overview: "Libro de los Ciclos", round: "Ciclo", official: "Arcano", status: "Destino",
     performances: "Rituales (Actuaciones)", song: "Obra", links: "Visiones", link_perf: "Observar", no_links: "Sin visiones.",
     indiv_chart: "Fluctuación del Aura", country: "Tierra", pronouns: "Identidad", instagram: "Grimorio (Insta)",
@@ -458,7 +434,7 @@ const I18N = {
     auto_updated: "Die Sterne stehen günstig für den Zyklus:", no_contestants: "Keine Karte gefunden.",
     rank: "Arkana", pos: "Pos", name: "Eingeweihte", rankings_desc: "Entwicklung der Aura über die Zyklen.",
     nominations: "Das Urteil der Orakel", nominee_lbl: "Schattenzone", saved_judges_lbl: "Gnade (Orakel)", saved_public_lbl: "Gnade (Waage)", eliminated_lbl: "Verzehrt",
-    global_chart: "Das Netz des Schicksals", perf_score: "Macht", official_rank: "Offizielle Arkana",
+    global_chart: "Das Netz des Schicksals", perf_score: "Macht", official_rank: "Offizielle Arkana", overall_rank: "Globale Arkana",
     back_contestants: "← Zurück zu den Karten", contestant_not_found: "Karte im Limbus verloren.", rounds_overview: "Buch der Zyklen", round: "Zyklus", official: "Arkana", status: "Schicksal",
     performances: "Rituale (Auftritte)", song: "Werk", links: "Visionen", link_perf: "Beobachten", no_links: "Keine Visionen.",
     indiv_chart: "Aura-Schwankung", country: "Erde", pronouns: "Identität", instagram: "Grimoire (Insta)",
@@ -473,7 +449,7 @@ const I18N = {
     auto_updated: "星が配置されました。現在のサイクル:", no_contestants: "カードが見つかりません。",
     rank: "アルカナ", pos: "位置", name: "入門者", rankings_desc: "サイクルごとのオーラの進化。",
     nominations: "オラクルの審判", nominee_lbl: "シャドウゾーン", saved_judges_lbl: "恩寵 (オラクル)", saved_public_lbl: "恩寵 (天秤)", eliminated_lbl: "消滅",
-    global_chart: "運命の網", perf_score: "力", official_rank: "公式アルカナ",
+    global_chart: "運命の網", perf_score: "力", official_rank: "公式アルカナ", overall_rank: "全体アルカナ",
     back_contestants: "← カードに戻る", contestant_not_found: "リンボに迷い込んだカード。", rounds_overview: "サイクルの書", round: "サイクル", official: "アルカナ", status: "運命",
     performances: "儀式 (パフォーマンス)", song: "作品", links: "幻影", link_perf: "観察", no_links: "幻影はありません。",
     indiv_chart: "オーラの変動", country: "大地", pronouns: "アイデンティティ", instagram: "魔導書 (Insta)",
@@ -488,7 +464,7 @@ const I18N = {
     auto_updated: "별들이 정렬되었습니다. 현재 주기:", no_contestants: "카드를 찾을 수 없습니다.",
     rank: "아르카나", pos: "위치", name: "입문자", rankings_desc: "주기에 따른 오라의 진화.",
     nominations: "오라클의 심판", nominee_lbl: "그림자 구역", saved_judges_lbl: "은총 (오라클)", saved_public_lbl: "은총 (천칭)", eliminated_lbl: "소멸됨",
-    global_chart: "운명의 그물", perf_score: "힘", official_rank: "공식 아르카나",
+    global_chart: "운명의 그물", perf_score: "힘", official_rank: "공식 아르카나", overall_rank: "전체 아르카나",
     back_contestants: "← 카드로 돌아가기", contestant_not_found: "림보에서 길을 잃은 카드.", rounds_overview: "주기의 서", round: "주기", official: "아르카나", status: "운명",
     performances: "의식 (퍼포먼스)", song: "작품", links: "환영", link_perf: "관찰", no_links: "환영이 없습니다.",
     indiv_chart: "오라 변동", country: "대지", pronouns: "정체성", instagram: "그리무아르 (Insta)",
@@ -503,7 +479,7 @@ const I18N = {
     auto_updated: "星辰已对齐，当前周期：", no_contestants: "未找到卡牌。",
     rank: "秘仪", pos: "位置", name: "启蒙者", rankings_desc: "光环在周期中的演变。",
     nominations: "神谕的审判", nominee_lbl: "暗影区", saved_judges_lbl: "恩赐 (神谕)", saved_public_lbl: "恩赐 (天平)", eliminated_lbl: "被吞噬",
-    global_chart: "命运之网", perf_score: "力量", official_rank: "官方秘仪",
+    global_chart: "命运之网", perf_score: "力量", official_rank: "官方秘仪", overall_rank: "全局秘仪",
     back_contestants: "← 返回卡牌", contestant_not_found: "卡牌迷失在边缘。", rounds_overview: "周期之书", round: "周期", official: "秘仪", status: "命运",
     performances: "仪式 (表演)", song: "作品", links: "幻象", link_perf: "观察", no_links: "没有幻象。",
     indiv_chart: "光环波动", country: "土地", pronouns: "身份", instagram: "魔法书 (Insta)",
@@ -513,7 +489,6 @@ const I18N = {
   }
 };
 
-// ANGLAIS PAR DÉFAUT
 let currentLang = localStorage.getItem('kca_lang') || 'en';
 function t(key) { return I18N[currentLang][key] || key; }
 
@@ -530,7 +505,7 @@ const CONFIG = {
 
 const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "ROUND_5", "FINAL"];
 const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"]; 
-const EXCLUDED_NAMES = new Set(['official_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle', 'overall_rank']);
+const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
 
 // ==========================================
 // 3. MOTEUR DE LECTURE CSV
@@ -673,30 +648,37 @@ function statusClass(status) {
 function statusLabel(status) { return status ? t(status) : t('tbd'); }
 function getFirstEliminatedRoundIndex(contestantId) { return ROUND_ORDER.findIndex(round => getStatus(round, contestantId) === 'eliminated'); }
 
-function getActiveCountForRound(roundId) {
+// 🔴 COMPTE LE NOMBRE D'ACTIFS DANS LE CERCLE POUR CALCULER LES POINTS JUGES
+function getActiveCountForRound(roundId, teamClass) {
     const rIdx = ROUND_ORDER.indexOf(roundId);
     let count = 0;
     state.data.contestants.forEach(c => {
+        if (teamClass && c.teamClass !== teamClass) return; // Uniquement les filles de la même équipe
         const elimIdx = getFirstEliminatedRoundIndex(c.id);
         if (elimIdx === -1 || elimIdx >= rIdx) count++;
     });
-    return count > 0 ? count : 40;
+    return count > 0 ? count : (teamClass ? 16 : 48); // Fallback logique
 }
 
 function getPerformanceScoreByRound() {
     const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
     ROUND_ORDER.forEach(round => {
-        const activeCount = getActiveCountForRound(round);
-        const pointsBase = activeCount + 1;
         state.data.contestants.forEach(c => {
+            // Nombre de filles en vie DANS LE CERCLE DE LA FILLE
+            const activeCount = getActiveCountForRound(round, c.teamClass); 
+            const pointsBase = activeCount + 1; // ex: 16 actives -> Base 17. Le 1er prend 17-1 = 16 points.
+
             let totalPoints = 0; let hasData = false;
+            
+            // Le "Score" sur 100
             const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
             if (rawScoreRec && Number.isFinite(rawScoreRec.total)) { totalPoints += rawScoreRec.total; hasData = true; }
             
+            // Les points des 4 juges
             JUDGE_NAMES.forEach(jn => {
                 const jRankRec = state.data.judge_rankings.find(r => r.round_id === round && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
                 if (jRankRec && Number.isFinite(jRankRec.rank) && jRankRec.rank >= 1) {
-                    totalPoints += Math.max(0, pointsBase - jRankRec.rank);
+                    totalPoints += Math.max(0, pointsBase - jRankRec.rank); // Système de points adaptatifs !
                     hasData = true;
                 }
             });
@@ -706,38 +688,52 @@ function getPerformanceScoreByRound() {
     return out;
 }
 
-function getOfficialRankingByRound() {
+function getOfficialRankingByRound(isGlobal = false) {
+    const targetJudge = isGlobal ? 'overall' : 'official'; // Cherche official_rank ou overall_rank
     const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-    state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === 'official').forEach(r => { 
+    
+    // 1. Force les rangs définis dans l'Excel
+    state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === targetJudge).forEach(r => { 
         if (Number.isFinite(r.rank)) out[r.round_id][r.contestant_id] = r.rank; 
     });
 
+    // 2. Calcule automatiquement pour ceux qui manquent
     const perfScoresByRound = getPerformanceScoreByRound();
     ROUND_ORDER.forEach(round => {
         const perfScores = perfScoresByRound[round];
-        const scoredIds = Object.keys(perfScores).filter(id => !Number.isFinite(out[round][id]));
-        scoredIds.sort((a, b) => perfScores[b] - perfScores[a]);
+        const groups = isGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
         
-        let usedRanks = new Set(Object.values(out[round]));
-        let autoRank = 1;
-        scoredIds.forEach((id) => {
-            while(usedRanks.has(autoRank)) autoRank++;
-            out[round][id] = autoRank;
-            usedRanks.add(autoRank);
+        groups.forEach(group => {
+            const groupIds = state.data.contestants.filter(c => (isGlobal || c.teamClass === group)).map(c => c.id);
+            const scoredIds = groupIds.filter(id => !Number.isFinite(out[round][id]) && Number.isFinite(perfScores[id]));
+            scoredIds.sort((a, b) => perfScores[b] - perfScores[a]);
+            
+            let usedRanks = new Set();
+            groupIds.forEach(id => { if (Number.isFinite(out[round][id])) usedRanks.add(out[round][id]); });
+            
+            let autoRank = 1;
+            scoredIds.forEach((id) => {
+                while(usedRanks.has(autoRank)) autoRank++;
+                out[round][id] = autoRank;
+                usedRanks.add(autoRank);
+            });
         });
     });
 
-    let availableBottomRank = state.data.contestants.length;
+    // 3. Glissement des éliminées (option de sécurité)
     const finalHistoricalRanks = {};
-
-    ROUND_ORDER.forEach(round => {
-        const newlyEliminated = state.data.contestants.filter(c => getFirstEliminatedRoundIndex(c.id) === ROUND_ORDER.indexOf(round));
-        if (newlyEliminated.length > 0) {
-            newlyEliminated.sort((a, b) => (out[round][a.id] || 999) - (out[round][b.id] || 999));
-            const startRank = availableBottomRank - newlyEliminated.length + 1;
-            newlyEliminated.forEach((c, idx) => finalHistoricalRanks[c.id] = startRank + idx);
-            availableBottomRank -= newlyEliminated.length;
-        }
+    const groups = isGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
+    groups.forEach(group => {
+        let availableBottomRank = isGlobal ? state.data.contestants.length : state.data.contestants.filter(c => c.teamClass === group).length;
+        ROUND_ORDER.forEach(round => {
+            const newlyEliminated = state.data.contestants.filter(c => (isGlobal || c.teamClass === group) && getFirstEliminatedRoundIndex(c.id) === ROUND_ORDER.indexOf(round));
+            if (newlyEliminated.length > 0) {
+                newlyEliminated.sort((a, b) => (out[round][a.id] || 999) - (out[round][b.id] || 999));
+                const startRank = availableBottomRank - newlyEliminated.length + 1;
+                newlyEliminated.forEach((c, idx) => finalHistoricalRanks[c.id] = startRank + idx);
+                availableBottomRank -= newlyEliminated.length;
+            }
+        });
     });
 
     ROUND_ORDER.forEach((round, rIdx) => {
@@ -777,7 +773,9 @@ async function loadDataFromRoundTabs() {
      const group_song = String(pickValue(row, ['performance2', 'performance 2']) || '').trim();
      const link = String(pickValue(row, ['link', 'performance_link', 'youtube_url', 'url', 'linktotheperformance', 'linktotheperformance1']) || '').trim();
      const link2 = String(pickValue(row, ['link2', 'linktotheperformance2']) || '').trim();
+     
      const officialRank = parseNum(pickValue(row, ['official_rank', 'rank', 'official ranking', 'classement']));
+     const overallRank = parseNum(pickValue(row, ['overall_rank', 'overall rank', 'global rank', 'classement global', 'overall']));
      const perfScore = parseNum(pickValue(row, ['performance_score', 'score', 'creator_score', 'total', 'note']));
      
      const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
@@ -802,6 +800,7 @@ async function loadDataFromRoundTabs() {
      }
      
      if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
+     if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
      if (Number.isFinite(perfScore)) scores.push({ round_id, contestant_id: id, total: perfScore });
      if (performance || link) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
      if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
@@ -864,17 +863,17 @@ function getJudgeRankingByRound(judgeName) {
 
 function getRankingViewOptions() {
  return [
-   { value: 'official', label: t('official_rank') },
+   { value: 'default', label: state.activeTeam === 'Global' ? t('overall_rank') : t('official_rank') },
    ...JUDGE_NAMES.map(j => ({ value: `judge:${j}`, label: j })),
    { value: 'performance_score', label: t('perf_score') }
  ];
 }
 
 function getRankingMapByView(view) {
- if (view === 'official') return getOfficialRankingByRound();
+ if (view === 'default') return getOfficialRankingByRound(state.activeTeam === 'Global');
  if (view === 'performance_score') return getPerformanceScoreByRound();
  if (view.startsWith('judge:')) return getJudgeRankingByRound(view.split(':')[1]);
- return getOfficialRankingByRound();
+ return getOfficialRankingByRound(state.activeTeam === 'Global');
 }
 
 function getLatestRound() {
@@ -892,7 +891,7 @@ function getLatestRound() {
 }
 
 function sortedContestants() {
- const officialByRound = getOfficialRankingByRound();
+ const officialByRound = getOfficialRankingByRound(state.activeTeam === 'Global');
  const current = officialByRound[state.latestRound] || {};
  
  let filtered = state.data.contestants;
@@ -922,8 +921,7 @@ function renderContestants() {
  if (state.data.contestants.length === 0) {
    root.innerHTML = '<div class="card-paper" style="text-align: center; padding: 4rem 2rem;"><h2>' + t('opening_soon') + '</h2></div>'; return;
  }
- const officialByRound = getOfficialRankingByRound();
- const currentRanks = officialByRound[state.latestRound] || {};
+ const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
  
  let teamTitle = "";
  if(state.activeTeam === 'Soleil') teamTitle = " - ✹";
@@ -1086,7 +1084,6 @@ function renderRankings() {
  document.getElementById('rankingViewSelect').addEventListener('change', (e) => { state.rankingView = e.target.value; renderRankings(); });
  document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => { state.selectedRankingsRound = e.target.value; renderRankings(); });
 
- // Sécurisation absolue de Chart.js
  try {
      if (rankingChart) rankingChart.destroy();
      const ctx = document.getElementById('rankingChart');
@@ -1156,9 +1153,7 @@ function renderRankings() {
          }
        }
      });
- } catch (err) {
-     console.error("Erreur lors de la génération du graphique :", err);
- }
+ } catch (err) { console.error("Erreur Graphique:", err); }
 }
 
 function renderProfile(contestantId) {
@@ -1166,7 +1161,7 @@ function renderProfile(contestantId) {
  const root = document.getElementById('profile');
  if (!c) { root.innerHTML = '<div class="card-paper"><p>' + t('contestant_not_found') + '</p></div>'; return; }
 
- const official = getOfficialRankingByRound();
+ const official = getOfficialRankingByRound(state.activeTeam === 'Global');
  const judgesByName = Object.fromEntries(JUDGE_NAMES.map(j => [j, getJudgeRankingByRound(j)]));
  const perfScore = getPerformanceScoreByRound();
 
@@ -1206,6 +1201,8 @@ function renderProfile(contestantId) {
      '</tr>';
  }).join('') : '<tr><td colspan="3">' + t('no_links') + '</td></tr>';
 
+ const dynamicRankLabel = state.activeTeam === 'Global' ? t('overall_rank') : t('official_rank');
+
  root.innerHTML = '<div class="card-paper">' +
  '<div class="profile-nav">' +
  '<button class="btn" onclick="location.hash=\'#contestants\'">' + t('back_contestants') + '</button>' +
@@ -1220,7 +1217,7 @@ function renderProfile(contestantId) {
  '<h3 style="margin-top:3rem;">' + t('rounds_overview') + '</h3>' +
  '<div class="table-wrap">' +
  '<table>' +
- '<thead><tr><th>' + t('round') + '</th><th>' + t('official') + '</th>' + JUDGE_NAMES.map(j => '<th>' + j + '</th>').join('') + '<th>' + t('perf_score') + '</th><th>' + t('status') + '</th></tr></thead>' +
+ '<thead><tr><th>' + t('round') + '</th><th>' + dynamicRankLabel + '</th>' + JUDGE_NAMES.map(j => '<th>' + j + '</th>').join('') + '<th>' + t('perf_score') + '</th><th>' + t('status') + '</th></tr></thead>' +
  '<tbody>' + roundsRowsHtml + '</tbody>' +
  '</table>' +
  '</div>' +
@@ -1276,9 +1273,7 @@ function renderProfile(contestantId) {
          }
        }
      });
- } catch (err) {
-     console.error("Erreur lors de la génération du graphique de profil :", err);
- }
+ } catch (err) {}
 }
 
 function renderVotes() {
@@ -1380,7 +1375,7 @@ async function hydrate() {
 
 async function boot() {
  try {
-   document.getElementById('langSelect').value = currentLang; // Initialise le sélecteur avec 'en'
+   document.getElementById('langSelect').value = currentLang;
    document.getElementById('brandTagline').textContent = t('tagline');
    document.getElementById('menuTagline').textContent = "KÆOS PROJECT • " + (currentLang === 'fr' ? "Choisissez votre destinée" : "Choose your destiny");
    setupNav(); 
