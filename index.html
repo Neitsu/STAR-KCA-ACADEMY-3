@@ -1,1394 +1,398 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KÆOS PROJECT - L'Académie des Oracles</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --tarot-bg: #222222;      
-      --tarot-gold: #E2B961;    
-      --tarot-gold-dim: rgba(226, 185, 97, 0.2);
-      --tarot-danger: #D93838;  
-      --tarot-danger-dim: rgba(217, 56, 56, 0.4);
-      --tarot-ash: #555555;
-      --tarot-ash-dark: #151515;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÆOS PROJECT - Mobile Vertical Cinematic (Clean BG)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tarot-bg: #222222; 
+            --tarot-gold: #E2B961; 
+            --tarot-danger: #D93838;
+            --tarot-ash: #555555; 
+            --tarot-ash-dark: #151515;
+            --bg: #0A0A0A;
+            --font-primary: 'Playfair Display', serif;
+            --font-secondary: 'Poppins', sans-serif;
+        }
 
-      --bg: #0A0A0A;
-      --panel: #1A1A1A;
-      --panel2: #2A2A2A;
-      --text: #F0EDE5;
-      --muted: #888888;
-      --line: #444444;
-      --accent: #E2B961; 
-      --radius: 6px;
-    }
-    
-    * { box-sizing: border-box; }
-    
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--tarot-gold); }
+        body, html {
+            margin: 0; padding: 0; 
+            background-color: var(--bg); /* Fond parfaitement uni pour le montage */
+            color: #F0EDE5; font-family: var(--font-primary);
+            width: 100vw; height: 100vh; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      color: var(--text);
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at top, #1a1a1a 0%, #000000 100%);
-      background-attachment: fixed;
-      overflow-x: hidden;
-    }
-    
-    h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--tarot-gold); font-weight: 600; letter-spacing: 2px;}
-    .container { width: min(1300px, 94vw); margin: 0 auto; }
-    
-    #landing-menu {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 2rem 0; transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    .menu-header { text-align: center; margin-bottom: 3rem; color: var(--tarot-gold); }
-    .menu-header h1 { font-size: 3.5rem; letter-spacing: 6px; text-transform: uppercase; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(226, 185, 97, 0.3); }
-    .menu-header p { font-family: 'Poppins', sans-serif; font-size: 1rem; letter-spacing: 8px; text-transform: uppercase; margin: 0; color: #888; }
-    
-    .cards-layout { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; max-width: 1400px; padding: 20px; }
-    
-    .card-container { width: 280px; height: 440px; perspective: 1500px; cursor: pointer; }
-    .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
-    .card-container:hover .tarot-flip-card { transform: rotateY(180deg) translateY(-20px); }
-    
-    .card-face {
-      position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
-      background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.8); padding: 10px; box-sizing: border-box;
-    }
-    
-    .card-front {
-      display: flex; justify-content: center; align-items: center;
-      background-image: linear-gradient(var(--tarot-gold) 1px, transparent 1px), linear-gradient(90deg, var(--tarot-gold) 1px, transparent 1px);
-      background-size: 20px 20px; background-position: center;
-    }
-    .card-front::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(34, 34, 34, 0.85); }
-    .card-front-inner { position: relative; z-index: 2; width: 85%; height: 90%; border: 1px solid var(--tarot-gold); display: flex; justify-content: center; align-items: center; }
-    
-    .front-symbol {
-      width: 80px; height: 80px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg);
-      display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: var(--tarot-gold);
-      box-shadow: 0 0 20px rgba(226, 185, 97, 0.2), inset 0 0 15px rgba(226, 185, 97, 0.3); text-shadow: 0 0 15px rgba(226, 185, 97, 0.8);
-    }
-    
-    .card-back { transform: rotateY(180deg); }
-    .card-container:hover .card-back { box-shadow: 0 0 30px rgba(226, 185, 97, 0.2), 0 20px 40px rgba(0,0,0,0.9); }
+        /* ÉCRAN DE DÉMARRAGE */
+        #start-overlay {
+            position: absolute; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100%; left: 0; top: 0; background: rgba(10,10,10,0.9); backdrop-filter: blur(5px);
+            transition: opacity 1s ease;
+        }
+        #start-btn {
+            padding: 15px 30px; font-family: var(--font-primary); font-size: 1.2rem;
+            background: rgba(34,34,34,0.6); color: var(--tarot-gold); border: 1px solid var(--tarot-gold);
+            border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+            transition: all 0.3s ease; font-weight: 600; margin-top: 20px;
+        }
+        #start-btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 30px rgba(226, 185, 97, 0.4); transform: scale(1.05); }
 
-    #app-dashboard { display: none; opacity: 0; transition: opacity 0.8s ease; }
-    
-    header {
-      position: sticky; top: 0; z-index: 30; backdrop-filter: blur(12px);
-      background: rgba(10, 10, 10, 0.85); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-    .topbar { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; padding: .8rem 0; }
-    
-    .brand { cursor: pointer; transition: transform 0.3s ease; }
-    .brand:hover { transform: scale(1.02); }
-    .brand:hover h1 { text-shadow: 0 0 15px var(--tarot-gold); }
-    .brand h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); transition: text-shadow 0.3s;}
-    .brand p { margin: .2rem 0 0; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: 2px;}
-    
-    .nav-wrapper { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    nav { display: flex; gap: .5rem; flex-wrap: wrap; }
-    .nav-link {
-      text-decoration: none; color: var(--text); background: var(--panel);
-      border: 1px solid var(--line); border-radius: 4px; padding: .42rem .74rem; font-size: .84rem;
-      transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .nav-link:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
-    .nav-link.active { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 600; }
-    
-    .lang-select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: .35rem .5rem; font-size: .8rem; cursor: pointer; outline: none; font-family: 'Poppins'; }
+        /* =========================================
+           ÉLÉMENTS VISUELS (Adaptés au format Vertical)
+           ========================================= */
+        .visual-element {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            opacity: 0; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; z-index: 10;
+        }
+        .visual-element.visible { opacity: 1; }
 
-    main { padding: 2rem 0 4rem; }
-    
-    @keyframes fadeInSlide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    .page { display: none; }
-    .page.active { display: block; animation: fadeInSlide 0.5s ease forwards; }
+        /* Mouvements Verticaux (Spécial Mobile) */
+        .shift-up { transform: translate(-50%, calc(-50% - 140px)) scale(0.8) !important; }
+        .shift-down { transform: translate(-50%, calc(-50% + 140px)) scale(0.65) !important; }
 
-    .card-paper {
-      background: var(--panel); border: 1px solid var(--tarot-gold); border-radius: 6px; padding: 2rem; margin-bottom: 2rem;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(226,185,97,0.05); position: relative;
-    }
-    
-    h2 { font-size: 2rem; text-transform: uppercase;}
-    h3 { font-size: 1.4rem; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 10px;}
-    .small { color: var(--muted); font-size: .82rem; }
-    
-    .filters { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: 1rem; }
-    input, select { border-radius: 4px; border: 1px solid var(--line); outline: none; background: var(--bg); color: var(--text); padding: .6rem .8rem; transition: all 0.3s; font-family: 'Poppins'; }
-    input:focus, select:focus { border-color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
-    
-    .contestants-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: center; justify-items: center; padding: 1rem 0; }
-    
-    .tarot-card {
-        width: 280px; height: 420px; background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold);
-        border-radius: 6px; padding: 10px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        cursor: pointer; transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-    .tarot-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 25px var(--tarot-gold-dim); z-index: 10;}
+        /* Logo */
+        #logo-container { text-align: center; width: 100%; }
+        #logo-container h2 { font-size: 0.9rem; letter-spacing: 8px; font-weight: 400; color: #888; text-transform: uppercase; margin: 0 0 10px 0; font-family: var(--font-secondary); }
+        #logo-container h1 { font-size: 3.5rem; letter-spacing: 8px; text-transform: uppercase; margin: 0; color: var(--tarot-gold); text-shadow: 0 0 30px rgba(226, 185, 97, 0.5); font-weight: 800; line-height: 1.1; }
+        .symbols { display: flex; gap: 30px; justify-content: center; margin-top: 20px; font-size: 2rem; color: var(--tarot-gold); }
 
-    .tarot-inner-border { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; align-items: center; }
+        /* Les 48 Cartes (Grille Animée - Format Réduit) */
+        #forty-eight-cards { 
+            display: flex; gap: 0; flex-wrap: wrap; justify-content: center; align-items: center;
+            width: 100%; height: 100%;
+        }
+        .mini-card {
+            position: absolute; width: 16px; height: 26px; background: var(--tarot-bg); border: 1px solid var(--tarot-gold);
+            border-radius: 2px; opacity: 0; transform: translate(0, 0) scale(0);
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1), opacity 1.5s ease;
+            box-shadow: 0 0 8px rgba(226, 185, 97, 0.2);
+            display: flex; justify-content: center; align-items: center;
+            background-image: linear-gradient(var(--tarot-gold) 1px, transparent 1px), linear-gradient(90deg, var(--tarot-gold) 1px, transparent 1px);
+            background-size: 6px 6px; background-position: center;
+        }
+        .mini-card::after { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(34,34,34,0.85); }
+        .mini-card-inner { position: relative; z-index: 2; width: 12px; height: 12px; border: 1px solid var(--tarot-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--tarot-gold); font-size: 0.4rem;}
 
-    .corner { position: absolute; width: 6px; height: 6px; border: 1px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg); }
-    .corner-tl { top: -4px; left: -4px; } .corner-tr { top: -4px; right: -4px; }
-    .corner-bl { bottom: -4px; left: -4px; } .corner-br { bottom: -4px; right: -4px; }
+        /* Oracles (Resserrés pour le Mobile) */
+        #oracles-section { display: flex; gap: 8px; justify-content: center; width: 100%; top: 35%; }
+        .oracle-showcase { display: flex; flex-direction: column; align-items: center; width: 110px; opacity: 0; transform: translateY(30px); transition: all 1.2s ease; }
+        .oracle-showcase.appear { opacity: 1; transform: translateY(0); }
+        .oracle-card-tiny { width: 100%; height: 160px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.8); position: relative; padding: 4px; box-sizing: border-box; }
+        .oracle-inner { width: 100%; height: 100%; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; align-items: center; padding-top: 5px; box-sizing: border-box; overflow: hidden;}
+        .oracle-portrait { height: 80px; margin-top: 5px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)); object-fit: contain;}
+        .oracle-title { font-family: var(--font-primary); font-size: 0.9rem; color: var(--tarot-gold); letter-spacing: 2px; font-weight: 800; margin-top: 8px; text-transform: uppercase;}
+        .oracle-subtitle { font-family: var(--font-secondary); font-size: 0.5rem; color: #fff; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; opacity: 0.8;}
 
-    .tarot-top-icon { position: absolute; top: -10px; color: var(--tarot-gold); font-size: 14px; background: var(--tarot-bg); padding: 0 8px; }
+        /* Carte de Démonstration Principale */
+        #demo-card-container { width: 200px; height: 310px; perspective: 1500px; transform: translate(-50%, -50%) scale(1); }
+        #demo-card-shaker { width: 100%; height: 100%; } 
+        
+        .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .tarot-flip-card.flipped { transform: rotateY(180deg); } 
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); padding: 8px; box-sizing: border-box; transition: all 1.2s ease; }
+        .card-front { display: flex; justify-content: center; align-items: center; background-image: linear-gradient(var(--tarot-gold) 1px, transparent 1px), linear-gradient(90deg, var(--tarot-gold) 1px, transparent 1px); background-size: 15px 15px; background-position: center; }
+        .card-front::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(34, 34, 34, 0.85); }
+        .front-symbol { position: relative; z-index: 2; width: 50px; height: 50px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--tarot-gold); }
+        .card-back { transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center;}
+        .tarot-inner-border { position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; align-items: center; transition: border-color 1.2s ease; box-sizing: border-box; }
+        .tarot-name { color: var(--tarot-gold); font-size: 1.2rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-top: 15px; transition: color 1.2s ease; }
+        .tarot-image-container { position: absolute; top: 50px; width: 100%; height: 160px; display: flex; justify-content: center; align-items: center; }
+        .tarot-image-container img { max-width: 90%; max-height: 95%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); transition: filter 1.2s ease, opacity 1.2s ease; }
+        .tarot-rank { position: absolute; bottom: 10px; color: var(--tarot-gold); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; transition: color 1.2s ease; }
 
-    .tarot-name {
-        color: var(--tarot-gold); font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 600;
-        letter-spacing: 4px; text-transform: uppercase; margin-top: 25px; z-index: 2; text-align: center;
-        width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px;
-    }
+        /* Danger */
+        .state-danger .card-face { border-color: var(--tarot-danger); box-shadow: 0 0 40px rgba(217, 56, 56, 0.5); }
+        .state-danger .tarot-inner-border { border-color: var(--tarot-danger); }
+        .state-danger .tarot-name, .state-danger .tarot-rank { color: var(--tarot-danger); text-shadow: 0 0 15px rgba(217, 56, 56, 0.4); }
+        @keyframes shake { 0%, 100% { transform: translate(0px, 0px) rotate(0deg); } 10%, 30% { transform: translate(-2px, -1px) rotate(-1deg); } 20%, 40% { transform: translate(2px, 1px) rotate(1deg); } }
+        .shake-animation { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        /* Consumée */
+        .state-eliminated .card-back { border-color: var(--tarot-ash); background-color: var(--tarot-ash-dark); }
+        .state-eliminated .tarot-inner-border { border-color: var(--tarot-ash); }
+        .state-eliminated .tarot-name, .state-eliminated .tarot-rank { color: var(--tarot-ash); text-shadow: none; }
+        .state-eliminated img { filter: grayscale(100%) brightness(30%); }
+        .fade-away { transform: translate(-50%, calc(-50% + 150px)) scale(0.6) !important; opacity: 0 !important; transition: all 2.5s ease !important; }
 
-    .tarot-image-container { position: absolute; top: 80px; width: 100%; height: 230px; display: flex; justify-content: center; align-items: center; }
-    .tarot-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
+        /* La Balance (The Scale) */
+        #scale-container { width: 320px; height: 320px; display: flex; flex-direction: column; align-items: center; }
+        
+        .scale-plate-text { 
+            font-family: var(--font-primary); font-size: 1.2rem; color: var(--tarot-gold) !important; 
+            letter-spacing: 2px; position: absolute; top: 10px; width: 220px; text-align: center; 
+            text-transform: uppercase; font-weight: 800; text-shadow: 0 0 15px rgba(226, 185, 97, 0.6);
+        }
+        #text-plate-left { left: calc(50% - 280px); }
+        #text-plate-right { right: calc(50% - 280px); }
 
-    .tarot-rank {
-        position: absolute; bottom: 20px; color: var(--tarot-gold); font-family: 'Playfair Display', serif;
-        font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
-    }
+        #scale-svg { width: 100%; height: 100%; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.8)); margin-top: 50px;}
+        #beam { transform-origin: 160px 65px; transition: transform 1.5s ease; }
+        #pan-left, #pan-right { transition: transform 1.5s ease; transform-origin: 55px 65px; }
+        #pan-right { transform-origin: 265px 65px; }
+        
+        .tilt-scale-public #beam { transform: rotate(18deg); }
+        .tilt-scale-public #pan-left { transform: translateY(-30px); }
+        .tilt-scale-public #pan-right { transform: translateY(30px); }
+        .tilt-scale-leader #beam { transform: rotate(-18deg); }
+        .tilt-scale-leader #pan-left { transform: translateY(30px); }
+        .tilt-scale-leader #pan-right { transform: translateY(-30px); }
 
-    .theme-sun .front-symbol::before { content: '✹'; font-size: 2.8rem; }
-    .theme-sun .tarot-top-icon::before { content: '✹'; }
-    .theme-sun .tarot-rank::before, .theme-sun .tarot-rank::after { content: '✹'; font-size: 0.7rem; }
-    
-    .theme-moon .front-symbol::before { content: '☾'; font-size: 2.8rem; margin-top: -5px; }
-    .theme-moon .tarot-top-icon::before { content: '☾'; font-size: 16px;}
-    .theme-moon .tarot-rank::before { content: '☽'; font-size: 0.9rem; }
-    .theme-moon .tarot-rank::after { content: '☾'; font-size: 0.9rem; }
-    
-    .theme-star .front-symbol::before { content: '✦'; font-size: 3rem; }
-    .theme-star .tarot-top-icon::before { content: '✦'; }
-    .theme-star .tarot-rank::before, .theme-star .tarot-rank::after { content: '✦'; font-size: 0.8rem; }
-    
-    .theme-global .front-symbol::before { content: '☉'; font-size: 2.8rem; margin-top: -2px;}
-    .theme-global .tarot-top-icon::before { content: '☉'; font-size: 16px;}
-    .theme-global .tarot-rank::before, .theme-global .tarot-rank::after { content: '☉'; font-size: 0.9rem; }
+        /* La Finale : Les 12 Cartes (Format Grille Mobile 3x4) */
+        #finale-cards {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; justify-content: center;
+            width: 90%; max-width: 350px;
+        }
+        .finale-card {
+            width: 100%; aspect-ratio: 2/3; background: var(--tarot-bg); border: 1px solid var(--tarot-gold);
+            border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 2s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; transform: translateY(30px);
+            display: flex; justify-content: center; align-items: center;
+            background-image: linear-gradient(var(--tarot-gold) 1px, transparent 1px), linear-gradient(90deg, var(--tarot-gold) 1px, transparent 1px);
+            background-size: 8px 8px; background-position: center; position: relative;
+        }
+        .finale-card::after { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(34,34,34,0.85); }
+        .finale-card-inner { position: relative; z-index: 2; width: 25px; height: 25px; border: 1px solid var(--tarot-gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--tarot-gold); font-size: 0.7rem; transition: all 2s ease;}
+        
+        .finale-card.appear { opacity: 1; transform: translateY(0); }
+        
+        .finale-card.winner { transform: translateY(-15px) scale(1.1); box-shadow: 0 0 20px rgba(226, 185, 97, 0.8); border-color: #fff; z-index: 5;}
+        .finale-card.winner .finale-card-inner { color: #fff; border-color: #fff; box-shadow: inset 0 0 10px #fff; }
+        
+        .finale-card.loser { transform: translateY(20px) scale(0.9); opacity: 0.3; filter: grayscale(100%); border-color: var(--tarot-ash); }
+        .finale-card.loser .finale-card-inner { color: var(--tarot-ash); border-color: var(--tarot-ash); }
 
-    .danger-zone { border-color: var(--tarot-danger); }
-    .danger-zone:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 25px var(--tarot-danger-dim); }
-    .danger-zone .tarot-inner-border { border-color: var(--tarot-danger); }
-    .danger-zone .tarot-name, .danger-zone .tarot-rank, .danger-zone .tarot-top-icon { color: var(--tarot-danger); }
-    .danger-zone .corner { border-color: var(--tarot-danger); }
+        /* Replay Btn */
+        #replay-btn {
+            position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+            padding: 12px 30px; font-family: var(--font-secondary); font-size: 0.9rem;
+            background: transparent; color: var(--tarot-gold); border: 1px solid var(--tarot-gold);
+            border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+            transition: all 0.3s ease; opacity: 0; pointer-events: none; z-index: 999;
+        }
+        #replay-btn.visible { opacity: 1; pointer-events: auto; }
+        #replay-btn:hover { background: var(--tarot-gold); color: var(--bg); }
 
-    .eliminated { border-color: var(--tarot-ash); background-color: var(--tarot-ash-dark); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .eliminated:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
-    .eliminated .tarot-inner-border, .eliminated .corner { border-color: var(--tarot-ash); }
-    .eliminated .corner, .eliminated .tarot-top-icon { background-color: var(--tarot-ash-dark); }
-    .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
-    .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(50%); opacity: 0.8; }
-
-    .pill { display: inline-block; padding: .3rem .8rem; border-radius: 4px; font-size: .75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
-    .safe { background: transparent; color: var(--tarot-gold); border-color: var(--tarot-gold); }
-    .nominee { background: var(--tarot-danger); color: white; border-color: var(--tarot-danger); }
-    .saved_judges, .saved_public { background: #3c5466; color: #a4c9e3; border-color: #a4c9e3; }
-    .eliminated-pill { background: var(--tarot-ash-dark); color: #888; border-color: var(--tarot-ash); }
-    .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
-    .winner { background: var(--tarot-gold); color: var(--bg); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.4); }
-    
-    .row { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media (min-width: 840px) { .row.two { grid-template-columns: 350px 1fr; gap: 3rem; align-items: start; } }
-    
-    .profile-img-wrap { width: 100%; max-width: 350px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; padding: 10px; display: flex; justify-content: center; position: relative;}
-    .profile-img-wrap::before { content:''; position: absolute; top:5px; left:5px; right:5px; bottom:5px; border: 1px solid var(--tarot-gold); pointer-events: none;}
-    .profile-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2;}
-    .profile-content { min-width: 0; width: 100%; }
-    
-    .btn { text-decoration: none; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); background: transparent; border-radius: 4px; padding: .6rem 1.2rem; display: inline-block; cursor: pointer; transition: all 0.3s; font-family: 'Poppins'; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;}
-    .btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 15px var(--tarot-gold-dim); }
-    .profile-nav { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; margin-bottom: 2rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem;}
-    
-    .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-    th { font-family: 'Playfair Display'; font-size: 1rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 1rem .5rem; text-align: left; }
-    td { border-bottom: 1px dotted var(--line); padding: 1rem .5rem; text-align: left; white-space: nowrap; }
-    .table-wrap a { color: var(--tarot-gold); text-decoration: none; font-weight: 600; transition: color 0.2s;}
-    .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
-    
-    .chip { display: inline-block; border: 1px solid var(--tarot-gold); border-radius: 4px; padding: .2rem .6rem; font-size: .74rem; background: rgba(226,185,97,0.1); font-weight: 600;}
-    .vote-row { margin-bottom: 1.5rem; }
-    .bar { width: 100%; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 0.5rem;}
-    .bar > span { display: block; height: 100%; background: var(--tarot-gold); transition: width 0.5s ease; box-shadow: 0 0 10px var(--tarot-gold);}
-
-    @media (max-width: 680px) {
-      .brand h1 { font-size: 1.2rem; }
-      .nav-link { font-size: .76rem; padding: .35rem .6rem; }
-      .filters { flex-direction: column; align-items: stretch; gap: .6rem; }
-      .card-paper, .card { padding: 1.2rem; }
-    }
-  </style>
+    </style>
 </head>
 <body>
 
-<div id="landing-menu">
-    <div class="menu-header">
-        <h1>Star KCA Academy</h1>
-        <p id="menuTagline">KÆOS PROJECT • Choose your destiny</p>
+    <div id="start-overlay">
+        <h2 style="font-family: 'Poppins', sans-serif; color:#888; letter-spacing:4px; font-weight:400; margin-bottom: 0; font-size:0.9rem;">STAR KCA ACADEMY - S3</h2>
+        <h1 style="font-size: 2.5rem; letter-spacing: 6px; margin: 10px 0 20px; color: var(--tarot-gold); font-weight:800; text-shadow: 0 0 20px rgba(226, 185, 97, 0.3); text-align:center;">KÆOS<br>PROJECT</h1>
+        <button id="start-btn" onclick="startCinematic()">Play Visual Trailer</button>
+        <p style="color:#888; font-family:'Poppins'; font-size:0.8rem; margin-top:20px; text-align:center; max-width:80%;">Format 9:16 (TikTok/Reels)<br>Make sure your window is narrow before playing.</p>
     </div>
 
-    <div class="cards-layout">
-        <div class="card-container" onclick="entrerAcademie('Soleil')">
-            <div class="tarot-flip-card theme-sun">
-                <div class="card-face card-front"><div class="card-front-inner"><div class="front-symbol"></div></div></div>
+    <button id="replay-btn" onclick="location.reload()">↺ Replay</button>
+
+    <!-- LES ÉLÉMENTS VISUELS (SANS TEXTE) -->
+    <div id="logo-container" class="visual-element">
+        <h2>The Star KCA Academy returns with</h2>
+        <h1>KÆOS<br>PROJECT</h1>
+        <div class="symbols"><span>✹</span><span>☾</span><span>✦</span></div>
+    </div>
+
+    <div id="forty-eight-cards" class="visual-element"></div>
+
+    <div id="oracles-section" class="visual-element">
+        <div id="o-1" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+            <span style="font-size:1.2rem; color: var(--tarot-gold)">✹</span><img class="oracle-portrait" src="neitsu.png" onerror="this.src='https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80'"><div class="oracle-title">Neitsu</div><div class="oracle-subtitle">Sun</div>
+        </div></div></div>
+        <div id="o-2" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+            <span style="font-size:1.2rem; color: var(--tarot-gold)">☾</span><img class="oracle-portrait" src="kaina.png" onerror="this.src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80'"><div class="oracle-title">Kaina</div><div class="oracle-subtitle">Moon</div>
+        </div></div></div>
+        <div id="o-3" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+            <span style="font-size:1.2rem; color: var(--tarot-gold)">✦</span><img class="oracle-portrait" src="aya.png" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'"><div class="oracle-title">Aya</div><div class="oracle-subtitle">Star</div>
+        </div></div></div>
+    </div>
+
+    <!-- CARTE DE DÉMO (Centrée de base) -->
+    <div id="demo-card-container" class="visual-element">
+        <div id="demo-card-shaker">
+            <div id="demo-card" class="tarot-flip-card">
+                <div class="card-face card-front"><div class="card-front-inner"><div class="front-symbol">☉</div></div></div>
                 <div class="card-face card-back">
                     <div class="tarot-inner-border">
                         <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-                        <div class="tarot-top-icon"></div><div class="tarot-name">NEITSU</div>
-                        <div class="tarot-image-container"><img src="neitsu.png" alt="Neitsu" onerror="handleImageFallback(this)"></div>
+                        <div class="tarot-name">NEITSU</div>
+                        <div class="tarot-image-container"><img src="neitsu.png" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'"></div>
                         <div class="tarot-rank">THE SUN</div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="card-container" onclick="entrerAcademie('Lune')">
-            <div class="tarot-flip-card theme-moon">
-                <div class="card-face card-front"><div class="card-front-inner"><div class="front-symbol"></div></div></div>
-                <div class="card-face card-back">
-                    <div class="tarot-inner-border">
-                        <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-                        <div class="tarot-top-icon"></div><div class="tarot-name">KAINA</div>
-                        <div class="tarot-image-container"><img src="kaina.png" alt="Kaina" onerror="handleImageFallback(this)"></div>
-                        <div class="tarot-rank">THE MOON</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-container" onclick="entrerAcademie('Etoile')">
-            <div class="tarot-flip-card theme-star">
-                <div class="card-face card-front"><div class="card-front-inner"><div class="front-symbol"></div></div></div>
-                <div class="card-face card-back">
-                    <div class="tarot-inner-border">
-                        <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-                        <div class="tarot-top-icon"></div><div class="tarot-name">AYA</div>
-                        <div class="tarot-image-container"><img src="aya.png" alt="Aya" onerror="handleImageFallback(this)"></div>
-                        <div class="tarot-rank">THE STAR</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-container" onclick="entrerAcademie('Global')">
-            <div class="tarot-flip-card theme-global">
-                <div class="card-face card-front"><div class="card-front-inner"><div class="front-symbol"></div></div></div>
-                <div class="card-face card-back">
-                    <div class="tarot-inner-border">
-                        <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-                        <div class="tarot-top-icon"></div><div class="tarot-name">GLOBAL</div>
-                        <div class="tarot-image-container"><img src="world.png" alt="Global World" onerror="handleImageFallback(this)"></div>
-                        <div class="tarot-rank">THE WORLD</div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
 
-<div id="app-dashboard">
-    <header>
-      <div class="container topbar">
-        <div class="brand" onclick="retourMenuPrincipale()" title="Return to Selection">
-          <h1>KÆOS PROJECT</h1>
-          <p id="brandTagline">The Oracles' Academy</p>
-        </div>
-        <div class="nav-wrapper">
-          <nav id="nav"></nav>
-          <select id="langSelect" class="lang-select">
-            <option value="en">🇬🇧 EN</option>
-            <option value="fr">🇫🇷 FR</option>
-            <option value="es">🇪🇸 ES</option>
-            <option value="de">🇩🇪 DE</option>
-            <option value="ja">🇯🇵 JA</option>
-            <option value="ko">🇰🇷 KO</option>
-            <option value="zh">🇨🇳 ZH</option>
-          </select>
-        </div>
-      </div>
-    </header>
+    <!-- LA BALANCE -->
+    <div id="scale-container" class="visual-element">
+        <span id="text-plate-left" class="scale-plate-text">LEADER</span>
+        <span id="text-plate-right" class="scale-plate-text">PUBLIC</span>
+        <svg id="scale-svg" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M160 50 L160 250" stroke="#E2B961" stroke-width="6" stroke-linecap="round"/>
+            <path d="M110 250 L210 250 L185 265 L135 265 Z" fill="#E2B961" stroke="#BA9547" stroke-width="2"/>
+            <circle cx="160" cy="65" r="10" fill="#222222" stroke="#E2B961" stroke-width="3"/>
+            <g id="beam">
+                <path d="M40 65 L280 65" stroke="#E2B961" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="160" cy="65" r="4" fill="#E2B961"/><circle cx="55" cy="65" r="3" fill="#E2B961"/><circle cx="265" cy="65" r="3" fill="#E2B961"/>
+                <path d="M125 65 L115 55 M195 65 L205 55 M160 65 L160 40" stroke="#E2B961" stroke-width="2"/>
+            </g>
+            <g id="pan-left">
+                <line x1="55" y1="65" x2="30" y2="150" stroke="#BA9547" stroke-width="2"/><line x1="55" y1="65" x2="80" y2="150" stroke="#BA9547" stroke-width="2"/>
+                <path d="M20 150 L90 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
+                <path d="M20 150 C20 165 90 165 90 150 Z" fill="rgba(226,185,97,0.15)" stroke="#E2B961" stroke-width="1.5"/>
+            </g>
+            <g id="pan-right">
+                <line x1="265" y1="65" x2="240" y2="150" stroke="#BA9547" stroke-width="2"/><line x1="265" y1="65" x2="290" y2="150" stroke="#BA9547" stroke-width="2"/>
+                <path d="M230 150 L300 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
+                <path d="M230 150 C230 165 300 165 300 150 Z" fill="rgba(226,185,97,0.15)" stroke="#E2B961" stroke-width="1.5"/>
+            </g>
+        </svg>
+    </div>
 
-    <main class="container">
-      <section id="contestants" class="page active"></section>
-      <section id="profile" class="page"></section>
-      <section id="rankings" class="page"></section>
-      <section id="votes" class="page"></section>
-    </main>
-</div>
+    <!-- 12 CARTES FINALE -->
+    <div id="finale-cards" class="visual-element"></div>
 
 <script>
-// ==========================================
-// ETAT GLOBAL 
-// ==========================================
-const state = {
- data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
- latestRound: "PRERANK", selectedRankingsRound: null, rankingView: "default", votesRound: "PRERANK", votesTimer: null,
- activeTeam: "Global" 
-};
-
-// ==========================================
-// TRANSITIONS MENU <-> DASHBOARD
-// ==========================================
-function entrerAcademie(teamFilter) {
-    state.activeTeam = teamFilter; 
-    state.rankingView = 'default';
-    
-    const menu = document.getElementById('landing-menu');
-    const dashboard = document.getElementById('app-dashboard');
-    
-    menu.style.opacity = '0';
-    menu.style.transform = 'scale(0.95)';
-    
-    setTimeout(() => {
-        menu.style.display = 'none';
-        dashboard.style.display = 'block';
-        setTimeout(() => {
-            dashboard.style.opacity = '1';
-            renderContestants(); 
-            renderRankings();
-            renderVotes();
-            location.hash = '#contestants';
-        }, 50); 
-    }, 800);
-}
-
-function retourMenuPrincipale() {
-    const menu = document.getElementById('landing-menu');
-    const dashboard = document.getElementById('app-dashboard');
-    
-    dashboard.style.opacity = '0';
-    setTimeout(() => {
-        dashboard.style.display = 'none';
-        menu.style.display = 'flex';
-        history.replaceState(null, null, ' '); 
-        setTimeout(() => {
-            menu.style.opacity = '1';
-            menu.style.transform = 'scale(1)';
-        }, 50);
-    }, 500);
-}
-
-// ==========================================
-// 1. TRADUCTIONS INTERNATIONALES
-// ==========================================
-const I18N = {
-  en: {
-    tagline: "The Oracles' Academy", welcome_title: "The Grand Reading", nav_contestants: "Initiates", nav_rankings: "Alignment", nav_votes: "The Scale",
-    search_ph: "Search a soul...", all_status: "All destinies", safe: "Upright Card", nominee: "Shadow Zone", saved_judges: "Oracle's Grace", saved_public: "Scale's Grace", eliminated: "Consumed", tbd: "Unknown",
-    winner: "CHOSEN", second: "2ND", third: "3RD", fourth: "4TH", fifth: "5TH", sixth: "6TH", seventh: "7TH",
-    auto_updated: "The stars are aligned for the cycle:", no_contestants: "No card found.",
-    rank: "Arcana", pos: "Pos", name: "Initiate", rankings_desc: "Aura evolution across cycles.",
-    nominations: "The Oracles' Judgment", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Grace (Oracles)", saved_public_lbl: "Grace (Scale)", eliminated_lbl: "Consumed",
-    global_chart: "Web of Destiny", perf_score: "Power", official_rank: "Official Arcana", overall_rank: "Global Arcana",
-    back_contestants: "← Back to cards", contestant_not_found: "Card lost in limbo.", rounds_overview: "Book of Cycles", round: "Cycle", official: "Arcana", status: "Destiny",
-    performances: "Rituals (Performances)", song: "Work", links: "Visions", link_perf: "Observe", no_links: "No visions.",
-    indiv_chart: "Aura Fluctuation", country: "Land", pronouns: "Identity", instagram: "Grimoire (Insta)",
-    votes: "Voices", vote_now: "Tip the Scale", no_vote_data: "Silence reigns this cycle.", avail_vote_rounds: "Influenceable cycles:", total_votes: "Souls voted:", last_refresh: "Last vision:",
-    r_prerank: "Awakening", r_r1: "Cycle 1", r_r2: "Cycle 2", r_r3: "Cycle 3", r_r4: "Cycle 4", r_r5: "The Eclipse", r_final: "Apotheosis",
-    opening_soon: "Drawing the cards..."
-  },
-  fr: {
-    tagline: "L'Académie des Oracles", welcome_title: "Le Grand Tirage", nav_contestants: "Les Initiées", nav_rankings: "L'Alignement", nav_votes: "La Balance",
-    search_ph: "Chercher une âme...", all_status: "Tous les destins", safe: "Carte Droite", nominee: "Zone d'Ombre", saved_judges: "Grâce de l'Oracle", saved_public: "Grâce de la Balance", eliminated: "Consumée", tbd: "Destin Inconnu",
-    winner: "ÉLUE", second: "2ÈME", third: "3ÈME", fourth: "4ÈME", fifth: "5ÈME", sixth: "6ÈME", seventh: "7ÈME",
-    auto_updated: "Les astres sont alignés pour le cycle :", no_contestants: "Aucune carte trouvée.",
-    rank: "Arcane", pos: "Pos", name: "Initié", rankings_desc: "Évolution de l'Aura au fil des cycles.",
-    nominations: "Le Jugement des Oracles", nominee_lbl: "Zone d'Ombre", saved_judges_lbl: "Grâce (Oracles)", saved_public_lbl: "Grâce (Balance)", eliminated_lbl: "Consumées",
-    global_chart: "La Toile du Destin", perf_score: "Puissance", official_rank: "Arcane Officiel", overall_rank: "Arcane Global",
-    back_contestants: "← Retourner aux cartes", contestant_not_found: "Carte perdue dans les limbes.", rounds_overview: "Livre des Cycles", round: "Cycle", official: "Arcane", status: "Destinée",
-    performances: "Rituels (Performances)", song: "Œuvre", links: "Visions", link_perf: "Observer", no_links: "Aucune vision.",
-    indiv_chart: "Fluctuation de l'Aura", country: "Terre", pronouns: "Identité", instagram: "Grimoire (Insta)",
-    votes: "Voix", vote_now: "Faire pencher la Balance", no_vote_data: "Le silence règne pour ce cycle.", avail_vote_rounds: "Cycles influençables :", total_votes: "Âmes ayant voté :", last_refresh: "Dernière vision :",
-    r_prerank: "L'Éveil", r_r1: "Cycle 1", r_r2: "Cycle 2", r_r3: "Cycle 3", r_r4: "Cycle 4", r_r5: "L'Éclipse", r_final: "L'Apothéose",
-    opening_soon: "Tirage des cartes en cours..."
-  },
-  es: {
-    tagline: "La Academia de los Oráculos", welcome_title: "La Gran Lectura", nav_contestants: "Iniciadas", nav_rankings: "Alineación", nav_votes: "La Balanza",
-    search_ph: "Buscar un alma...", all_status: "Todos los destinos", safe: "Carta Derecha", nominee: "Zona de Sombras", saved_judges: "Gracia del Oráculo", saved_public: "Gracia de la Balanza", eliminated: "Consumida", tbd: "Desconocido",
-    winner: "ELEGIDA", second: "2DA", third: "3RA", fourth: "4TA", fifth: "5TA", sixth: "6TA", seventh: "7MA",
-    auto_updated: "Los astros están alineados para el ciclo:", no_contestants: "Ninguna carta encontrada.",
-    rank: "Arcano", pos: "Pos", name: "Iniciada", rankings_desc: "Evolución del Aura a través de los ciclos.",
-    nominations: "El Juicio de los Oráculos", nominee_lbl: "Zona de Sombras", saved_judges_lbl: "Gracia (Oráculos)", saved_public_lbl: "Gracia (Balanza)", eliminated_lbl: "Consumidas",
-    global_chart: "La Red del Destino", perf_score: "Poder", official_rank: "Arcano Oficial", overall_rank: "Arcano Global",
-    back_contestants: "← Volver a las cartas", contestant_not_found: "Carta perdida en el limbo.", rounds_overview: "Libro de los Ciclos", round: "Ciclo", official: "Arcano", status: "Destino",
-    performances: "Rituales (Actuaciones)", song: "Obra", links: "Visiones", link_perf: "Observar", no_links: "Sin visiones.",
-    indiv_chart: "Fluctuación del Aura", country: "Tierra", pronouns: "Identidad", instagram: "Grimorio (Insta)",
-    votes: "Voces", vote_now: "Inclinar la Balanza", no_vote_data: "El silencio reina en este ciclo.", avail_vote_rounds: "Ciclos influenciables:", total_votes: "Almas que votaron:", last_refresh: "Última visión:",
-    r_prerank: "El Despertar", r_r1: "Ciclo 1", r_r2: "Ciclo 2", r_r3: "Ciclo 3", r_r4: "Ciclo 4", r_r5: "El Eclipse", r_final: "La Apoteosis",
-    opening_soon: "Robando las cartas..."
-  },
-  de: {
-    tagline: "Die Akademie der Orakel", welcome_title: "Die Große Lesung", nav_contestants: "Eingeweihte", nav_rankings: "Ausrichtung", nav_votes: "Die Waage",
-    search_ph: "Suche eine Seele...", all_status: "Alle Schicksale", safe: "Aufrechte Karte", nominee: "Schattenzone", saved_judges: "Gnade des Orakels", saved_public: "Gnade der Waage", eliminated: "Verzehrt", tbd: "Unbekannt",
-    winner: "AUSERWÄHLT", second: "2.", third: "3.", fourth: "4.", fifth: "5.", sixth: "6.", seventh: "7.",
-    auto_updated: "Die Sterne stehen günstig für den Zyklus:", no_contestants: "Keine Karte gefunden.",
-    rank: "Arkana", pos: "Pos", name: "Eingeweihte", rankings_desc: "Entwicklung der Aura über die Zyklen.",
-    nominations: "Das Urteil der Orakel", nominee_lbl: "Schattenzone", saved_judges_lbl: "Gnade (Orakel)", saved_public_lbl: "Gnade (Waage)", eliminated_lbl: "Verzehrt",
-    global_chart: "Das Netz des Schicksals", perf_score: "Macht", official_rank: "Offizielle Arkana", overall_rank: "Globale Arkana",
-    back_contestants: "← Zurück zu den Karten", contestant_not_found: "Karte im Limbus verloren.", rounds_overview: "Buch der Zyklen", round: "Zyklus", official: "Arkana", status: "Schicksal",
-    performances: "Rituale (Auftritte)", song: "Werk", links: "Visionen", link_perf: "Beobachten", no_links: "Keine Visionen.",
-    indiv_chart: "Aura-Schwankung", country: "Erde", pronouns: "Identität", instagram: "Grimoire (Insta)",
-    votes: "Stimmen", vote_now: "Die Waage neigen", no_vote_data: "In diesem Zyklus herrscht Stille.", avail_vote_rounds: "Beeinflussbare Zyklen:", total_votes: "Abgestimmte Seelen:", last_refresh: "Letzte Vision:",
-    r_prerank: "Das Erwachen", r_r1: "Zyklus 1", r_r2: "Zyklus 2", r_r3: "Zyklus 3", r_r4: "Zyklus 4", r_r5: "Die Finsternis", r_final: "Apotheose",
-    opening_soon: "Karten werden gezogen..."
-  },
-  ja: {
-    tagline: "オラクルのアカデミー", welcome_title: "大いなる占い", nav_contestants: "入門者", nav_rankings: "星の配置", nav_votes: "天秤",
-    search_ph: "魂を探す...", all_status: "すべての運命", safe: "正位置", nominee: "シャドウゾーン", saved_judges: "オラクルの恩寵", saved_public: "天秤の恩寵", eliminated: "消滅", tbd: "未定",
-    winner: "選ばれし者", second: "2位", third: "3位", fourth: "4位", fifth: "5位", sixth: "6位", seventh: "7位",
-    auto_updated: "星が配置されました。現在のサイクル:", no_contestants: "カードが見つかりません。",
-    rank: "アルカナ", pos: "位置", name: "入門者", rankings_desc: "サイクルごとのオーラの進化。",
-    nominations: "オラクルの審判", nominee_lbl: "シャドウゾーン", saved_judges_lbl: "恩寵 (オラクル)", saved_public_lbl: "恩寵 (天秤)", eliminated_lbl: "消滅",
-    global_chart: "運命の網", perf_score: "力", official_rank: "公式アルカナ", overall_rank: "全体アルカナ",
-    back_contestants: "← カードに戻る", contestant_not_found: "リンボに迷い込んだカード。", rounds_overview: "サイクルの書", round: "サイクル", official: "アルカナ", status: "運命",
-    performances: "儀式 (パフォーマンス)", song: "作品", links: "幻影", link_perf: "観察", no_links: "幻影はありません。",
-    indiv_chart: "オーラの変動", country: "大地", pronouns: "アイデンティティ", instagram: "魔導書 (Insta)",
-    votes: "声", vote_now: "天秤を傾ける", no_vote_data: "このサイクルは沈黙に包まれています。", avail_vote_rounds: "影響を与えられるサイクル:", total_votes: "投票した魂:", last_refresh: "最後の幻影:",
-    r_prerank: "覚醒", r_r1: "サイクル 1", r_r2: "サイクル 2", r_r3: "サイクル 3", r_r4: "サイクル 4", r_r5: "日食", r_final: "神格化",
-    opening_soon: "カードを引いています..."
-  },
-  ko: {
-    tagline: "오라클 아카데미", welcome_title: "위대한 점술", nav_contestants: "입문자", nav_rankings: "별의 정렬", nav_votes: "천칭",
-    search_ph: "영혼 검색...", all_status: "모든 운명", safe: "정방향 카드", nominee: "그림자 구역", saved_judges: "오라클의 은총", saved_public: "천칭의 은총", eliminated: "소멸됨", tbd: "미정",
-    winner: "선택받은 자", second: "2위", third: "3위", fourth: "4위", fifth: "5위", sixth: "6위", seventh: "7위",
-    auto_updated: "별들이 정렬되었습니다. 현재 주기:", no_contestants: "카드를 찾을 수 없습니다.",
-    rank: "아르카나", pos: "위치", name: "입문자", rankings_desc: "주기에 따른 오라의 진화.",
-    nominations: "오라클의 심판", nominee_lbl: "그림자 구역", saved_judges_lbl: "은총 (오라클)", saved_public_lbl: "은총 (천칭)", eliminated_lbl: "소멸됨",
-    global_chart: "운명의 그물", perf_score: "힘", official_rank: "공식 아르카나", overall_rank: "전체 아르카나",
-    back_contestants: "← 카드로 돌아가기", contestant_not_found: "림보에서 길을 잃은 카드.", rounds_overview: "주기의 서", round: "주기", official: "아르카나", status: "운명",
-    performances: "의식 (퍼포먼스)", song: "작품", links: "환영", link_perf: "관찰", no_links: "환영이 없습니다.",
-    indiv_chart: "오라 변동", country: "대지", pronouns: "정체성", instagram: "그리무아르 (Insta)",
-    votes: "목소리", vote_now: "천칭 기울이기", no_vote_data: "이 주기에는 침묵만이 흐릅니다.", avail_vote_rounds: "영향을 줄 수 있는 주기:", total_votes: "투표한 영혼:", last_refresh: "마지막 환영:",
-    r_prerank: "각성", r_r1: "주기 1", r_r2: "주기 2", r_r3: "주기 3", r_r4: "주기 4", r_r5: "일식", r_final: "신격화",
-    opening_soon: "카드를 뽑는 중..."
-  },
-  zh: {
-    tagline: "神谕学院", welcome_title: "大占卜", nav_contestants: "启蒙者", nav_rankings: "星象排列", nav_votes: "天平",
-    search_ph: "搜索灵魂...", all_status: "所有命运", safe: "正位牌", nominee: "暗影区", saved_judges: "神谕之恩", saved_public: "天平之恩", eliminated: "被吞噬", tbd: "未知",
-    winner: "天选", second: "第二", third: "第三", fourth: "第四", fifth: "第五", sixth: "第六", seventh: "第七",
-    auto_updated: "星辰已对齐，当前周期：", no_contestants: "未找到卡牌。",
-    rank: "秘仪", pos: "位置", name: "启蒙者", rankings_desc: "光环在周期中的演变。",
-    nominations: "神谕的审判", nominee_lbl: "暗影区", saved_judges_lbl: "恩赐 (神谕)", saved_public_lbl: "恩赐 (天平)", eliminated_lbl: "被吞噬",
-    global_chart: "命运之网", perf_score: "力量", official_rank: "官方秘仪", overall_rank: "全局秘仪",
-    back_contestants: "← 返回卡牌", contestant_not_found: "卡牌迷失在边缘。", rounds_overview: "周期之书", round: "周期", official: "秘仪", status: "命运",
-    performances: "仪式 (表演)", song: "作品", links: "幻象", link_perf: "观察", no_links: "没有幻象。",
-    indiv_chart: "光环波动", country: "土地", pronouns: "身份", instagram: "魔法书 (Insta)",
-    votes: "声音", vote_now: "倾斜天平", no_vote_data: "这个周期一片寂静。", avail_vote_rounds: "可影响的周期：", total_votes: "已投票的灵魂：", last_refresh: "最后幻象：",
-    r_prerank: "觉醒", r_r1: "周期 1", r_r2: "周期 2", r_r3: "周期 3", r_r4: "周期 4", r_r5: "日食", r_final: "神化",
-    opening_soon: "正在抽牌..."
-  }
-};
-
-let currentLang = localStorage.getItem('kca_lang') || 'en';
-function t(key) { return I18N[currentLang][key] || key; }
-
-// ==========================================
-// 2. CONFIGURATION SAISON 3
-// ==========================================
-const CONFIG = {
- SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
- VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
- ROUND_TABS: { PRERANK: "PRERANK", ROUND_1: "R1", ROUND_2: "R2", ROUND_3: "R3", ROUND_4: "R4", ROUND_5: "R5", FINAL: "FINAL" },
- VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
- REFRESH_MS: 30000
-};
-
-const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "ROUND_5", "FINAL"];
-const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"]; 
-const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
-
-// ==========================================
-// 3. MOTEUR DE LECTURE CSV
-// ==========================================
-function setLang(lang) {
- currentLang = lang; localStorage.setItem('kca_lang', lang);
- document.getElementById('brandTagline').textContent = t('tagline');
- document.getElementById('menuTagline').textContent = "KÆOS PROJECT • " + (lang === 'fr' ? "Choisissez votre destinée" : "Choose your destiny");
- setupNav(); renderContestants(); renderRankings(); renderVotes();
- if (location.hash && location.hash.startsWith('#profile')) renderProfile(location.hash.split('/')[1]);
-}
-
-document.getElementById('langSelect').addEventListener('change', (e) => setLang(e.target.value));
-
-function getRoundLabel(id) {
- const map = { PRERANK: 'r_prerank', ROUND_1: 'r_r1', ROUND_2: 'r_r2', ROUND_3: 'r_r3', ROUND_4: 'r_r4', ROUND_5: 'r_r5', FINAL: 'r_final' };
- return t(map[id] || id);
-}
-
-function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
-function canonicalRoundId(value) {
- const raw = String(value || '').trim().toUpperCase().replace(/\s+/g, '_').replace(/-/g, '_');
- if (!raw) return ''; 
- if (ROUND_ORDER.includes(raw)) return raw;
- if (/^R[1-6]$/.test(raw)) return `ROUND_${raw.slice(1)}`;
- if (raw === 'ROUND1') return 'ROUND_1';
- if (raw === 'ROUND2') return 'ROUND_2';
- if (raw === 'ROUND3') return 'ROUND_3';
- if (raw === 'ROUND4') return 'ROUND_4';
- if (raw === 'ROUND5') return 'ROUND_5';
- if (raw === 'ROUND6' || raw === 'R6') return 'FINAL';
- if (raw === 'PRE_RANK' || raw === 'PRERANKING') return 'PRERANK';
- return raw;
-}
-function normalizeJudgeName(v) { return String(v || '').trim().toLowerCase(); }
-function getContestantName(id) {
- const raw = state.data.contestants.find(c => c.id === id)?.name || '';
- return String(raw || '').trim() || id;
-}
-function colorForIndex(i) { const hue = (i * 47) % 360; return `hsl(${hue} 60% 65%)`; }
-
-function handleImageFallback(img) {
- const step = Number(img.dataset.fallbackStep || '0');
- const contestantId = String(img.dataset.contestantId || '').trim();
- if (step === 0 && contestantId) {
-     img.dataset.fallbackStep = '1';
-     img.src = `${contestantId}.png`; 
-     return;
- }
- img.onerror = null;
- img.src = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80'; 
-}
-
-function parseCSV(text) {
-  const rows = []; let row = []; let inQuotes = false; let val = "";
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (inQuotes) {
-      if (char === '"') {
-        if (text[i + 1] === '"') { val += '"'; i++; } else { inQuotes = false; }
-      } else { val += char; }
-    } else {
-      if (char === '"') { inQuotes = true; }
-      else if (char === ',') { row.push(val); val = ""; }
-      else if (char === '\n' || char === '\r') {
-        row.push(val); rows.push(row); row = []; val = "";
-        if (char === '\r' && text[i + 1] === '\n') i++;
-      } else { val += char; }
+    // --- SETUP VISUELS ---
+    const cardsContainer = document.getElementById('forty-eight-cards');
+    for(let i=0; i<48; i++) {
+        let div = document.createElement('div');
+        div.className = 'mini-card';
+        div.innerHTML = '<div class="mini-card-inner">☉</div>';
+        cardsContainer.appendChild(div);
     }
-  }
-  if (val !== "" || row.length > 0) { row.push(val); rows.push(row); }
-  if (rows.length < 1) return [];
-  
-  let headerIndex = 0;
-  for(let i=0; i<Math.min(5, rows.length); i++){
-     if(rows[i].some(c => typeof c === 'string' && ['contestant', 'name', 'candidat', 'eleve', 'username'].some(k => c.toLowerCase().includes(k)))) {
-         headerIndex = i; break;
-     }
-  }
-  
-  const headers = rows[headerIndex].map(h => String(h).trim().toLowerCase());
-  return rows.slice(headerIndex + 1).map(r => {
-    const obj = {};
-    headers.forEach((h, i) => { if(h) obj[h] = r[i] !== undefined ? String(r[i]).trim() : ''; });
-    return obj;
-  });
-}
 
-async function fetchSheetTab(sheetName, customSheetId = null) {
- const targetId = customSheetId || CONFIG.SHEET_ID;
- if (!targetId) return []; 
- 
- const tryFetch = async (name) => {
-   const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;
-   try {
-     const response = await fetch(url);
-     if (!response.ok) return null;
-     const txt = await response.text();
-     if (txt.toLowerCase().includes('<!doctype html>')) return null;
-     return parseCSV(txt);
-   } catch (e) { return null; }
- };
+    const finaleContainer = document.getElementById('finale-cards');
+    for(let i=0; i<12; i++) {
+        let div = document.createElement('div');
+        div.className = 'finale-card';
+        div.innerHTML = '<div class="finale-card-inner">☉</div>';
+        finaleContainer.appendChild(div);
+    }
 
- let data = await tryFetch(sheetName);
- if (!data) data = await tryFetch(sheetName.toLowerCase());
- if (!data) data = await tryFetch(sheetName + ' ');
- if (!data && sheetName.match(/^R\d$/)) {
-     const num = sheetName.replace('R', '');
-     data = await tryFetch(`Round ${num}`) || await tryFetch(`Round_${num}`) || await tryFetch(`ROUND ${num}`) || await tryFetch(`R${num} `);
- }
- if (!data && sheetName === 'R6') data = await tryFetch('FINAL') || await tryFetch('Finale') || await tryFetch('FINALE');
- return data || [];
-}
+    // --- MOTEUR CHRONOLOGIQUE SANS TEXTE ---
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
-async function fetchOptionalSheetTab(sheetName, customSheetId = null) { return await fetchSheetTab(sheetName, customSheetId); }
-function keyNorm(k) { return String(k || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
-function pickValue(row, aliases) {
- const keys = Object.keys(row);
- for (const a of aliases) {
-   const n = keyNorm(a); 
-   const real = keys.find(k => keyNorm(k) === n);
-   if (real != null && row[real] !== null && row[real] !== undefined && String(row[real]).trim() !== '' && String(row[real]).toLowerCase() !== 'nan') return row[real];
- }
- return '';
-}
-function parseNum(val) {
- if (val === '' || val === null || val === undefined) return NaN;
- const num = Number(String(val).replace(/\s/g, '').replace(',', '.'));
- return isNaN(num) ? NaN : num;
-}
+    async function startCinematic() {
+        document.getElementById('start-overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('start-overlay').style.display = 'none', 1000);
+        await delay(1000);
 
-// ==========================================
-// 4. ALGORITHMES SVS INTELLIGENTS
-// ==========================================
-function getStatus(roundId, contestantId) { return state.data.round_status.find(r => r.round_id === roundId && r.contestant_id === contestantId)?.status || ''; }
-function statusClass(status) { 
-  if (status === 'eliminated') return 'eliminated-pill';
-  return status || 'tbd'; 
-}
-function statusLabel(status) { return status ? t(status) : t('tbd'); }
-function getFirstEliminatedRoundIndex(contestantId) { return ROUND_ORDER.findIndex(round => getStatus(round, contestantId) === 'eliminated'); }
+        // 1. LOGO
+        document.getElementById('logo-container').classList.add('visible');
+        await delay(3500);
+        document.getElementById('logo-container').classList.remove('visible');
+        await delay(1500);
 
-// 🔴 COMPTE LE NOMBRE D'ACTIFS DANS LE CERCLE POUR CALCULER LES POINTS JUGES
-function getActiveCountForRound(roundId, teamClass) {
-    const rIdx = ROUND_ORDER.indexOf(roundId);
-    let count = 0;
-    state.data.contestants.forEach(c => {
-        if (teamClass && c.teamClass !== teamClass) return; // Uniquement les filles de la même équipe
-        const elimIdx = getFirstEliminatedRoundIndex(c.id);
-        if (elimIdx === -1 || elimIdx >= rIdx) count++;
-    });
-    return count > 0 ? count : (teamClass ? 16 : 48); // Fallback logique
-}
-
-function getPerformanceScoreByRound() {
-    const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-    ROUND_ORDER.forEach(round => {
-        state.data.contestants.forEach(c => {
-            // Nombre de filles en vie DANS LE CERCLE DE LA FILLE
-            const activeCount = getActiveCountForRound(round, c.teamClass); 
-            const pointsBase = activeCount + 1; // ex: 16 actives -> Base 17. Le 1er prend 17-1 = 16 points.
-
-            let totalPoints = 0; let hasData = false;
-            
-            // Le "Score" sur 100
-            const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
-            if (rawScoreRec && Number.isFinite(rawScoreRec.total)) { totalPoints += rawScoreRec.total; hasData = true; }
-            
-            // Les points des 4 juges
-            JUDGE_NAMES.forEach(jn => {
-                const jRankRec = state.data.judge_rankings.find(r => r.round_id === round && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
-                if (jRankRec && Number.isFinite(jRankRec.rank) && jRankRec.rank >= 1) {
-                    totalPoints += Math.max(0, pointsBase - jRankRec.rank); // Système de points adaptatifs !
-                    hasData = true;
-                }
-            });
-            if (hasData) out[round][c.id] = totalPoints;
+        // 2. EXPLOSION DES 48 CARTES
+        document.getElementById('forty-eight-cards').classList.add('visible');
+        const minis = document.querySelectorAll('.mini-card');
+        minis.forEach((m, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 40 + Math.random() * 120;
+            const x = Math.cos(angle) * radius; const y = Math.sin(angle) * radius;
+            const rot = (Math.random() - 0.5) * 60;
+            setTimeout(() => { m.style.opacity = '1'; m.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(1)`; }, i * 20);
         });
-    });
-    return out;
-}
 
-function getOfficialRankingByRound(isGlobal = false) {
-    const targetJudge = isGlobal ? 'overall' : 'official'; // Cherche official_rank ou overall_rank
-    const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-    
-    // 1. Force les rangs définis dans l'Excel
-    state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === targetJudge).forEach(r => { 
-        if (Number.isFinite(r.rank)) out[r.round_id][r.contestant_id] = r.rank; 
-    });
+        await delay(3000);
 
-    // 2. Calcule automatiquement pour ceux qui manquent
-    const perfScoresByRound = getPerformanceScoreByRound();
-    ROUND_ORDER.forEach(round => {
-        const perfScores = perfScoresByRound[round];
-        const groups = isGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
+        // 3. APPARITION ORACLES & RANGEMENT DES CARTES
+        const oracles = document.getElementById('oracles-section');
+        oracles.classList.add('visible');
+        document.getElementById('o-1').classList.add('appear'); 
+        document.getElementById('o-2').classList.add('appear'); 
+        document.getElementById('o-3').classList.add('appear'); 
+
+        // Les 48 cartes volent se ranger SOUS les oracles
+        minis.forEach((m, i) => {
+            let groupX, symbol;
+            if (i < 16) { groupX = -115; symbol = '✹'; }
+            else if (i < 32) { groupX = 0; symbol = '☾'; }
+            else { groupX = 115; symbol = '✦'; }
+            
+            let row = Math.floor((i % 16) / 4);
+            let col = (i % 16) % 4;
+            let x = groupX + (col - 1.5) * 20; 
+            let y = 140 + (row * 30); 
+            
+            setTimeout(() => {
+                m.innerHTML = `<div class="mini-card-inner">${symbol}</div>`;
+                m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`;
+            }, i * 25 + 500); 
+        });
+
+        await delay(4500);
+        document.getElementById('forty-eight-cards').classList.remove('visible');
+        oracles.classList.remove('visible');
+        await delay(1500);
+
+        // 4. CARTE DE DÉMO ET SHADOW ZONE
+        const cardContainer = document.getElementById('demo-card-container');
+        const cardShaker = document.getElementById('demo-card-shaker');
+        const card = document.getElementById('demo-card');
         
-        groups.forEach(group => {
-            const groupIds = state.data.contestants.filter(c => (isGlobal || c.teamClass === group)).map(c => c.id);
-            const scoredIds = groupIds.filter(id => !Number.isFinite(out[round][id]) && Number.isFinite(perfScores[id]));
-            scoredIds.sort((a, b) => perfScores[b] - perfScores[a]);
-            
-            let usedRanks = new Set();
-            groupIds.forEach(id => { if (Number.isFinite(out[round][id])) usedRanks.add(out[round][id]); });
-            
-            let autoRank = 1;
-            scoredIds.forEach((id) => {
-                while(usedRanks.has(autoRank)) autoRank++;
-                out[round][id] = autoRank;
-                usedRanks.add(autoRank);
-            });
+        cardContainer.classList.add('visible');
+        await delay(1500);
+        card.classList.add('flipped'); // Safe
+        
+        await delay(2500);
+
+        // Danger
+        cardShaker.classList.add('shake-animation'); 
+        cardContainer.classList.add('state-danger'); 
+        await delay(2500);
+        cardShaker.classList.remove('shake-animation');
+
+        // 5. DIVISION VERTICALE : CARTE EN HAUT, BALANCE EN BAS
+        cardContainer.classList.add('shift-up'); 
+        const scaleContainer = document.getElementById('scale-container');
+        scaleContainer.classList.add('shift-down'); 
+        scaleContainer.classList.add('visible');
+        
+        await delay(1500);
+        
+        scaleContainer.classList.add('tilt-scale-public'); 
+        await delay(2500);
+
+        scaleContainer.classList.remove('tilt-scale-public');
+        scaleContainer.classList.add('tilt-scale-leader'); 
+        await delay(3000);
+
+        // 6. ÉLIMINATION
+        scaleContainer.classList.remove('visible');
+        cardContainer.classList.remove('shift-up'); 
+        await delay(1500);
+
+        cardContainer.classList.add('state-eliminated'); 
+        await delay(2000);
+        
+        cardContainer.classList.add('fade-away');
+        await delay(2500);
+
+        // 7. FINALE GLOBALE (12 CARTES)
+        const finaleContainer = document.getElementById('finale-cards');
+        finaleContainer.classList.add('visible');
+        const fCards = document.querySelectorAll('.finale-card');
+        fCards.forEach((c, i) => { setTimeout(() => c.classList.add('appear'), i * 150); });
+        
+        await delay(3000); 
+
+        const winners = [1, 4, 6, 8, 11]; 
+        fCards.forEach((c, i) => {
+            if(winners.includes(i)) c.classList.add('winner');
+            else c.classList.add('loser');
         });
-    });
 
-    // 3. Glissement des éliminées (option de sécurité)
-    const finalHistoricalRanks = {};
-    const groups = isGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
-    groups.forEach(group => {
-        let availableBottomRank = isGlobal ? state.data.contestants.length : state.data.contestants.filter(c => c.teamClass === group).length;
-        ROUND_ORDER.forEach(round => {
-            const newlyEliminated = state.data.contestants.filter(c => (isGlobal || c.teamClass === group) && getFirstEliminatedRoundIndex(c.id) === ROUND_ORDER.indexOf(round));
-            if (newlyEliminated.length > 0) {
-                newlyEliminated.sort((a, b) => (out[round][a.id] || 999) - (out[round][b.id] || 999));
-                const startRank = availableBottomRank - newlyEliminated.length + 1;
-                newlyEliminated.forEach((c, idx) => finalHistoricalRanks[c.id] = startRank + idx);
-                availableBottomRank -= newlyEliminated.length;
-            }
-        });
-    });
+        await delay(4000);
+        finaleContainer.classList.remove('visible');
+        await delay(2000);
 
-    ROUND_ORDER.forEach((round, rIdx) => {
-        state.data.contestants.forEach(c => {
-            const elimIdx = getFirstEliminatedRoundIndex(c.id);
-            if (elimIdx !== -1 && finalHistoricalRanks[c.id] && rIdx > elimIdx) out[round][c.id] = finalHistoricalRanks[c.id];
-        });
-    });
-    return out;
-}
-
-async function loadDataFromRoundTabs() {
- const rowsByRound = {};
- for (const [rid, tab] of Object.entries(CONFIG.ROUND_TABS)) { rowsByRound[rid] = await fetchOptionalSheetTab(tab); }
- 
- const contestantsMap = new Map();
- const judge_rankings = []; const scores = []; const submissions = []; const round_status_clean = [];
-
- Object.entries(rowsByRound).forEach(([round_id, rows]) => {
-   rows.forEach((row) => {
-     const name = String(pickValue(row, ['name', 'contestant', 'contestants', 'candidate']) || '').trim(); 
-     if (!name) return;
-     const id = normId(name);
-     if (EXCLUDED_NAMES.has(id)) return;
-
-     const instagram = String(pickValue(row, ['instagram', 'instagram_handle', 'username']) || '').trim();
-     const country = String(pickValue(row, ['country', 'pays', 'origine']) || '').trim();
-     const pronouns = String(pickValue(row, ['pronouns', 'pronoms']) || '').trim();
-     
-     const teamRaw = String(pickValue(row, ['team', 'equipe', 'cercle', 'groupe', 'team_name']) || '').toLowerCase();
-     let teamClass = 'theme-global';
-     if (teamRaw.includes('sun') || teamRaw.includes('soleil') || teamRaw.includes('neitsu') || teamRaw.includes('rouge')) teamClass = 'theme-sun';
-     else if (teamRaw.includes('moon') || teamRaw.includes('lune') || teamRaw.includes('kaina') || teamRaw.includes('bleu')) teamClass = 'theme-moon';
-     else if (teamRaw.includes('star') || teamRaw.includes('etoile') || teamRaw.includes('aya') || teamRaw.includes('violet')) teamClass = 'theme-star';
-
-     const performance = String(pickValue(row, ['performance', 'song', 'song_title', 'performance1', 'performance 1']) || '').trim();
-     const group_song = String(pickValue(row, ['performance2', 'performance 2']) || '').trim();
-     const link = String(pickValue(row, ['link', 'performance_link', 'youtube_url', 'url', 'linktotheperformance', 'linktotheperformance1']) || '').trim();
-     const link2 = String(pickValue(row, ['link2', 'linktotheperformance2']) || '').trim();
-     
-     const officialRank = parseNum(pickValue(row, ['official_rank', 'rank', 'official ranking', 'classement']));
-     const overallRank = parseNum(pickValue(row, ['overall_rank', 'overall rank', 'global rank', 'classement global', 'overall']));
-     const perfScore = parseNum(pickValue(row, ['performance_score', 'score', 'creator_score', 'total', 'note']));
-     
-     const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
-     let statusValue = statusValueRaw;
-     if (statusValueRaw.includes('public')) statusValue = 'saved_public';
-     else if (statusValueRaw.includes('judge') || statusValueRaw.includes('jury') || statusValueRaw.includes('oracle')) statusValue = 'saved_judges';
-     else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw === '1') statusValue = 'winner';
-     else if (statusValueRaw.includes('2nd') || statusValueRaw === '2') statusValue = 'second';
-     else if (statusValueRaw.includes('3rd') || statusValueRaw === '3') statusValue = 'third';
-     else if (statusValueRaw.includes('elim') || statusValueRaw.includes('élim') || statusValueRaw.includes('consumée')) statusValue = 'eliminated';
-     else if (statusValueRaw.includes('nominee') || statusValueRaw.includes('rouge') || statusValueRaw.includes('ombre')) statusValue = 'nominee';
-     else if (statusValueRaw.includes('safe') || statusValueRaw.includes('droite')) statusValue = 'safe';
-
-     if (!contestantsMap.has(id)) {
-         contestantsMap.set(id, { id, name, photo_url: `${id}.png`, country, bio: '', instagram, pronouns, teamClass });
-     } else {
-         const c = contestantsMap.get(id);
-         if (country && !c.country) c.country = country;
-         if (pronouns && !c.pronouns) c.pronouns = pronouns;
-         if (instagram && !c.instagram) c.instagram = instagram;
-         if (teamClass !== 'theme-global' && c.teamClass === 'theme-global') c.teamClass = teamClass; 
-     }
-     
-     if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
-     if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
-     if (Number.isFinite(perfScore)) scores.push({ round_id, contestant_id: id, total: perfScore });
-     if (performance || link) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
-     if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
-
-     JUDGE_NAMES.forEach(jn => {
-       const val = parseNum(pickValue(row, [jn, `${jn}_rank`, `${jn} rank`]));
-       if (Number.isFinite(val)) judge_rankings.push({ round_id, judge_name: jn, contestant_id: id, rank: val });
-     });
-   });
- });
-
- const allIds = [...contestantsMap.keys()];
- let lastStatusObj = {};
- ROUND_ORDER.forEach(round => {
-     allIds.forEach(id => {
-         const existingIndex = round_status_clean.findIndex(r => r.round_id === round && r.contestant_id === id);
-         if (existingIndex >= 0) { lastStatusObj[id] = round_status_clean[existingIndex].status; } 
-         else {
-             if (lastStatusObj[id] === 'eliminated') round_status_clean.push({ round_id: round, contestant_id: id, status: 'eliminated' });
-         }
-     });
- });
-
- return { contestants: [...contestantsMap.values()], rounds: [], submissions, scores, judge_rankings, round_status: round_status_clean, votes_live: [] };
-}
-
-async function loadData() { 
- state.data = await loadDataFromRoundTabs(); 
- try {
-   let votesRaw = await fetchSheetTab('votes_live', CONFIG.VOTE_SHEET_ID);
-   if (!votesRaw || votesRaw.length === 0) votesRaw = await fetchSheetTab('', CONFIG.VOTE_SHEET_ID);
-   state.data.votes_live = (votesRaw || []).map(r => {
-     const rid = pickValue(r, ['round_id', 'round', 'roundid', 'a']);
-     const cid = pickValue(r, ['contestant_id', 'contestant', 'name', 'candidat', 'b']);
-     let vcount = pickValue(r, ['votes_count', 'votes', 'count', 'total', 'c']);
-     if (vcount === '' && Object.values(r).length >= 3) vcount = Object.values(r)[2];
-     return { round_id: canonicalRoundId(rid), contestant_id: normId(cid), votes_count: parseNum(vcount) || 0 };
-   }).filter(v => v.contestant_id && v.round_id && !v.round_id.includes('ROUNDID'));
- } catch (e) { console.warn("Fichier de vote inaccessible.", e); }
-}
-
-function normalizeData() {
- const d = state.data;
- d.contestants = d.contestants.filter(c => c.id && !EXCLUDED_NAMES.has(c.id));
- const contestantsById = new Map();
- d.contestants.forEach((c) => {
-   if (!contestantsById.has(c.id)) { contestantsById.set(c.id, c); return; }
-   const existing = contestantsById.get(c.id);
-   contestantsById.set(c.id, { ...existing, name: existing.name || c.name, instagram: existing.instagram || c.instagram, teamClass: existing.teamClass || c.teamClass });
- });
- d.contestants = [...contestantsById.values()];
-}
-
-function getJudgeRankingByRound(judgeName) {
- const key = normalizeJudgeName(judgeName);
- const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
- state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === key).forEach(r => { if (Number.isFinite(r.rank)) out[r.round_id][r.contestant_id] = r.rank; });
- return out;
-}
-
-function getRankingViewOptions() {
- return [
-   { value: 'default', label: state.activeTeam === 'Global' ? t('overall_rank') : t('official_rank') },
-   ...JUDGE_NAMES.map(j => ({ value: `judge:${j}`, label: j })),
-   { value: 'performance_score', label: t('perf_score') }
- ];
-}
-
-function getRankingMapByView(view) {
- if (view === 'default') return getOfficialRankingByRound(state.activeTeam === 'Global');
- if (view === 'performance_score') return getPerformanceScoreByRound();
- if (view.startsWith('judge:')) return getJudgeRankingByRound(view.split(':')[1]);
- return getOfficialRankingByRound(state.activeTeam === 'Global');
-}
-
-function getLatestRound() {
- for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
-   const round = ROUND_ORDER[i];
-   if (state.data.scores.some(r => r.round_id === round && Number.isFinite(r.total)) ||
-       state.data.judge_rankings.some(r => r.round_id === round && normalizeJudgeName(r.judge_name) === 'official') ||
-       state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
-       state.data.round_status.some(r => r.round_id === round && r.status !== '' && r.status !== 'eliminated') ||
-       state.data.submissions.some(r => r.round_id === round && (r.song_title || r.youtube_url))) {
-     return round;
-   }
- }
- return 'PRERANK';
-}
-
-function sortedContestants() {
- const officialByRound = getOfficialRankingByRound(state.activeTeam === 'Global');
- const current = officialByRound[state.latestRound] || {};
- 
- let filtered = state.data.contestants;
- if (state.activeTeam === 'Soleil') filtered = filtered.filter(c => c.teamClass === 'theme-sun');
- if (state.activeTeam === 'Lune') filtered = filtered.filter(c => c.teamClass === 'theme-moon');
- if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => c.teamClass === 'theme-star');
- 
- return [...filtered].sort((a, b) => {
-   const aElim = getStatus(state.latestRound, a.id) === 'eliminated' ? 1 : 0;
-   const bElim = getStatus(state.latestRound, b.id) === 'eliminated' ? 1 : 0;
-   if (aElim !== bElim) return aElim - bElim;
-
-   const ar = current[a.id]; const br = current[b.id];
-   if (Number.isFinite(ar) && Number.isFinite(br)) return ar - br;
-   if (Number.isFinite(ar)) return -1;
-   if (Number.isFinite(br)) return 1;
-   return String(a.name || '').localeCompare(String(b.name || ''));
- });
-}
-
-// ==========================================
-// RENDERS
-// ==========================================
-
-function renderContestants() {
- const root = document.getElementById('contestants');
- if (state.data.contestants.length === 0) {
-   root.innerHTML = '<div class="card-paper" style="text-align: center; padding: 4rem 2rem;"><h2>' + t('opening_soon') + '</h2></div>'; return;
- }
- const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
- 
- let teamTitle = "";
- if(state.activeTeam === 'Soleil') teamTitle = " - ✹";
- if(state.activeTeam === 'Lune') teamTitle = " - ☾";
- if(state.activeTeam === 'Etoile') teamTitle = " - ✦";
-
- root.innerHTML = '<div class="card-paper">' +
- '<h2>' + t('welcome_title') + teamTitle + '</h2>' +
- '<p class="small" style="color:var(--tarot-gold)">' + t('auto_updated') + ' <span class="chip" style="font-weight:bold; color:var(--bg); background:var(--tarot-gold)">' + getRoundLabel(state.latestRound) + '</span></p>' +
- '<div class="filters" style="margin-top:1.5rem;">' +
- '<input id="searchContestant" placeholder="' + t('search_ph') + '" />' +
- '<select id="statusFilter">' +
- '<option value="all">' + t('all_status') + '</option>' +
- '<option value="safe">' + t('safe') + '</option>' +
- '<option value="nominee">' + t('nominee') + '</option>' +
- '<option value="saved_judges">' + t('saved_judges') + '</option>' +
- '<option value="saved_public">' + t('saved_public') + '</option>' +
- '<option value="eliminated">' + t('eliminated') + '</option>' +
- '</select>' +
- '</div>' +
- '</div>' +
- '<div id="contestantsGrid" class="contestants-grid"></div>';
-
- const draw = () => {
-   const q = document.getElementById('searchContestant').value.toLowerCase().trim();
-   const f = document.getElementById('statusFilter').value;
-   
-   const list = sortedContestants().filter(c => c.name.toLowerCase().includes(q)).filter(c => {
-     let status = getStatus(state.latestRound, c.id);
-     if (!status && getFirstEliminatedRoundIndex(c.id) !== -1 && getFirstEliminatedRoundIndex(c.id) <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
-     if (f === 'all') return true;
-     if (f === 'tbd') return !status;
-     return status === f || (f === 'safe' && ['winner', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].includes(status)); 
-   });
-
-   if (list.length === 0) {
-     document.getElementById('contestantsGrid').innerHTML = '<p class="small">' + t('no_contestants') + '</p>';
-   } else {
-     document.getElementById('contestantsGrid').innerHTML = list.map((c) => {
-       let status = getStatus(state.latestRound, c.id);
-       const elimRound = getFirstEliminatedRoundIndex(c.id);
-       if (!status && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
-
-       const rank = currentRanks[c.id];
-       const rankDisplay = Number.isFinite(rank) ? 'RANK ' + (rank < 10 ? '0'+rank : rank) : 'TBD';
-       
-       let extraClass = '';
-       if (status === 'eliminated') extraClass = 'eliminated';
-       else if (status === 'nominee') extraClass = 'danger-zone';
-       
-       const teamClass = c.teamClass || 'theme-global'; 
-
-       return `
-       <div class="tarot-card ${teamClass} ${extraClass}" onclick="location.hash='#profile/${c.id}'">
-           <div class="tarot-inner-border">
-               <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
-               <div class="corner corner-bl"></div><div class="corner corner-br"></div>
-               <div class="tarot-top-icon"></div>
-               <div class="tarot-name">${getContestantName(c.id)}</div>
-               <div class="tarot-image-container">
-                   <img src="${c.photo_url}" alt="${c.name}" onerror="handleImageFallback(this)" />
-               </div>
-               <div class="tarot-rank">${rankDisplay}</div>
-           </div>
-       </div>`;
-     }).join('');
-   }
- };
- document.getElementById('searchContestant').addEventListener('input', draw);
- document.getElementById('statusFilter').addEventListener('change', draw);
- draw();
-}
-
-function renderRankings() {
- const root = document.getElementById('rankings');
- if (state.data.contestants.length === 0) {
-   root.innerHTML = '<div class="card-paper" style="text-align: center; padding: 4rem 2rem;"><h2>' + t('opening_soon') + '</h2></div>'; return;
- }
- const viewOptions = getRankingViewOptions();
- const rankingMap = getRankingMapByView(state.rankingView);
- const isPerformance = state.rankingView === 'performance_score';
- const activeRound = state.selectedRankingsRound || state.latestRound;
-
- const list = sortedContestants().sort((a, b) => {
-   const aElim = getStatus(activeRound, a.id) === 'eliminated' ? 1 : 0;
-   const bElim = getStatus(activeRound, b.id) === 'eliminated' ? 1 : 0;
-   if (aElim !== bElim) return aElim - bElim;
-
-   const va = rankingMap[activeRound]?.[a.id]; const vb = rankingMap[activeRound]?.[b.id];
-   if (Number.isFinite(va) && Number.isFinite(vb)) { return isPerformance ? vb - va : va - vb; }
-   if (Number.isFinite(va)) return -1; if (Number.isFinite(vb)) return 1;
-   return String(a.name || '').localeCompare(String(b.name || ''));
- });
- 
- const teamIds = list.map(c => c.id);
-
- const nominations = {
-   nominee: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'nominee' && teamIds.includes(r.contestant_id)),
-   saved_judges: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_judges' && teamIds.includes(r.contestant_id)),
-   saved_public: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_public' && teamIds.includes(r.contestant_id)),
-   eliminated: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'eliminated' && teamIds.includes(r.contestant_id))
- };
-
- let optionsHtml = viewOptions.map(o => '<option value="' + o.value + '" ' + (o.value===state.rankingView?'selected':'') + '>' + o.label + '</option>').join('');
- let roundsHtml = ROUND_ORDER.map(r => '<option value="' + r + '" ' + (r === activeRound ? 'selected' : '') + '>' + getRoundLabel(r) + '</option>').join('');
- let thRoundsHtml = ROUND_ORDER.map(r => '<th>' + getRoundLabel(r) + '</th>').join('');
-
- let rowsHtml = list.map((c, idx) => {
-     let cellsHtml = ROUND_ORDER.map(r => {
-         const v = rankingMap[r]?.[c.id]; 
-         const elimIndex = getFirstEliminatedRoundIndex(c.id);
-         const isDeadInTable = elimIndex !== -1 && elimIndex < ROUND_ORDER.indexOf(r);
-         
-         if (Number.isFinite(v)) {
-             const displayV = (isPerformance && v % 1 !== 0) ? v.toFixed(1) : v;
-             if (!isPerformance && isDeadInTable) {
-                 return `<td><span style="color:var(--tarot-ash); font-weight:600;">${displayV}</span> <span class="pill eliminated-pill" style="font-size:0.55rem; padding:0.15rem 0.4rem; margin-left:6px;">${t('eliminated')}</span></td>`;
-             }
-             return '<td>' + displayV + '</td>';
-         }
-         
-         let st = getStatus(r, c.id);
-         if (st && st !== 'eliminated' && !isDeadInTable) return '<td><span class="pill ' + statusClass(st) + '" style="font-size:0.68rem; padding:0.15rem 0.5rem;">' + statusLabel(st) + '</span></td>';
-         if (st === 'eliminated' || isDeadInTable) return '<td><span class="pill eliminated-pill" style="font-size:0.68rem; padding:0.15rem 0.5rem;">' + statusLabel('eliminated') + '</span></td>';
-         return '<td>—</td>';
-     }).join('');
-     return '<tr><td>' + (idx + 1) + '</td><td><a href="#profile/' + c.id + '">' + getContestantName(c.id) + '</a></td>' + cellsHtml + '</tr>';
- }).join('');
-
- root.innerHTML = '<div class="card-paper">' +
- '<h2>' + t('nav_rankings') + '</h2>' +
- '<div class="filters">' +
- '<select id="rankingViewSelect">' + optionsHtml + '</select>' +
- '<select id="rankingsRoundSelect">' + roundsHtml + '</select>' +
- '</div>' +
- '<p class="small" style="color:var(--tarot-gold)">' + t('rankings_desc') + '</p>' +
- '<div class="table-wrap">' +
- '<table>' +
- '<thead>' +
- '<tr><th>' + (isPerformance ? t('pos') : t('rank')) + '</th><th>' + t('name') + '</th>' + thRoundsHtml + '</tr>' +
- '</thead>' +
- '<tbody>' + rowsHtml + '</tbody>' +
- '</table>' +
- '</div>' +
- '<h3 style="margin-top:3rem;">' + t('nominations') + ' (' + getRoundLabel(activeRound) + ')</h3>' +
- '<p class="small"><span style="color:var(--tarot-danger); font-weight:bold;">' + t('nominee_lbl') + ':</span> ' + (nominations.nominee.map(x => getContestantName(x.contestant_id)).join(', ') || '—') + '</p>' +
- '<p class="small"><span style="color:#a4c9e3; font-weight:bold;">' + t('saved_judges_lbl') + ':</span> ' + (nominations.saved_judges.map(x => getContestantName(x.contestant_id)).join(', ') || '—') + '</p>' +
- '<p class="small"><span style="color:#a4c9e3; font-weight:bold;">' + t('saved_public_lbl') + ':</span> ' + (nominations.saved_public.map(x => getContestantName(x.contestant_id)).join(', ') || '—') + '</p>' +
- '<p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">' + t('eliminated_lbl') + ':</span> ' + (nominations.eliminated.map(x => getContestantName(x.contestant_id)).join(', ') || '—') + '</p>' +
- '</div>' +
- '<div class="card-paper">' +
- '<h3>' + t('global_chart') + '</h3>' +
- '<div class="table-wrap">' +
- '<div style="min-width: 600px; height: 350px;">' +
- '<canvas id="rankingChart"></canvas>' +
- '</div>' +
- '</div>' +
- '</div>';
-
- document.getElementById('rankingViewSelect').addEventListener('change', (e) => { state.rankingView = e.target.value; renderRankings(); });
- document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => { state.selectedRankingsRound = e.target.value; renderRankings(); });
-
- try {
-     if (rankingChart) rankingChart.destroy();
-     const ctx = document.getElementById('rankingChart');
-     if (!ctx || typeof Chart === 'undefined') return;
-     
-     Chart.defaults.color = '#888888';
-     Chart.defaults.borderColor = '#333333';
-
-     rankingChart = new Chart(ctx, {
-       type: 'line',
-       data: {
-         labels: ROUND_ORDER.map(r => getRoundLabel(r)),
-         datasets: list.map((c, idx) => {
-           const elimIndex = getFirstEliminatedRoundIndex(c.id);
-           const isEliminated = getStatus(activeRound, c.id) === 'eliminated';
-           const baseColor = colorForIndex(idx);
-           const color = isEliminated ? baseColor.replace('hsl', 'hsla').replace(')', ', 0.2)') : baseColor;
-           
-           return { 
-             label: getContestantName(c.id), 
-             data: ROUND_ORDER.map((r, rIdx) => { 
-                 if (elimIndex !== -1 && rIdx > elimIndex) return null;
-                 const v = rankingMap[r]?.[c.id]; 
-                 return Number.isFinite(v) ? v : null; 
-             }), 
-             borderColor: color, backgroundColor: color, 
-             borderWidth: isEliminated ? 1 : 3, borderDash: isEliminated ? [5, 5] : [], 
-             pointRadius: isEliminated ? 0 : 3, pointHoverRadius: 6, tension: .25, spanGaps: true, order: isEliminated ? 2 : 1 
-           };
-         })
-       },
-       options: {
-         responsive: true, maintainAspectRatio: false,
-         interaction: { mode: 'dataset', intersect: true },
-         onHover: (e, elements, chart) => {
-           if (elements && elements.length) {
-             const hoveredIdx = elements[0].datasetIndex;
-             chart.data.datasets.forEach((ds, i) => {
-               const isHovered = i === hoveredIdx;
-               const isElim = getStatus(activeRound, list[i]?.id) === 'eliminated';
-               ds.borderColor = isHovered ? colorForIndex(i) : 'rgba(136, 136, 136, 0.1)';
-               ds.borderWidth = isHovered ? 5 : (isElim ? 1 : 2);
-               ds.order = isHovered ? 0 : 1;
-             });
-             chart.update('none');
-           } else {
-             chart.data.datasets.forEach((ds, i) => {
-               const isElim = getStatus(activeRound, list[i]?.id) === 'eliminated';
-               const baseCol = colorForIndex(i);
-               ds.borderColor = isElim ? baseCol.replace('hsl', 'hsla').replace(')', ', 0.2)') : baseCol;
-               ds.borderWidth = isElim ? 1 : 3;
-               ds.order = isElim ? 2 : 1;
-             });
-             chart.update('none');
-           }
-         },
-         plugins: { legend: { display: true, position: 'bottom', labels: { color: '#F0EDE5', boxWidth: 10, usePointStyle: true, pointStyle: 'circle' } } },
-         scales: {
-             x: { ticks: { color: '#888' } },
-             y: {
-                 reverse: !isPerformance,
-                 min: isPerformance ? undefined : 1,
-                 max: isPerformance ? undefined : Math.max(22, list.length),
-                 ticks: { color: '#888', stepSize: isPerformance ? undefined : 1 },
-                 title: isPerformance ? { display: true, text: t('perf_score'), color: '#888' } : { display: false }
-             }
-         }
-       }
-     });
- } catch (err) { console.error("Erreur Graphique:", err); }
-}
-
-function renderProfile(contestantId) {
- const c = state.data.contestants.find(x => x.id === contestantId);
- const root = document.getElementById('profile');
- if (!c) { root.innerHTML = '<div class="card-paper"><p>' + t('contestant_not_found') + '</p></div>'; return; }
-
- const official = getOfficialRankingByRound(state.activeTeam === 'Global');
- const judgesByName = Object.fromEntries(JUDGE_NAMES.map(j => [j, getJudgeRankingByRound(j)]));
- const perfScore = getPerformanceScoreByRound();
-
- const profileOrder = sortedContestants();
- const profileIndex = profileOrder.findIndex(x => x.id === c.id);
- const prevContestant = profileIndex > 0 ? profileOrder[profileIndex - 1] : null;
- const nextContestant = profileIndex >= 0 && profileIndex < profileOrder.length - 1 ? profileOrder[profileIndex + 1] : null;
- const submissions = state.data.submissions.filter(s => s.contestant_id === c.id).sort((a,b) => ROUND_ORDER.indexOf(a.round_id) - ROUND_ORDER.indexOf(b.round_id));
-
- const meta = [
-   c.country ? t('country') + ': ' + c.country : '',
-   c.pronouns ? t('pronouns') + ': ' + c.pronouns : '',
-   c.instagram ? t('instagram') + ': <a href="' + (c.instagram.startsWith('http') ? c.instagram : 'https://instagram.com/' + c.instagram.replace('@', '')) + '" target="_blank" style="color:var(--tarot-gold)">' + c.instagram + '</a>' : ''
- ].filter(Boolean).join(' · ');
-
- let roundsRowsHtml = ROUND_ORDER.map(r => {
-     let st = getStatus(r, c.id);
-     const elimRound = getFirstEliminatedRoundIndex(c.id);
-     if (!st && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(r)) st = 'eliminated';
-     const pScore = perfScore[r]?.[c.id];
-     
-     let pScoreStr = '—';
-     if (Number.isFinite(pScore)) { pScoreStr = pScore % 1 === 0 ? pScore.toString() : pScore.toFixed(1); }
-     
-     const jCellsHtml = JUDGE_NAMES.map(j => '<td>' + (judgesByName[j]?.[r]?.[c.id] ?? '—') + '</td>').join('');
-     return '<tr><td><strong>' + getRoundLabel(r) + '</strong></td><td>' + (official[r]?.[c.id] ?? '—') + '</td>' + jCellsHtml + '<td><span style="color:var(--tarot-gold)">' + pScoreStr + '</span></td><td><span class="pill ' + statusClass(st) + '">' + statusLabel(st) + '</span></td></tr>';
- }).join('');
-
- let perfsRowsHtml = submissions.length > 0 ? submissions.map(s => {
-     return '<tr>' +
-     '<td><strong>' + (getRoundLabel(s.round_id) || s.round_id) + '</strong></td>' +
-     '<td>' + (s.song_title || t('tbd')) + (s.group_song ? '<br><span style="color:var(--muted); font-size:0.85em">' + s.group_song + '</span>' : '') + '</td>' +
-     '<td>' +
-     (s.youtube_url ? '<a target="_blank" href="' + s.youtube_url + '">[' + t('link_perf') + ']</a>' : '—') +
-     (s.bandlab_url ? '<br><a target="_blank" href="' + s.bandlab_url + '">[' + t('link_perf') + ']</a>' : '') +
-     '</td>' +
-     '</tr>';
- }).join('') : '<tr><td colspan="3">' + t('no_links') + '</td></tr>';
-
- const dynamicRankLabel = state.activeTeam === 'Global' ? t('overall_rank') : t('official_rank');
-
- root.innerHTML = '<div class="card-paper">' +
- '<div class="profile-nav">' +
- '<button class="btn" onclick="location.hash=\'#contestants\'">' + t('back_contestants') + '</button>' +
- (prevContestant ? '<button class="btn" onclick="location.hash=\'#profile/' + prevContestant.id + '\'">← ' + getContestantName(prevContestant.id) + '</button>' : '') +
- (nextContestant ? '<button class="btn" onclick="location.hash=\'#profile/' + nextContestant.id + '\'">' + getContestantName(nextContestant.id) + ' →</button>' : '') +
- '</div>' +
- '<div class="row two" style="margin-top:2rem">' +
- '<div style="display:flex; justify-content:center;"><div class="profile-img-wrap"><img class="profile-img" src="' + c.photo_url + '" data-contestant-id="' + c.id + '" alt="' + c.name + '" onerror="handleImageFallback(this)" /></div></div>' +
- '<div class="profile-content">' +
- '<h2 style="font-size: clamp(2rem, 5vw, 3rem); margin-top:0; margin-bottom: 0.5rem; word-break: break-word;">' + getContestantName(c.id) + '</h2>' +
- (meta ? '<p class="small" style="font-size:1.1rem; color:var(--tarot-gold)">' + meta + '</p>' : '') +
- '<h3 style="margin-top:3rem;">' + t('rounds_overview') + '</h3>' +
- '<div class="table-wrap">' +
- '<table>' +
- '<thead><tr><th>' + t('round') + '</th><th>' + dynamicRankLabel + '</th>' + JUDGE_NAMES.map(j => '<th>' + j + '</th>').join('') + '<th>' + t('perf_score') + '</th><th>' + t('status') + '</th></tr></thead>' +
- '<tbody>' + roundsRowsHtml + '</tbody>' +
- '</table>' +
- '</div>' +
- '<h3 style="margin-top:3rem;">' + t('performances') + '</h3>' +
- '<div class="table-wrap">' +
- '<table>' +
- '<thead><tr><th>' + t('round') + '</th><th>' + t('song') + '</th><th>' + t('links') + '</th></tr></thead>' +
- '<tbody>' + perfsRowsHtml + '</tbody>' +
- '</table>' +
- '</div>' +
- '</div>' +
- '</div>' +
- '</div>' +
- '<div class="card-paper">' +
- '<h3>' + t('indiv_chart') + '</h3>' +
- '<div class="table-wrap">' +
- '<div style="min-width: 500px; height: 300px;">' +
- '<canvas id="profileChart"></canvas>' +
- '</div>' +
- '</div>' +
- '</div>';
-
- const elimIndex = getFirstEliminatedRoundIndex(c.id);
-
- try {
-     if (profileChart) profileChart.destroy();
-     const ctx2 = document.getElementById('profileChart');
-     if (!ctx2 || typeof Chart === 'undefined') return;
-
-     profileChart = new Chart(ctx2, {
-       type: 'line',
-       data: {
-         labels: ROUND_ORDER.map(r => getRoundLabel(r)),
-         datasets: [{ 
-           label: getContestantName(c.id), 
-           data: ROUND_ORDER.map((r, rIdx) => {
-               if (elimIndex !== -1 && rIdx > elimIndex) return null;
-               const v = official[r]?.[c.id]; 
-               return Number.isFinite(v) ? v : null;
-           }), 
-           borderColor: '#E2B961', backgroundColor: 'rgba(226, 185, 97, 0.1)', borderWidth: 3, tension: .25, spanGaps: true 
-         }]
-       },
-       options: {
-         responsive: true, maintainAspectRatio: false,
-         plugins: { legend: { labels: { color: '#F0EDE5' } } },
-         scales: { 
-             x: { ticks: { color: '#888' } }, 
-             y: { 
-                 reverse: true, min: 1, max: Math.max(22, state.data.contestants.length), 
-                 ticks: { color: '#888', stepSize: 1 } 
-             } 
-         }
-       }
-     });
- } catch (err) {}
-}
-
-function renderVotes() {
- const root = document.getElementById('votes');
- if (state.data.contestants.length === 0) {
-   root.innerHTML = '<div class="card-paper" style="text-align: center; padding: 4rem 2rem;"><h2>' + t('opening_soon') + '</h2></div>'; return;
- }
- const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
- const selected = canonicalRoundId(state.votesRound);
- state.votesRound = ROUND_ORDER.includes(selected) ? selected : (roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound);
-
- const nominees = state.data.round_status.filter(r => r.round_id === state.votesRound && r.status === 'nominee').map(r => r.contestant_id);
- const votedCandidates = state.data.votes_live.filter(v => v.round_id === state.votesRound).map(v => v.contestant_id);
- 
- const activeTeamIds = sortedContestants().map(c => c.id);
- const targets = [...new Set([...nominees, ...votedCandidates])].filter(id => activeTeamIds.includes(id));
-
- const rows = targets.map(id => {
-   const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
-   return { id, name: getContestantName(id), votes: Number(record?.votes_count || 0), updated: record?.last_updated || '-' };
- }).sort((a, b) => b.votes - a.votes);
-
- const totalVotes = rows.reduce((sum, r) => sum + r.votes, 0);
- const maxVotes = rows.length > 0 ? rows[0].votes : 0;
-
- let votesListHtml = rows.length ? rows.map(r => {
-   const pct = totalVotes > 0 ? (r.votes / totalVotes) * 100 : 0;
-   const barPct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
-   return '<div class="vote-row"><div><strong style="font-family:\'Playfair Display\'; font-size:1.2rem; color:var(--tarot-gold)">' + r.name + '</strong> — ' + r.votes + ' ' + t('votes').toLowerCase() + ' (' + pct.toFixed(1) + '%)</div><div class="bar"><span style="width:' + barPct + '%"></span></div></div>';
- }).join('') : '<p>' + t('no_vote_data') + '</p>' + (roundsWithVotes.length ? '<p class="small">' + t('avail_vote_rounds') + ' ' + roundsWithVotes.map(r => getRoundLabel(r)).join(', ') + '</p>' : '');
-
- let roundsOptionsHtml = ROUND_ORDER.map(r => '<option value="' + r + '" ' + (r===state.votesRound?'selected':'') + '>' + getRoundLabel(r) + '</option>').join('');
-
- root.innerHTML = '<div class="card-paper">' +
- '<h2>' + t('nav_votes') + '</h2>' +
- '<div class="filters">' +
- '<select id="votesRoundSelect">' + roundsOptionsHtml + '</select>' +
- (CONFIG.VOTE_FORM_URL ? '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + CONFIG.VOTE_FORM_URL + '">' + t('vote_now') + '</a>' : '') +
- '</div>' +
- '<div style="margin-top:3rem;">' + votesListHtml + '</div>' +
- '<p class="small" style="margin-top:3rem; color:var(--tarot-gold)">' + t('total_votes') + ' ' + totalVotes + ' · ' + t('last_refresh') + ' ' + new Date().toLocaleString(currentLang) + '</p>' +
- '</div>';
-
- document.getElementById('votesRoundSelect').addEventListener('change', (e) => { state.votesRound = e.target.value; renderVotes(); });
- clearTimeout(state.votesTimer);
- state.votesTimer = setTimeout(async () => { await hydrate(); renderContestants(); renderRankings(); renderVotes(); }, CONFIG.REFRESH_MS);
-}
-
-function setupNav() {
- const nav = document.getElementById('nav');
- const tabs = [{id:'contestants', label: t('nav_contestants')}, {id:'rankings', label: t('nav_rankings')}, {id:'votes', label: t('nav_votes')}];
- nav.innerHTML = tabs.map(t => '<a class="nav-link" href="#' + t.id + '">' + t.label + '</a>').join('');
-
- const onHash = () => {
-   const hash = location.hash || ''; 
-   
-   if(hash === '' || hash === '#') {
-       document.getElementById('app-dashboard').style.display = 'none';
-       document.getElementById('app-dashboard').style.opacity = '0';
-       document.getElementById('landing-menu').style.display = 'flex';
-       document.getElementById('landing-menu').style.opacity = '1';
-       document.getElementById('landing-menu').style.transform = 'scale(1)';
-       return;
-   } else {
-       document.getElementById('landing-menu').style.display = 'none';
-       document.getElementById('app-dashboard').style.display = 'block';
-       document.getElementById('app-dashboard').style.opacity = '1';
-   }
-
-   const [page] = hash.slice(1).split('/');
-   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-   if (page === 'profile') {
-     document.getElementById('profile').classList.add('active');
-     renderProfile(hash.split('/')[1]);
-   } else if (page) {
-     const target = document.getElementById(page) ? page : 'contestants';
-     const targetEl = document.getElementById(target);
-     if(targetEl) targetEl.classList.add('active');
-   }
-   document.querySelectorAll('.nav-link').forEach(a => {
-       if (a.getAttribute('href') === '#' + page) a.classList.add('active');
-       else a.classList.remove('active');
-   });
- };
- window.removeEventListener('hashchange', onHash);
- window.addEventListener('hashchange', onHash);
- onHash();
-}
-
-async function hydrate() {
- await loadData(); 
- normalizeData(); 
- 
- state.latestRound = getLatestRound();
- if (!state.selectedRankingsRound) state.selectedRankingsRound = state.latestRound;
- const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
- state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound;
-}
-
-async function boot() {
- try {
-   document.getElementById('langSelect').value = currentLang;
-   document.getElementById('brandTagline').textContent = t('tagline');
-   document.getElementById('menuTagline').textContent = "KÆOS PROJECT • " + (currentLang === 'fr' ? "Choisissez votre destinée" : "Choose your destiny");
-   setupNav(); 
-   await hydrate(); 
-   renderContestants(); 
-   renderRankings(); 
-   renderVotes();
- } catch (error) {
-   console.error("Erreur critique au démarrage :", error);
- }
-}
-
-boot();
+        document.getElementById('replay-btn').classList.add('visible');
+    }
 </script>
 </body>
 </html>
