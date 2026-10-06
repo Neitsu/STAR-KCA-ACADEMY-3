@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KÆOS PROJECT - Ultimate Cinematic Trailer (No Text)</title>
+    <title>KÆOS PROJECT - Ultimate Cinematic Trailer (No Text / Clean BG)</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,7 +12,7 @@
             --tarot-danger: #D93838;
             --tarot-ash: #555555; 
             --tarot-ash-dark: #151515;
-            --bg: #0A0A0A;
+            --bg: #0A0A0A; /* Fond noir uni parfait pour le montage */
             --font-primary: 'Playfair Display', serif;
             --font-secondary: 'Poppins', sans-serif;
         }
@@ -21,10 +21,8 @@
             margin: 0; padding: 0; background-color: var(--bg);
             color: #F0EDE5; font-family: var(--font-primary);
             width: 100vw; height: 100vh; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
         }
-
-        /* Poussière d'étoiles */
-        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
         /* ÉCRAN DE DÉMARRAGE */
         #start-overlay {
@@ -40,14 +38,18 @@
         }
         #start-btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 30px rgba(226, 185, 97, 0.4); transform: scale(1.05); }
 
-        /* LE TEXTE DYNAMIQUE (Désactivé) */
-        #main-text { display: none; }
+        /* =========================================
+           LE TEXTE DYNAMIQUE (Désactivé pour le montage)
+           ========================================= */
+        #main-text {
+            display: none !important; 
+        }
 
         /* =========================================
            ÉLÉMENTS VISUELS
            ========================================= */
         .visual-element {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%);
             opacity: 0; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; z-index: 10;
         }
         .visual-element.visible { opacity: 1; }
@@ -55,16 +57,13 @@
         .shift-up { transform: translate(-50%, calc(-50% - 130px)) scale(0.85) !important; }
         .shift-down { transform: translate(-50%, calc(-50% + 140px)) scale(0.65) !important; }
 
-        /* Logo KÆOS PROJECT */
+        /* Logo */
         #logo-container { text-align: center; width: 100%; }
-        #logo-container h1 { font-size: 2.2rem; letter-spacing: 6px; margin: 0; color: var(--tarot-gold); text-shadow: 0 0 30px rgba(226, 185, 97, 0.5); font-weight: 800; line-height: 1.4; }
-        #logo-container span.sub-logo { font-size: 1.3rem; font-weight: 400; letter-spacing: 8px; color: var(--tarot-gold); }
+        #logo-container h2 { font-size: 1rem; letter-spacing: 8px; font-weight: 400; color: #888; text-transform: uppercase; margin: 0 0 10px 0; font-family: var(--font-secondary); }
+        #logo-container h1 { font-size: 3rem; letter-spacing: 8px; text-transform: uppercase; margin: 0; color: var(--tarot-gold); text-shadow: 0 0 30px rgba(226, 185, 97, 0.5); font-weight: 800; line-height: 1.1; }
         .symbols { display: flex; gap: 30px; justify-content: center; margin-top: 20px; font-size: 2rem; color: var(--tarot-gold); }
-        .symbols span { animation: pulse 2s infinite ease-in-out; }
-        .symbols span:nth-child(2) { animation-delay: 0.4s; }
-        .symbols span:nth-child(3) { animation-delay: 0.8s; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(226,185,97,0.3)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 15px rgba(226,185,97,0.8)); } }
 
+        /* Symbole d'Outro (Fin) */
         #outro-symbols { font-size: 4rem; letter-spacing: 20px; color: var(--tarot-gold); text-shadow: 0 0 30px rgba(226, 185, 97, 0.6); }
 
         /* Les 48 Cartes */
@@ -72,7 +71,7 @@
         .mini-card {
             position: absolute; width: 16px; height: 26px; background: var(--tarot-bg); border: 1px solid var(--tarot-gold);
             border-radius: 2px; opacity: 0; transform: translate(0, 0) scale(0);
-            transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1), opacity 1.5s ease, filter 1s ease;
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1), opacity 1.5s ease;
             box-shadow: 0 0 8px rgba(226, 185, 97, 0.2);
             display: flex; justify-content: center; align-items: center;
             background-image: linear-gradient(var(--tarot-gold) 1px, transparent 1px), linear-gradient(90deg, var(--tarot-gold) 1px, transparent 1px);
@@ -166,8 +165,6 @@
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
-
     <div id="start-overlay">
         <h2 style="font-family: 'Poppins', sans-serif; color:#888; letter-spacing:4px; font-weight:400; margin-bottom: 0; font-size:0.9rem;">STAR KCA ACADEMY - S3</h2>
         <h1 style="font-size: 2.5rem; letter-spacing: 6px; margin: 10px 0 20px; color: var(--tarot-gold); font-weight:800; text-shadow: 0 0 20px rgba(226, 185, 97, 0.3); text-align:center;">KÆOS<br>PROJECT</h1>
@@ -177,8 +174,7 @@
 
     <button id="replay-btn" onclick="location.reload()">↺ Replay</button>
 
-    <!-- LES ÉLÉMENTS VISUELS (SANS TEXTE) -->
-    
+    <!-- LES ÉLÉMENTS VISUELS -->
     <div id="logo-container" class="visual-element">
         <h1 style="font-size: 2.2rem; letter-spacing: 6px; margin: 0; color: var(--tarot-gold); text-shadow: 0 0 30px rgba(226, 185, 97, 0.5); font-weight: 800; line-height: 1.4;">
             STAR KCA ACADEMY<br>
@@ -201,6 +197,7 @@
         </div></div></div>
     </div>
 
+    <!-- CARTE DE DÉMO -->
     <div id="demo-card-container" class="visual-element">
         <div id="demo-card-shaker">
             <div id="demo-card" class="tarot-flip-card">
@@ -220,6 +217,7 @@
         </div>
     </div>
 
+    <!-- LA BALANCE -->
     <div id="scale-container" class="visual-element">
         <span id="text-plate-left" class="scale-plate-text">ORACLE</span>
         <span id="text-plate-right" class="scale-plate-text">PUBLIC</span>
@@ -245,36 +243,16 @@
         </svg>
     </div>
 
+    <!-- 12 CARTES FINALE -->
     <div id="finale-cards" class="visual-element"></div>
+
+    <!-- SYMBOL OUTRO -->
     <div id="outro-symbols" class="visual-element">✹ ☾ ✦</div>
 
+    <!-- LE TEXTE (Désactivé) -->
+    <div id="main-text" class="cine-text"></div>
+
 <script>
-    // --- PARTICULES ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.5; this.speedX = Math.random() * 0.4 - 0.2; this.speedY = Math.random() * -0.5 - 0.1;
-            this.alpha = Math.random() * 0.5 + 0.1;
-        }
-        update() {
-            this.x += this.speedX; this.y += this.speedY;
-            if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
-        }
-        draw() {
-            ctx.fillStyle = `rgba(226, 185, 97, ${this.alpha})`;
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); 
-        }
-    }
-    for (let i = 0; i < 150; i++) particles.push(new Particle()); 
-    function animateBg() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateBg); }
-    animateBg();
-
     // --- SETUP VISUELS ---
     const cardsContainer = document.getElementById('forty-eight-cards');
     for(let i=0; i<48; i++) {
@@ -298,13 +276,13 @@
     async function startCinematic() {
         document.getElementById('start-overlay').style.opacity = '0';
         setTimeout(() => document.getElementById('start-overlay').style.display = 'none', 1000);
-        await delay(13800); // Temps de l'intro textuelle "Have you dreamt..."
+        await delay(14500); 
 
         // 2. LOGO
         document.getElementById('logo-container').classList.add('visible');
         await delay(5000);
         document.getElementById('logo-container').classList.remove('visible');
-        await delay(6000); // Temps du texte "Survival show is diff..."
+        await delay(5500); 
 
         // 3. EXPLOSION 48 CARTES
         document.getElementById('forty-eight-cards').classList.add('visible');
@@ -317,7 +295,7 @@
             setTimeout(() => { m.style.opacity = '1'; m.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(1)`; }, i * 30);
         });
 
-        await delay(9000); // Temps d'admirer + textes
+        await delay(11000); 
 
         // 4. ANIMATION DES 3 ÉQUIPES
         const oracles = document.getElementById('oracles-section');
@@ -331,7 +309,7 @@
                 setTimeout(() => { m.innerHTML = `<div class="mini-card-inner">✹</div>`; m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`; }, i * 40); 
             }
         });
-        await delay(4500);
+        await delay(4000);
 
         document.getElementById('o-2').classList.add('appear'); 
         minis.forEach((m, i) => {
@@ -342,7 +320,7 @@
                 setTimeout(() => { m.innerHTML = `<div class="mini-card-inner">☾</div>`; m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`; }, j * 40); 
             }
         });
-        await delay(4500);
+        await delay(4000);
 
         document.getElementById('o-3').classList.add('appear'); 
         minis.forEach((m, i) => {
@@ -353,7 +331,7 @@
                 setTimeout(() => { m.innerHTML = `<div class="mini-card-inner">✦</div>`; m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`; }, j * 40); 
             }
         });
-        await delay(5000);
+        await delay(4500);
 
         // 5. FOCUS SUR NEITSU ET L'ÉLIMINATION INTERNE
         document.getElementById('o-2').style.opacity = '0';
@@ -369,7 +347,7 @@
             }
         });
 
-        await delay(9500); // Textes explicatifs
+        await delay(10500); 
 
         let sunIndices = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
         sunIndices.sort(() => Math.random() - 0.5); 
@@ -388,7 +366,7 @@
         await delay(5000); 
         document.getElementById('forty-eight-cards').classList.remove('visible');
         oracles.classList.remove('visible');
-        await delay(11500); // 6. MÉCANIQUE D'UN CYCLE (Textes)
+        await delay(9000); 
         
         // 6. LA CARTE
         const cardContainer = document.getElementById('demo-card-container');
@@ -398,7 +376,7 @@
         cardContainer.classList.add('visible');
         await delay(2000);
         card.classList.add('flipped'); 
-        await delay(6000);
+        await delay(5000);
 
         // 7. LA CARTE DANGER (SHADOW ZONE)
         cardShaker.classList.add('shake-animation'); 
@@ -429,10 +407,10 @@
         await delay(4500);
         
         cardContainer.classList.add('fade-away');
-        await delay(5500); // "You are eliminated"
+        await delay(5500); 
 
         // 10. LA FINALE
-        await delay(9000); // "Circles will shatter..."
+        await delay(9000); 
 
         const finaleContainer = document.getElementById('finale-cards');
         finaleContainer.classList.add('visible');
@@ -447,12 +425,12 @@
             else c.classList.add('loser');
         });
 
-        await delay(5500);
+        await delay(6500);
         finaleContainer.classList.remove('visible');
         await delay(2000);
 
         // 11. OUTRO
-        await delay(15000); // Textes auditions
+        await delay(16500); 
         
         document.getElementById('outro-symbols').classList.add('visible');
         await delay(6000);
