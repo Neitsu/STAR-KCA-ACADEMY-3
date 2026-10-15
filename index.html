@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KÆOS PROJECT - L'Académie des Oracles</title>
+  <title>KÆOS PROJECT - Star KCA Academy</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --tarot-bg: #1e1e1e;      
+      --tarot-bg: #181818;      
       --tarot-gold: #E2B961;    
       --tarot-gold-dim: rgba(226, 185, 97, 0.22);
       --tarot-danger: #D93838;  
       --tarot-danger-dim: rgba(217, 56, 56, 0.45);
       --tarot-ash: #555555;
-      --tarot-ash-dark: #141414;
-      --tarot-saved: #6baed6;
+      --tarot-ash-dark: #121212;
 
       --bg: #0A0A0A;
-      --panel: #151515;
-      --panel2: #222222;
+      --panel: #121212;
+      --panel2: #1A1A1A;
       --text: #F0EDE5;
       --muted: #888888;
-      --line: #333333;
+      --line: #2E2E2E;
       --accent: #E2B961; 
       --radius: 6px;
     }
@@ -39,12 +38,17 @@
       font-family: 'Poppins', sans-serif;
       color: var(--text);
       background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, #1f1a12 0%, #0A0A0A 65%);
+      background-image: radial-gradient(circle at 50% 0%, #1a150e 0%, #0A0A0A 65%);
       background-attachment: fixed;
       overflow-x: hidden;
     }
     
-    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--tarot-gold); font-weight: 600; letter-spacing: 2px; }
+    h1, h2, h3, h4 {
+      font-family: 'Cinzel', 'Playfair Display', serif;
+      color: var(--tarot-gold);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+    }
     .container { width: min(1320px, 94vw); margin: 0 auto; }
 
     /* ==========================================
@@ -76,12 +80,12 @@
     
     .card-front {
       display: flex; justify-content: center; align-items: center;
-      background-image: linear-gradient(rgba(226, 185, 97, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.15) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(226, 185, 97, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.14) 1px, transparent 1px);
       background-size: 20px 20px; background-position: center;
     }
-    .card-front::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.6) 0%, rgba(10,10,10,0.92) 100%); }
+    .card-front::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.55) 0%, rgba(10,10,10,0.94) 100%); }
     .card-front-inner { position: relative; z-index: 2; width: 88%; height: 92%; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; }
-    .card-front-label { font-family: 'Playfair Display', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.85; }
+    .card-front-label { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.85rem; text-transform: uppercase; opacity: 0.85; }
 
     .front-symbol {
       width: 84px; height: 84px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg);
@@ -92,8 +96,8 @@
     .card-back { transform: rotateY(180deg); }
     .enter-hint {
       position: absolute; bottom: 52px; background: rgba(226, 185, 97, 0.95); color: #0A0A0A;
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; padding: 4px 12px; border-radius: 99px;
-      text-transform: uppercase; z-index: 5; box-shadow: 0 0 15px rgba(226, 185, 97, 0.6);
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; padding: 4px 14px; border-radius: 99px;
+      text-transform: uppercase; z-index: 5; box-shadow: 0 0 15px rgba(226, 185, 97, 0.5);
     }
 
     /* ==========================================
@@ -103,7 +107,7 @@
     
     header {
       position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px);
-      background: rgba(10, 10, 10, 0.88); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.65);
+      background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.7);
     }
     .topbar { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; padding: 0.7rem 0; }
     
@@ -112,44 +116,47 @@
     .brand h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); }
     .brand p { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; }
     
-    /* Sélecteur rapide de Cercle dans le Header */
     .circle-switcher {
-      display: flex; align-items: center; gap: 0.35rem; background: #111; padding: 4px;
+      display: flex; align-items: center; gap: 0.35rem; background: #0d0d0d; padding: 4px;
       border-radius: 6px; border: 1px solid var(--line);
     }
     .circle-btn {
       background: transparent; color: var(--muted); border: 1px solid transparent; border-radius: 4px;
-      padding: 0.32rem 0.65rem; font-size: 0.78rem; font-family: 'Poppins'; cursor: pointer;
+      padding: 0.32rem 0.65rem; font-size: 0.76rem; font-family: 'Poppins'; cursor: pointer;
       transition: all 0.25s ease; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+      text-transform: uppercase; letter-spacing: 1px;
     }
     .circle-btn:hover { color: var(--tarot-gold); }
     .circle-btn.active {
-      background: rgba(226, 185, 97, 0.16); color: var(--tarot-gold);
-      border-color: var(--tarot-gold); font-weight: 600; box-shadow: 0 0 10px rgba(226, 185, 97, 0.2);
+      background: rgba(226, 185, 97, 0.14); color: var(--tarot-gold);
+      border-color: var(--tarot-gold); font-weight: 600; box-shadow: 0 0 10px rgba(226, 185, 97, 0.18);
     }
 
     .nav-wrapper { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
     nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
     .nav-link {
       text-decoration: none; color: var(--text); background: var(--panel);
-      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.72rem; font-size: 0.8rem;
+      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.72rem; font-size: 0.78rem;
       transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
     }
     .nav-link:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); }
     .nav-link.active { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 600; }
     
-    .lang-select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 0.35rem 0.5rem; font-size: 0.78rem; cursor: pointer; outline: none; font-family: 'Poppins'; }
+    .lang-select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 0.35rem 0.55rem; font-size: 0.78rem; cursor: pointer; outline: none; font-family: 'Poppins'; }
 
-    /* Bannière Mode Démo */
+    /* Bannière Mode Démo sobre */
     .demo-banner {
-      background: linear-gradient(90deg, rgba(226,185,97,0.12), rgba(217,56,56,0.15), rgba(226,185,97,0.12));
-      border-bottom: 1px solid var(--tarot-gold-dim); padding: 0.45rem 1rem; text-align: center;
+      background: #111111;
+      border-bottom: 1px solid var(--tarot-gold-dim); padding: 0.5rem 1rem; text-align: center;
       font-size: 0.78rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;
+      color: var(--text);
     }
     .demo-toggle-btn {
-      background: var(--tarot-gold); color: var(--bg); border: none; border-radius: 4px;
-      padding: 0.22rem 0.7rem; font-size: 0.74rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+      background: transparent; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); border-radius: 4px;
+      padding: 0.22rem 0.75rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+      transition: all 0.25s;
     }
+    .demo-toggle-btn:hover { background: var(--tarot-gold); color: var(--bg); }
 
     main { padding: 2rem 0 4rem; }
     
@@ -159,11 +166,11 @@
 
     .card-paper {
       background: var(--panel); border: 1px solid var(--tarot-gold-dim); border-radius: 6px; padding: 2rem; margin-bottom: 2rem;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 0 25px rgba(226,185,97,0.03); position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(226,185,97,0.02); position: relative;
     }
     
-    h2 { font-size: clamp(1.5rem, 3vw, 2rem); text-transform: uppercase; margin-top: 0; }
-    h3 { font-size: 1.3rem; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+    h2 { font-size: clamp(1.45rem, 3vw, 1.95rem); text-transform: uppercase; margin-top: 0; }
+    h3 { font-size: 1.25rem; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
     .small { color: var(--muted); font-size: 0.84rem; }
     
     .filters { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem; align-items: center; }
@@ -197,7 +204,7 @@
     .tarot-top-icon { position: absolute; top: -11px; color: var(--tarot-gold); font-size: 14px; background: var(--tarot-bg); padding: 0 8px; }
 
     .tarot-name {
-      color: var(--tarot-gold); font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 600;
+      color: var(--tarot-gold); font-family: 'Cinzel', 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700;
       letter-spacing: 3px; text-transform: uppercase; margin-top: 24px; z-index: 2; text-align: center;
       width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px;
     }
@@ -207,13 +214,13 @@
     .tarot-card:hover .tarot-image-container img { transform: scale(1.03); }
 
     .tarot-badge {
-      position: absolute; bottom: 50px; z-index: 3; font-size: 0.62rem; font-weight: 700;
-      letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 99px;
+      position: absolute; bottom: 50px; z-index: 3; font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px;
     }
 
     .tarot-rank {
-      position: absolute; bottom: 16px; color: var(--tarot-gold); font-family: 'Playfair Display', serif;
-      font-size: 1.05rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+      position: absolute; bottom: 16px; color: var(--tarot-gold); font-family: 'Cinzel', 'Playfair Display', serif;
+      font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
     }
 
     /* Symboles des Cercles */
@@ -234,7 +241,7 @@
     .theme-global .tarot-top-icon::before { content: '☉'; font-size: 15px; }
     .theme-global .tarot-rank::before, .theme-global .tarot-rank::after { content: '☉'; font-size: 0.85rem; }
 
-    /* État : SHADOW ZONE (Nominé) + Halo Rouge automatique */
+    /* État : SHADOW ZONE (Nominé) — Seul élément en Rouge Carmin */
     @keyframes dangerPulse {
       0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.85), 0 0 18px rgba(217, 56, 56, 0.35); }
       50% { box-shadow: 0 20px 45px rgba(0,0,0,0.9), 0 0 32px rgba(217, 56, 56, 0.65); }
@@ -255,14 +262,14 @@
     .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
     .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(45%); opacity: 0.75; }
 
-    /* Pills & Statuts */
-    .pill { display: inline-block; padding: 0.28rem 0.75rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
-    .safe { background: rgba(226, 185, 97, 0.1); color: var(--tarot-gold); border-color: var(--tarot-gold); }
-    .nominee { background: var(--tarot-danger); color: white; border-color: var(--tarot-danger); }
-    .saved_judges, .saved_public { background: rgba(107, 174, 214, 0.18); color: #9ed2f2; border-color: #6baed6; }
-    .eliminated-pill { background: var(--tarot-ash-dark); color: #777; border-color: var(--tarot-ash); }
+    /* Pills & Statuts (Palette stricte Noir / Or / Cendre / Rouge uniquement pour Shadow Zone) */
+    .pill { display: inline-block; padding: 0.26rem 0.72rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
+    .safe { background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold); border-color: var(--tarot-gold); }
+    .nominee { background: var(--tarot-danger); color: #ffffff; border-color: var(--tarot-danger); }
+    .saved_judges, .saved_public { background: #141414; color: var(--tarot-gold); border-color: var(--tarot-gold-dim); }
+    .eliminated-pill { background: var(--tarot-ash-dark); color: #777777; border-color: var(--tarot-ash); }
     .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
-    .winner { background: var(--tarot-gold); color: var(--bg); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.5); }
+    .winner { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.45); }
     
     /* Layout Profil & Grilles */
     .row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -276,16 +283,16 @@
     .profile-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2; }
     .profile-content { min-width: 0; width: 100%; }
     
-    .btn { text-decoration: none; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); background: transparent; border-radius: 4px; padding: 0.55rem 1.1rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins'; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; }
+    .btn { text-decoration: none; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); background: transparent; border-radius: 4px; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins'; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; }
     .btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 15px var(--tarot-gold-dim); }
     .btn-primary { background: var(--tarot-gold); color: var(--bg); }
-    .btn-primary:hover { background: #f3cc74; box-shadow: 0 0 22px rgba(226, 185, 97, 0.5); }
+    .btn-primary:hover { background: #f0ca70; box-shadow: 0 0 22px rgba(226, 185, 97, 0.45); }
     
     .profile-nav { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
     
     .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { font-family: 'Playfair Display'; font-size: 0.95rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.9rem 0.5rem; text-align: left; white-space: nowrap; }
+    th { font-family: 'Cinzel', 'Playfair Display', serif; font-size: 0.9rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.9rem 0.5rem; text-align: left; white-space: nowrap; letter-spacing: 1.5px; }
     td { border-bottom: 1px dotted var(--line); padding: 0.85rem 0.5rem; text-align: left; white-space: nowrap; }
     .table-wrap a { color: var(--tarot-gold); text-decoration: none; font-weight: 600; transition: color 0.2s; }
     .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
@@ -296,23 +303,23 @@
        PORTAIL D'AUDITIONS (1er - 13 NOVEMBRE)
        ========================================== */
     .audition-hero {
-      text-align: center; padding: 3rem 1.5rem;
-      background: radial-gradient(circle at center, rgba(226,185,97,0.08) 0%, transparent 70%);
+      text-align: center; padding: 3.2rem 1.5rem;
+      background: radial-gradient(circle at center, rgba(226,185,97,0.06) 0%, transparent 70%);
     }
     .countdown-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 2rem 0; }
     .countdown-box {
-      background: #111; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      width: 90px; padding: 0.8rem 0.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
+      width: 95px; padding: 0.9rem 0.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.7);
     }
-    .countdown-num { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--tarot-gold); font-weight: 800; line-height: 1; }
-    .countdown-lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 6px; }
+    .countdown-num { font-family: 'Cinzel', 'Playfair Display', serif; font-size: 2rem; color: var(--tarot-gold); font-weight: 800; line-height: 1; }
+    .countdown-lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 6px; }
 
     /* ==========================================
        LA BALANCE ANIMÉE (PAGE VOTES)
        ========================================== */
     .scale-showcase {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 1.5rem 1rem 2rem; margin: 1.5rem 0; background: rgba(10,10,10,0.6);
+      padding: 1.8rem 1rem; margin: 1.5rem 0; background: #0d0d0d;
       border: 1px solid var(--line); border-radius: 6px;
     }
     @keyframes rockBeam {
@@ -321,29 +328,46 @@
     }
     .scale-svg { width: 220px; height: 130px; overflow: visible; }
     .scale-beam-group { transform-origin: 110px 35px; animation: rockBeam 6s ease-in-out infinite; }
-    .scale-quotas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+    .scale-quotas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.2rem; }
     .quota-card {
-      background: var(--panel2); border: 1px solid var(--line); border-radius: 6px;
-      padding: 0.7rem 1.2rem; text-align: center; min-width: 150px;
+      background: #121212; border: 1px solid var(--line); border-radius: 6px;
+      padding: 0.75rem 1.2rem; text-align: center; min-width: 155px;
     }
-    .quota-card strong { display: block; font-family: 'Playfair Display'; font-size: 1.4rem; color: var(--tarot-gold); }
+    .quota-card.shadow-quota { border-color: rgba(217, 56, 56, 0.5); }
+    .quota-card strong { display: block; font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--text); }
+    .quota-card.shadow-quota strong { color: var(--tarot-danger); }
 
-    .vote-row { margin-bottom: 1.4rem; background: rgba(255,255,255,0.02); padding: 0.9rem 1.1rem; border-radius: 6px; border: 1px solid #252525; }
-    .bar { width: 100%; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; }
-    .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--tarot-gold), #f7d788); transition: width 0.6s ease; box-shadow: 0 0 12px var(--tarot-gold); }
+    .vote-row { margin-bottom: 1.2rem; background: #0e0e0e; padding: 0.95rem 1.15rem; border-radius: 6px; border: 1px solid var(--line); }
+    .bar { width: 100%; height: 7px; background: #222; border-radius: 999px; overflow: hidden; margin-top: 0.55rem; }
+    .bar > span { display: block; height: 100%; background: var(--tarot-gold); transition: width 0.6s ease; box-shadow: 0 0 10px rgba(226, 185, 97, 0.5); }
 
     /* ==========================================
-       LE GRIMOIRE (LORE, ORACLES & BARÈME)
+       LE GRIMOIRE (STYLE MYSTIQUE & ÉSOTÉRIQUE)
        ========================================== */
-    .oracles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; margin: 1.5rem 0 2.5rem; }
-    .oracle-box {
-      background: #111; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
-      padding: 1.4rem; text-align: center; position: relative;
+    .grimoire-intro {
+      text-align: center; max-width: 820px; margin: 0 auto 2.5rem;
+      padding: 1.8rem; background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
     }
-    .oracle-symbol { font-size: 2.2rem; color: var(--tarot-gold); margin-bottom: 0.4rem; }
-    .rubric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
-    .rubric-item { background: #111; border: 1px solid var(--line); border-radius: 4px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-    .rubric-pts { font-family: 'Playfair Display'; color: var(--tarot-gold); font-weight: 700; font-size: 1.1rem; }
+    .grimoire-motto {
+      font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 5px;
+      font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.8rem; display: block;
+    }
+    .oracles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin: 1.5rem 0 2.8rem; }
+    .oracle-box {
+      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
+      padding: 1.6rem 1.3rem; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+    .oracle-box:hover { border-color: var(--tarot-gold); transform: translateY(-4px); }
+    .oracle-symbol {
+      height: 48px; display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; color: var(--tarot-gold); margin-bottom: 0.6rem;
+      text-shadow: 0 0 15px rgba(226, 185, 97, 0.35);
+    }
+    .oracle-eye-svg { width: 46px; height: 32px; overflow: visible; filter: drop-shadow(0 0 8px rgba(226, 185, 97, 0.35)); }
+    .rubric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
+    .rubric-item { background: #0d0d0d; border: 1px solid var(--line); border-radius: 4px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; }
+    .rubric-pts { font-family: 'Cinzel', serif; color: var(--tarot-gold); font-weight: 700; font-size: 1.05rem; }
 
     @media (max-width: 720px) {
       .topbar { justify-content: center; text-align: center; }
@@ -370,7 +394,7 @@
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
-            <div class="card-front-label">Le Soleil</div>
+            <div class="card-front-label" data-i18n="card_sun">Le Soleil</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -379,7 +403,7 @@
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">NEITSU</div>
             <div class="tarot-image-container"><img src="neitsu.png" alt="Neitsu" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Entrer ✹</div>
+            <div class="enter-hint"><span data-i18n="enter_card">Entrer</span> ✹</div>
             <div class="tarot-rank">THE SUN</div>
           </div>
         </div>
@@ -391,7 +415,7 @@
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
-            <div class="card-front-label">La Lune</div>
+            <div class="card-front-label" data-i18n="card_moon">La Lune</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -400,7 +424,7 @@
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">KAINA</div>
             <div class="tarot-image-container"><img src="kaina.png" alt="Kaina" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Entrer ☾</div>
+            <div class="enter-hint"><span data-i18n="enter_card">Entrer</span> ☾</div>
             <div class="tarot-rank">THE MOON</div>
           </div>
         </div>
@@ -412,7 +436,7 @@
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
-            <div class="card-front-label">L'Étoile</div>
+            <div class="card-front-label" data-i18n="card_star">L'Étoile</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -421,7 +445,7 @@
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">AYA</div>
             <div class="tarot-image-container"><img src="aya.png" alt="Aya" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Entrer ✦</div>
+            <div class="enter-hint"><span data-i18n="enter_card">Entrer</span> ✦</div>
             <div class="tarot-rank">THE STAR</div>
           </div>
         </div>
@@ -433,7 +457,7 @@
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
-            <div class="card-front-label">Le Monde</div>
+            <div class="card-front-label" data-i18n="card_world">Le Monde</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -442,7 +466,7 @@
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">GLOBAL</div>
             <div class="tarot-image-container"><img src="world.png" alt="Global World" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Explorer ☉</div>
+            <div class="enter-hint"><span data-i18n="enter_card">Entrer</span> ☉</div>
             <div class="tarot-rank">THE WORLD</div>
           </div>
         </div>
@@ -456,35 +480,35 @@
      ========================================== -->
 <div id="app-dashboard">
   <div id="demoBanner" class="demo-banner" style="display:none;">
-    <span id="demoBannerText">🔮 Mode Vision (Démo) actif : aperçu avec 12 candidats simulés en attendant la fin des auditions.</span>
-    <button class="demo-toggle-btn" onclick="toggleDemoMode()" id="demoToggleBtn">Quitter la Démo</button>
+    <span id="demoBannerText"></span>
+    <button class="demo-toggle-btn" onclick="toggleDemoMode()" id="demoToggleBtn"></button>
   </div>
 
   <header>
     <div class="container topbar">
-      <div class="brand" onclick="retourMenuPrincipale()" title="Retour aux Cartes">
+      <div class="brand" onclick="retourMenuPrincipale()" title="Return">
         <h1>KÆOS PROJECT</h1>
         <p id="brandTagline">L'Académie des Oracles</p>
       </div>
 
       <!-- Sélecteur de Cercle instantané -->
       <div class="circle-switcher" id="circleSwitcher">
-        <button class="circle-btn" data-team="Global" onclick="switchTeam('Global')">☉ Global</button>
-        <button class="circle-btn" data-team="Soleil" onclick="switchTeam('Soleil')">✹ Soleil</button>
-        <button class="circle-btn" data-team="Lune" onclick="switchTeam('Lune')">☾ Lune</button>
-        <button class="circle-btn" data-team="Etoile" onclick="switchTeam('Etoile')">✦ Étoile</button>
+        <button class="circle-btn" data-team="Global" onclick="switchTeam('Global')">☉ <span data-i18n="btn_global">Global</span></button>
+        <button class="circle-btn" data-team="Soleil" onclick="switchTeam('Soleil')">✹ <span data-i18n="btn_sun">Soleil</span></button>
+        <button class="circle-btn" data-team="Lune" onclick="switchTeam('Lune')">☾ <span data-i18n="btn_moon">Lune</span></button>
+        <button class="circle-btn" data-team="Etoile" onclick="switchTeam('Etoile')">✦ <span data-i18n="btn_star">Étoile</span></button>
       </div>
 
       <div class="nav-wrapper">
         <nav id="nav"></nav>
         <select id="langSelect" class="lang-select">
-          <option value="fr">🇫🇷 FR</option>
-          <option value="en">🇬🇧 EN</option>
-          <option value="es">🇪🇸 ES</option>
-          <option value="de">🇩🇪 DE</option>
-          <option value="ja">🇯🇵 JA</option>
-          <option value="ko">🇰🇷 KO</option>
-          <option value="zh">🇨🇳 ZH</option>
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="de">DE</option>
+          <option value="ja">JA</option>
+          <option value="ko">KO</option>
+          <option value="zh">ZH</option>
         </select>
       </div>
     </div>
@@ -521,67 +545,338 @@ const state = {
 };
 
 // ==========================================
-// 1. TRADUCTIONS INTERNATIONALES (SAISON 3 MIXTE)
+// 1. DICTIONNAIRE COMPLET EN 7 LANGUES
 // ==========================================
 const I18N = {
   fr: {
-    tagline: "L'Académie des Oracles", welcome_title: "Le Grand Tirage",
+    tagline: "L'Académie des Oracles", menu_sub: "KÆOS PROJECT • Choisissez votre destinée",
+    card_sun: "Le Soleil", card_moon: "La Lune", card_star: "L'Étoile", card_world: "Le Monde", enter_card: "Entrer",
+    btn_global: "Global", btn_sun: "Soleil", btn_moon: "Lune", btn_star: "Étoile",
+    welcome_title: "Le Grand Tirage",
     nav_contestants: "Les Initiés", nav_rankings: "L'Alignement", nav_votes: "La Balance", nav_grimoire: "Le Grimoire",
-    search_ph: "Chercher une âme...", all_status: "Tous les destins",
-    safe: "Carte Dorée (Safe)", nominee: "Shadow Zone", saved_judges: "Grâce de l'Oracle", saved_public: "Grâce de la Balance", eliminated: "Consumé(e)", tbd: "En attente",
+    search_ph: "Rechercher un(e) candidat(e)...", all_status: "Tous les destins",
+    safe: "Carte Droite (Safe)", nominee: "Shadow Zone", saved_judges: "Grâce de l'Oracle", saved_public: "Grâce de la Balance", eliminated: "Consumé(e)", tbd: "En attente",
     winner: "ÉLU(E)", second: "2ÈME", third: "3ÈME", fourth: "4ÈME", fifth: "5ÈME",
     auto_updated: "Les astres sont alignés sur le cycle :", no_contestants: "Aucune carte trouvée pour ce filtre.",
-    rank: "Arcane", pos: "Pos", name: "Initié(e)", rankings_desc: "Évolution de l'Aura au fil des 5 cycles.",
+    rank: "Arcane", pos: "Pos", name: "Initié(e)", rankings_desc: "Évolution de l'Aura au fil des cycles.",
     nominations: "Le Jugement des Oracles", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Grâce de l'Oracle", saved_public_lbl: "Grâce de la Balance", eliminated_lbl: "Cartes Consumées",
     global_chart: "La Toile du Destin", perf_score: "Score Total", official_rank: "Arcane de Cercle", overall_rank: "Arcane Global",
     back_contestants: "← Retour aux cartes", contestant_not_found: "Carte perdue dans les limbes.",
     rounds_overview: "Livre des Cycles", round: "Cycle", official: "Arcane", status: "Destinée",
-    performances: "Rituels (Performances)", song: "Œuvre", links: "Visions", link_perf: "▶ Observer le Rituel", no_links: "Aucune vision enregistrée.",
+    performances: "Rituels (Performances)", song: "Œuvre", links: "Visions", link_perf: "Observer le Rituel", no_links: "Aucune vision enregistrée.",
     indiv_chart: "Fluctuation de l'Aura", radar_chart: "Pentagramme d'Aura",
+    radar_sun: "✹ Soleil (Neitsu)", radar_moon: "☾ Lune (Kaina)", radar_star: "✦ Étoile (Aya)", radar_eye: "Hauras", radar_vocal: "Vocal (/100)",
     country: "Terre", pronouns: "Identité", instagram: "Grimoire (Insta)",
-    votes: "Voix", vote_now: "⚖️ Faire pencher la Balance", no_vote_data: "Le silence règne sur la Balance pour ce cycle.", avail_vote_rounds: "Cycles ayant des votes :", total_votes: "Âmes ayant voté :", last_refresh: "Dernière vision :",
+    votes: "Votes", vote_now: "Faire pencher la Balance", no_vote_data: "Le silence règne sur la Balance pour ce cycle.", avail_vote_rounds: "Cycles disposant de votes :", total_votes: "Total des votes :", last_refresh: "Dernière vision :",
+    quota_shadow: "En Shadow Zone", quota_oracle: "Sauvés par l'Oracle", quota_public: "Sauvé(s) par le Public", quota_elim: "Cartes Consumées", public_save_zone: "Grâce de la Balance",
     r_prerank: "Pré-Rank (L'Éveil)", r_r1: "Round 1", r_r2: "Round 2", r_r3: "Round 3", r_r4: "Round 4", r_final: "Finale (L'Apothéose)",
     opening_soon: "Le Portail des Auditions est Ouvert",
-    audition_sub: "Du 1er au 13 novembre • 48 âmes seront retenues pour former les 3 Cercles et élire les 5 nouveaux membres du groupe final.",
-    audition_btn: "✦ Déposer mon Audition", demo_btn: "🔮 Simuler l'Académie (Aperçu Démo)"
+    audition_sub: "Du 1er au 13 novembre • 48 candidats seront retenus à l'issue des auditions pour intégrer les 3 Cercles et tenter de rejoindre le groupe final.",
+    audition_btn: "✦ Déposer mon Audition", demo_btn: "✧ Explorer un Aperçu (Mode Démo)", grimoire_btn: "✦ Consulter le Grimoire",
+    demo_banner_txt: "✧ Mode Aperçu (Démo) actif : simulation avec 12 candidats en attendant la clôture des auditions.", demo_exit_btn: "Quitter l'Aperçu",
+    cd_days: "Jours", cd_hours: "Heures", cd_mins: "Minutes", cd_secs: "Secondes",
+    grim_title: "Le Grimoire — KÆOS PROJECT",
+    grim_intro: "La Star KCA Academy ouvre son troisième chapitre : le KÆOS PROJECT. À l'issue de cette saison, 5 nouveaux membres (filles et garçons) seront recrutés aux côtés des 3 fondateurs pour former le groupe final de 8 artistes : KÆOS.",
+    grim_oracles_title: "Les 3 Cercles & Le Jury",
+    grim_neitsu_title: "NEITSU — Cercle du Soleil",
+    grim_neitsu_desc: "Créateur de la Star KCA Academy et fondateur du groupe KÆOS (« Keep An Eye On Us »). Aux côtés de Kaina et Aya, il recherche les nouveaux membres afin de compléter le groupe et dirige le Cercle du Soleil.",
+    grim_kaina_title: "KAINA — Cercle de la Lune",
+    grim_kaina_desc: "Membre fondatrice du groupe KÆOS. Elle accompagne la quête des nouveaux talents du projet et dirige le Cercle de la Lune.",
+    grim_aya_title: "AYA — Cercle de l'Étoile",
+    grim_aya_desc: "Membre fondatrice du groupe KÆOS. Elle accompagne la quête des nouveaux talents du projet et dirige le Cercle de l'Étoile.",
+    grim_hauras_title: "HAURAS — Quatrième Jury",
+    grim_hauras_desc: "Quatrième membre du jury. Extérieur à l'univers de la KCA, il apporte un point de vue musical indépendant et joue un rôle tout aussi essentiel dans les classements.",
+    grim_cycles_title: "Le Livre des Cycles",
+    grim_col_cycle: "Cycle", grim_col_songs: "Œuvres / Chansons", grim_col_destiny: "Déroulement",
+    grim_prerank_songs: "Audition libre (1er – 13 novembre)", grim_prerank_destiny: "Sélection des 48 Initiés et répartition dans les 3 Cercles",
+    grim_tba: "À venir (To Be Announced)",
+    grim_rubric_title: "Le Barème Vocal sur 100 Points",
+    grim_rubric_sub: "Le score vocal sur 100 points est évalué selon ces 11 critères :"
   },
   en: {
-    tagline: "The Oracles' Academy", welcome_title: "The Grand Reading",
+    tagline: "The Oracles' Academy", menu_sub: "KÆOS PROJECT • Choose your destiny",
+    card_sun: "The Sun", card_moon: "The Moon", card_star: "The Star", card_world: "The World", enter_card: "Enter",
+    btn_global: "Global", btn_sun: "Sun", btn_moon: "Moon", btn_star: "Star",
+    welcome_title: "The Grand Reading",
     nav_contestants: "Initiates", nav_rankings: "Alignment", nav_votes: "The Scale", nav_grimoire: "Grimoire",
-    search_ph: "Search a soul...", all_status: "All destinies",
-    safe: "Golden Card (Safe)", nominee: "Shadow Zone", saved_judges: "Oracle's Grace", saved_public: "Scale's Grace", eliminated: "Consumed", tbd: "Unknown",
+    search_ph: "Search an initiate...", all_status: "All destinies",
+    safe: "Upright Card (Safe)", nominee: "Shadow Zone", saved_judges: "Oracle's Grace", saved_public: "Scale's Grace", eliminated: "Consumed", tbd: "Pending",
     winner: "CHOSEN", second: "2ND", third: "3RD", fourth: "4TH", fifth: "5TH",
     auto_updated: "The stars are aligned for cycle:", no_contestants: "No card found.",
-    rank: "Arcana", pos: "Pos", name: "Initiate", rankings_desc: "Aura evolution across the 5 cycles.",
+    rank: "Arcana", pos: "Pos", name: "Initiate", rankings_desc: "Aura evolution across the cycles.",
     nominations: "The Oracles' Judgment", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Oracle's Grace", saved_public_lbl: "Scale's Grace", eliminated_lbl: "Consumed Cards",
     global_chart: "Web of Destiny", perf_score: "Total Power", official_rank: "Circle Arcana", overall_rank: "Global Arcana",
     back_contestants: "← Back to cards", contestant_not_found: "Card lost in limbo.",
     rounds_overview: "Book of Cycles", round: "Cycle", official: "Arcana", status: "Destiny",
-    performances: "Rituals (Performances)", song: "Work", links: "Visions", link_perf: "▶ Observe Ritual", no_links: "No visions recorded.",
+    performances: "Rituals (Performances)", song: "Work", links: "Visions", link_perf: "Observe Ritual", no_links: "No visions recorded.",
     indiv_chart: "Aura Fluctuation", radar_chart: "Aura Pentagram",
+    radar_sun: "✹ Sun (Neitsu)", radar_moon: "☾ Moon (Kaina)", radar_star: "✦ Star (Aya)", radar_eye: "Hauras", radar_vocal: "Vocal (/100)",
     country: "Land", pronouns: "Identity", instagram: "Grimoire (Insta)",
-    votes: "Voices", vote_now: "⚖️ Tip the Scale", no_vote_data: "Silence reigns on the Scale this cycle.", avail_vote_rounds: "Influenceable cycles:", total_votes: "Souls voted:", last_refresh: "Last vision:",
+    votes: "Votes", vote_now: "Tip the Scale", no_vote_data: "Silence reigns on the Scale this cycle.", avail_vote_rounds: "Influenceable cycles:", total_votes: "Total votes:", last_refresh: "Last vision:",
+    quota_shadow: "In Shadow Zone", quota_oracle: "Saved by Oracle", quota_public: "Saved by Public", quota_elim: "Consumed Cards", public_save_zone: "Scale's Grace",
     r_prerank: "Pre-Rank (Awakening)", r_r1: "Round 1", r_r2: "Round 2", r_r3: "Round 3", r_r4: "Round 4", r_final: "Finale (Apotheosis)",
     opening_soon: "The Audition Portal is Open",
-    audition_sub: "November 1 to 13 • 48 souls will be chosen across the 3 Circles to crown the 5 new members of the final group.",
-    audition_btn: "✦ Submit my Audition", demo_btn: "🔮 Preview Academy (Demo Mode)"
+    audition_sub: "November 1 to 13 • 48 contestants will be selected through auditions to join the 3 Circles and compete for a spot in the final group.",
+    audition_btn: "✦ Submit my Audition", demo_btn: "✧ Explore Preview (Demo Mode)", grimoire_btn: "✦ Read the Grimoire",
+    demo_banner_txt: "✧ Preview Mode (Demo) active: displaying 12 simulated contestants while auditions are open.", demo_exit_btn: "Exit Preview",
+    cd_days: "Days", cd_hours: "Hours", cd_mins: "Minutes", cd_secs: "Seconds",
+    grim_title: "The Grimoire — KÆOS PROJECT",
+    grim_intro: "Star KCA Academy opens its third chapter: the KÆOS PROJECT. Through this season, 5 new members (girls and boys) will be recruited alongside the 3 founders to form the final 8-artist group: KÆOS.",
+    grim_oracles_title: "The 3 Circles & The Jury",
+    grim_neitsu_title: "NEITSU — Circle of the Sun",
+    grim_neitsu_desc: "Creator of the Star KCA Academy and founder of the group KÆOS ('Keep An Eye On Us'). Alongside Kaina and Aya, he seeks the new members to complete the group and leads the Circle of the Sun.",
+    grim_kaina_title: "KAINA — Circle of the Moon",
+    grim_kaina_desc: "Founding member of KÆOS. Alongside Neitsu and Aya, she searches for the future members of the group and leads the Circle of the Moon.",
+    grim_aya_title: "AYA — Circle of the Star",
+    grim_aya_desc: "Founding member of KÆOS. Alongside Neitsu and Kaina, she searches for the future members of the group and leads the Circle of the Star.",
+    grim_hauras_title: "HAURAS — Fourth Judge",
+    grim_hauras_desc: "Fourth member of the jury. Coming from outside the KCA universe, he brings an external musical perspective and plays an equally vital role in the rankings.",
+    grim_cycles_title: "The Book of Cycles",
+    grim_col_cycle: "Cycle", grim_col_songs: "Works / Songs", grim_col_destiny: "Progression",
+    grim_prerank_songs: "Open Audition (November 1 – 13)", grim_prerank_destiny: "Selection of the 48 Initiates and distribution into the 3 Circles",
+    grim_tba: "To Be Announced",
+    grim_rubric_title: "100-Point Vocal Rubric",
+    grim_rubric_sub: "The 100-point vocal score is evaluated across these 11 criteria:"
+  },
+  es: {
+    tagline: "La Academia de los Oráculos", menu_sub: "KÆOS PROJECT • Elige tu destino",
+    card_sun: "El Sol", card_moon: "La Luna", card_star: "La Estrella", card_world: "El Mundo", enter_card: "Entrar",
+    btn_global: "Global", btn_sun: "Sol", btn_moon: "Luna", btn_star: "Estrella",
+    welcome_title: "La Gran Lectura",
+    nav_contestants: "Iniciados", nav_rankings: "Alineación", nav_votes: "La Balanza", nav_grimoire: "El Grimorio",
+    search_ph: "Buscar un(a) candidato(a)...", all_status: "Todos los destinos",
+    safe: "Carta Derecha (Safe)", nominee: "Shadow Zone", saved_judges: "Gracia del Oráculo", saved_public: "Gracia de la Balanza", eliminated: "Consumido(a)", tbd: "Pendiente",
+    winner: "ELEGIDO(A)", second: "2º", third: "3º", fourth: "4º", fifth: "5º",
+    auto_updated: "Los astros están alineados para el ciclo:", no_contestants: "Ninguna carta encontrada.",
+    rank: "Arcano", pos: "Pos", name: "Iniciado(a)", rankings_desc: "Evolución del Aura a través de los ciclos.",
+    nominations: "El Juicio de los Oráculos", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Gracia del Oráculo", saved_public_lbl: "Gracia de la Balanza", eliminated_lbl: "Cartas Consumidas",
+    global_chart: "La Red del Destino", perf_score: "Poder Total", official_rank: "Arcano de Círculo", overall_rank: "Arcano Global",
+    back_contestants: "← Volver a las cartas", contestant_not_found: "Carta perdida en el limbo.",
+    rounds_overview: "Libro de los Ciclos", round: "Ciclo", official: "Arcano", status: "Destino",
+    performances: "Rituales (Actuaciones)", song: "Obra", links: "Visiones", link_perf: "Observar Ritual", no_links: "Sin visiones.",
+    indiv_chart: "Fluctuación del Aura", radar_chart: "Pentagrama de Aura",
+    radar_sun: "✹ Sol (Neitsu)", radar_moon: "☾ Luna (Kaina)", radar_star: "✦ Estrella (Aya)", radar_eye: "Hauras", radar_vocal: "Vocal (/100)",
+    country: "Tierra", pronouns: "Identidad", instagram: "Grimorio (Insta)",
+    votes: "Votos", vote_now: "Inclinar la Balanza", no_vote_data: "El silencio reina en la Balanza en este ciclo.", avail_vote_rounds: "Ciclos con votos:", total_votes: "Votos totales:", last_refresh: "Última visión:",
+    quota_shadow: "En Shadow Zone", quota_oracle: "Salvados por el Oráculo", quota_public: "Salvado(s) por el Público", quota_elim: "Cartas Consumidas", public_save_zone: "Gracia de la Balanza",
+    r_prerank: "Pre-Rank (El Despertar)", r_r1: "Ronda 1", r_r2: "Ronda 2", r_r3: "Ronda 3", r_r4: "Ronda 4", r_final: "Final (La Apoteosis)",
+    opening_soon: "El Portal de Audiciones está Abierto",
+    audition_sub: "Del 1 al 13 de noviembre • 48 candidatos serán seleccionados para formar los 3 Círculos y competir por un lugar en el grupo final.",
+    audition_btn: "✦ Enviar mi Audición", demo_btn: "✧ Explorar Vista Previa (Demo)", grimoire_btn: "✦ Consultar el Grimorio",
+    demo_banner_txt: "✧ Modo Vista Previa (Demo) activo: mostrando 12 candidatos simulados durante las audiciones.", demo_exit_btn: "Salir de la Demo",
+    cd_days: "Días", cd_hours: "Horas", cd_mins: "Minutos", cd_secs: "Segundos",
+    grim_title: "El Grimorio — KÆOS PROJECT",
+    grim_intro: "Star KCA Academy abre su tercer capítulo: el KÆOS PROJECT. En esta temporada se reclutarán 5 nuevos miembros (chicas y chicos) junto a los 3 fundadores para formar el grupo final de 8 artistas: KÆOS.",
+    grim_oracles_title: "Los 3 Círculos y el Jurado",
+    grim_neitsu_title: "NEITSU — Círculo del Sol",
+    grim_neitsu_desc: "Creador del concurso y fundador del grupo KÆOS ('Keep An Eye On Us'). Junto a Kaina y Aya, busca a los nuevos miembros para completar el grupo y dirige el Círculo del Sol.",
+    grim_kaina_title: "KAINA — Círculo de la Luna",
+    grim_kaina_desc: "Miembro fundadora del grupo KÆOS. Acompaña la búsqueda de los nuevos talentos y dirige el Círculo de la Luna.",
+    grim_aya_title: "AYA — Círculo de la Estrella",
+    grim_aya_desc: "Miembro fundadora del grupo KÆOS. Acompaña la búsqueda de los nuevos talentos y dirige el Círculo de la Estrella.",
+    grim_hauras_title: "HAURAS — Cuarto Jurado",
+    grim_hauras_desc: "Cuarto miembro del jurado. Externo al mundo de KCA, aporta una perspectiva musical independiente con un papel igualmente importante.",
+    grim_cycles_title: "El Libro de los Ciclos",
+    grim_col_cycle: "Ciclo", grim_col_songs: "Obras / Canciones", grim_col_destiny: "Desarrollo",
+    grim_prerank_songs: "Audición libre (1 – 13 de noviembre)", grim_prerank_destiny: "Selección de los 48 Iniciados y distribución en los 3 Círculos",
+    grim_tba: "Próximamente (To Be Announced)",
+    grim_rubric_title: "Baremo Vocal sobre 100 Puntos",
+    grim_rubric_sub: "La puntuación vocal sobre 100 se evalúa según estos 11 criterios:"
+  },
+  de: {
+    tagline: "Die Akademie der Orakel", menu_sub: "KÆOS PROJECT • Wähle dein Schicksal",
+    card_sun: "Die Sonne", card_moon: "Der Mond", card_star: "Der Stern", card_world: "Die Welt", enter_card: "Eintreten",
+    btn_global: "Global", btn_sun: "Sonne", btn_moon: "Mond", btn_star: "Stern",
+    welcome_title: "Die Große Lesung",
+    nav_contestants: "Eingeweihte", nav_rankings: "Ausrichtung", nav_votes: "Die Waage", nav_grimoire: "Grimoire",
+    search_ph: "Kandidat(in) suchen...", all_status: "Alle Schicksale",
+    safe: "Aufrechte Karte (Safe)", nominee: "Shadow Zone", saved_judges: "Gnade des Orakels", saved_public: "Gnade der Waage", eliminated: "Verzehrt", tbd: "Ausstehend",
+    winner: "AUSERWÄHLT", second: "2.", third: "3.", fourth: "4.", fifth: "5.",
+    auto_updated: "Die Sterne stehen günstig für den Zyklus:", no_contestants: "Keine Karte gefunden.",
+    rank: "Arkana", pos: "Pos", name: "Eingeweihte(r)", rankings_desc: "Entwicklung der Aura über die Zyklen.",
+    nominations: "Das Urteil der Orakel", nominee_lbl: "Shadow Zone", saved_judges_lbl: "Gnade des Orakels", saved_public_lbl: "Gnade der Waage", eliminated_lbl: "Verzehrte Karten",
+    global_chart: "Das Netz des Schicksals", perf_score: "Gesamtpunkte", official_rank: "Kreis-Arkana", overall_rank: "Globale Arkana",
+    back_contestants: "← Zurück zu den Karten", contestant_not_found: "Karte im Limbus verloren.",
+    rounds_overview: "Buch der Zyklen", round: "Zyklus", official: "Arkana", status: "Schicksal",
+    performances: "Rituale (Auftritte)", song: "Werk", links: "Visionen", link_perf: "Ritual ansehen", no_links: "Keine Visionen.",
+    indiv_chart: "Aura-Schwankung", radar_chart: "Aura-Pentagramm",
+    radar_sun: "✹ Sonne (Neitsu)", radar_moon: "☾ Mond (Kaina)", radar_star: "✦ Stern (Aya)", radar_eye: "Hauras", radar_vocal: "Vokal (/100)",
+    country: "Land", pronouns: "Identität", instagram: "Grimoire (Insta)",
+    votes: "Stimmen", vote_now: "Die Waage neigen", no_vote_data: "In diesem Zyklus herrscht Stille.", avail_vote_rounds: "Beeinflussbare Zyklen:", total_votes: "Stimmen gesamt:", last_refresh: "Letzte Vision:",
+    quota_shadow: "In der Shadow Zone", quota_oracle: "Vom Orakel gerettet", quota_public: "Vom Publikum gerettet", quota_elim: "Verzehrte Karten", public_save_zone: "Gnade der Waage",
+    r_prerank: "Pre-Rank (Das Erwachen)", r_r1: "Runde 1", r_r2: "Runde 2", r_r3: "Runde 3", r_r4: "Runde 4", r_final: "Finale (Apotheose)",
+    opening_soon: "Das Audition-Portal ist Geöffnet",
+    audition_sub: "1. bis 13. November • 48 Kandidaten werden ausgewählt, um den 3 Kreisen beizutreten und um einen Platz in der finalen Gruppe zu kämpfen.",
+    audition_btn: "✦ Audition einreichen", demo_btn: "✧ Vorschau erkunden (Demo)", grimoire_btn: "✦ Grimoire lesen",
+    demo_banner_txt: "✧ Vorschaumodus (Demo) aktiv: 12 simulierte Kandidaten während der laufenden Auditions.", demo_exit_btn: "Vorschau beenden",
+    cd_days: "Tage", cd_hours: "Stunden", cd_mins: "Minuten", cd_secs: "Sekunden",
+    grim_title: "Das Grimoire — KÆOS PROJECT",
+    grim_intro: "Die Star KCA Academy eröffnet ihr drittes Kapitel: das KÆOS PROJECT. 5 neue Mitglieder (Mädchen und Jungen) werden neben den 3 Gründern gesucht, um die finale 8-köpfige Gruppe KÆOS zu bilden.",
+    grim_oracles_title: "Die 3 Kreise & Die Jury",
+    grim_neitsu_title: "NEITSU — Kreis der Sonne",
+    grim_neitsu_desc: "Schöpfer des Wettbewerbs und Gründer der Gruppe KÆOS ('Keep An Eye On Us'). Gemeinsam mit Kaina und Aya sucht er die neuen Mitglieder und leitet den Kreis der Sonne.",
+    grim_kaina_title: "KAINA — Kreis des Mondes",
+    grim_kaina_desc: "Gründungsmitglied der Gruppe KÆOS. Sie begleitet die Suche nach den neuen Talenten und leitet den Kreis des Mondes.",
+    grim_aya_title: "AYA — Kreis des Sterns",
+    grim_aya_desc: "Gründungsmitglied der Gruppe KÆOS. Sie begleitet die Suche nach den neuen Talenten und leitet den Kreis des Sterns.",
+    grim_hauras_title: "HAURAS — Vierter Juror",
+    grim_hauras_desc: "Viertes Jurymitglied. Außerhalb der KCA-Welt bringt er eine unabhängige musikalische Perspektive mit einer ebenso wichtigen Rolle ein.",
+    grim_cycles_title: "Das Buch der Zyklen",
+    grim_col_cycle: "Zyklus", grim_col_songs: "Werke / Songs", grim_col_destiny: "Ablauf",
+    grim_prerank_songs: "Freie Audition (1. – 13. November)", grim_prerank_destiny: "Auswahl der 48 Eingeweihten und Aufteilung in die 3 Kreise",
+    grim_tba: "Demnächst (To Be Announced)",
+    grim_rubric_title: "100-Punkte Gesangsbewertung",
+    grim_rubric_sub: "Die 100 Punkte für den Gesang setzen sich aus diesen 11 Kriterien zusammen:"
+  },
+  ja: {
+    tagline: "オラクルのアカデミー", menu_sub: "KÆOS PROJECT • 運命を選べ",
+    card_sun: "太陽", card_moon: "月", card_star: "星", card_world: "世界", enter_card: "入る",
+    btn_global: "全体", btn_sun: "太陽", btn_moon: "月", btn_star: "星",
+    welcome_title: "大いなる導き",
+    nav_contestants: "入門者", nav_rankings: "星の配置", nav_votes: "天秤", nav_grimoire: "魔導書",
+    search_ph: "候補者を検索...", all_status: "すべての運命",
+    safe: "正位置 (Safe)", nominee: "シャドウゾーン", saved_judges: "オラクルの恩寵", saved_public: "天秤の恩寵", eliminated: "消滅", tbd: "未定",
+    winner: "選ばれし者", second: "2位", third: "3位", fourth: "4位", fifth: "5位",
+    auto_updated: "現在のサイクル:", no_contestants: "カードが見つかりません。",
+    rank: "アルカナ", pos: "順位", name: "入門者", rankings_desc: "サイクルごとのオーラの推移。",
+    nominations: "オラクルの審判", nominee_lbl: "シャドウゾーン", saved_judges_lbl: "オラクルの恩寵", saved_public_lbl: "天秤の恩寵", eliminated_lbl: "消滅したカード",
+    global_chart: "運命の網", perf_score: "合計スコア", official_rank: "サークル順位", overall_rank: "全体順位",
+    back_contestants: "← カード一覧へ", contestant_not_found: "カードが見つかりません。",
+    rounds_overview: "サイクルの書", round: "サイクル", official: "アルカナ", status: "運命",
+    performances: "儀式 (パフォーマンス)", song: "楽曲", links: "映像", link_perf: "儀式を観る", no_links: "記録なし。",
+    indiv_chart: "オーラの変動", radar_chart: "オーラ五芒星",
+    radar_sun: "✹ 太陽 (Neitsu)", radar_moon: "☾ 月 (Kaina)", radar_star: "✦ 星 (Aya)", radar_eye: "Hauras", radar_vocal: "ボーカル (/100)",
+    country: "出身", pronouns: "代名詞", instagram: "Instagram",
+    votes: "票", vote_now: "天秤を傾ける (投票)", no_vote_data: "このサイクルにはまだ投票がありません。", avail_vote_rounds: "投票のあるサイクル:", total_votes: "総投票数:", last_refresh: "最終更新:",
+    quota_shadow: "シャドウゾーン", quota_oracle: "オラクル救済", quota_public: "視聴者救済", quota_elim: "消滅カード", public_save_zone: "天秤の恩寵",
+    r_prerank: "プレランク (覚醒)", r_r1: "ラウンド 1", r_r2: "ラウンド 2", r_r3: "ラウンド 3", r_r4: "ラウンド 4", r_final: "ファイナル (神格化)",
+    opening_soon: "オーディション受付中",
+    audition_sub: "11月1日〜13日 • オーディションで48名が選出され、3つのサークルに分かれて最終グループの座を競います。",
+    audition_btn: "✦ オーディションに応募する", demo_btn: "✧ プレビューを見る (デモ)", grimoire_btn: "✦ 魔導書を読む",
+    demo_banner_txt: "✧ プレビューモード(デモ)表示中：12名のサンプル候補者を表示しています。", demo_exit_btn: "デモを終了",
+    cd_days: "日", cd_hours: "時間", cd_mins: "分", cd_secs: "秒",
+    grim_title: "魔導書 — KÆOS PROJECT",
+    grim_intro: "Star KCA Academyの第3章「KÆOS PROJECT」。今シーズンでは3人の創設者と共に最終8人組グループ「KÆOS」を結成する5人の新メンバー（男女）を募集します。",
+    grim_oracles_title: "3つのサークルと審査員",
+    grim_neitsu_title: "NEITSU — 太陽のサークル",
+    grim_neitsu_desc: "コンテストの創設者であり、グループ「KÆOS（Keep An Eye On Us）」の創設者。Kaina、Ayaと共に新メンバーを探し、太陽のサークルを率いる。",
+    grim_kaina_title: "KAINA — 月のサークル",
+    grim_kaina_desc: "KÆOSの創設メンバー。新たな才能の発掘を共に担い、月のサークルを率いる。",
+    grim_aya_title: "AYA — 星のサークル",
+    grim_aya_desc: "KÆOSの創設メンバー。新たな才能の発掘を共に担い、星のサークルを率いる。",
+    grim_hauras_title: "HAURAS — 第4の審査員",
+    grim_hauras_desc: "第4の審査員。KCAの世界の外から客観的な音楽的視点をもたらし、ランキングにおいて同様に重要な役割を果たす。",
+    grim_cycles_title: "サイクルの書",
+    grim_col_cycle: "サイクル", grim_col_songs: "課題曲", grim_col_destiny: "進行",
+    grim_prerank_songs: "自由曲オーディション (11月1日〜13日)", grim_prerank_destiny: "48名の選出および3つのサークルへの振り分け",
+    grim_tba: "近日公開 (To Be Announced)",
+    grim_rubric_title: "ボーカル採点基準 (100点満点)",
+    grim_rubric_sub: "100点満点のボーカルスコアは以下の11項目で評価されます："
+  },
+  ko: {
+    tagline: "오라클 아카데미", menu_sub: "KÆOS PROJECT • 당신의 운명을 선택하세요",
+    card_sun: "태양", card_moon: "달", card_star: "별", card_world: "세계", enter_card: "입장",
+    btn_global: "전체", btn_sun: "태양", btn_moon: "달", btn_star: "별",
+    welcome_title: "위대한 리딩",
+    nav_contestants: "입문자", nav_rankings: "별의 정렬", nav_votes: "천칭", nav_grimoire: "그리무아르",
+    search_ph: "참가자 검색...", all_status: "모든 운명",
+    safe: "정방향 카드 (Safe)", nominee: "섀도우 존", saved_judges: "오라클의 은총", saved_public: "천칭의 은총", eliminated: "소멸됨", tbd: "대기 중",
+    winner: "최종 선발", second: "2위", third: "3위", fourth: "4위", fifth: "5위",
+    auto_updated: "현재 정렬된 주기:", no_contestants: "카드를 찾을 수 없습니다.",
+    rank: "아르카나", pos: "순위", name: "입문자", rankings_desc: "주기에 따른 오라의 변화.",
+    nominations: "오라클의 심판", nominee_lbl: "섀도우 존", saved_judges_lbl: "오라클의 은총", saved_public_lbl: "천칭의 은총", eliminated_lbl: "소멸된 카드",
+    global_chart: "운명의 그물", perf_score: "총점", official_rank: "서클 아르카나", overall_rank: "전체 아르카나",
+    back_contestants: "← 카드로 돌아가기", contestant_not_found: "카드를 찾을 수 없습니다.",
+    rounds_overview: "주기의 서", round: "주기", official: "아르카나", status: "운명",
+    performances: "의식 (퍼포먼스)", song: "곡명", links: "영상", link_perf: "퍼포먼스 보기", no_links: "기록 없음.",
+    indiv_chart: "오라 변동", radar_chart: "오라 펜타그램",
+    radar_sun: "✹ 태양 (Neitsu)", radar_moon: "☾ 달 (Kaina)", radar_star: "✦ 별 (Aya)", radar_eye: "Hauras", radar_vocal: "보컬 (/100)",
+    country: "국가", pronouns: "대명사", instagram: "인스타그램",
+    votes: "표", vote_now: "천칭 기울이기 (투표)", no_vote_data: "이번 주기에는 아직 투표가 없습니다.", avail_vote_rounds: "투표 기록 주기:", total_votes: "총 투표수:", last_refresh: "최근 업데이트:",
+    quota_shadow: "섀도우 존", quota_oracle: "오라클 구제", quota_public: "대중 투표 구제", quota_elim: "소멸된 카드", public_save_zone: "천칭의 은총",
+    r_prerank: "프리랭크 (각성)", r_r1: "라운드 1", r_r2: "라운드 2", r_r3: "라운드 3", r_r4: "라운드 4", r_final: "파이널 (신격화)",
+    opening_soon: "오디션 포털 오픈",
+    audition_sub: "11월 1일 ~ 13일 • 오디션을 통해 선발된 48명의 참가자가 3개의 서클에 배정되어 최종 그룹 데뷔를 향해 경쟁합니다.",
+    audition_btn: "✦ 오디션 지원하기", demo_btn: "✧ 미리보기 체험 (데모 모드)", grimoire_btn: "✦ 그리무아르 열람",
+    demo_banner_txt: "✧ 미리보기(데모) 모드 활성화: 12명의 가상 참가자 데이터를 표시 중입니다.", demo_exit_btn: "미리보기 종료",
+    cd_days: "일", cd_hours: "시간", cd_mins: "분", cd_secs: "초",
+    grim_title: "그리무아르 — KÆOS PROJECT",
+    grim_intro: "Star KCA Academy의 세 번째 챕터, KÆOS PROJECT가 시작됩니다. 이번 시즌을 통해 3명의 창립 멤버와 함께 최종 8인조 그룹 KÆOS를 완성할 5명의 새로운 멤버(남녀 무관)를 선발합니다.",
+    grim_oracles_title: "3개의 서클 & 심사위원단",
+    grim_neitsu_title: "NEITSU — 태양의 서클",
+    grim_neitsu_desc: "서바이벌의 창립자이자 그룹 KÆOS('Keep An Eye On Us')의 설립자. Kaina, Aya와 함께 그룹을 완성할 새 멤버를 찾으며 태양의 서클을 이끕니다.",
+    grim_kaina_title: "KAINA — 달의 서클",
+    grim_kaina_desc: "그룹 KÆOS의 창립 멤버. 새로운 인재를 발굴하며 달의 서클을 이끕니다.",
+    grim_aya_title: "AYA — 별의 서클",
+    grim_aya_desc: "그룹 KÆOS의 창립 멤버. 새로운 인재를 발굴하며 별의 서클을 이끕니다.",
+    grim_hauras_title: "HAURAS — 제4 심사위원",
+    grim_hauras_desc: "네 번째 심사위원. KCA 외부의 독립적인 음악적 시선을 제공하며 순위 산정에서 동등하게 중요한 역할을 담당합니다.",
+    grim_cycles_title: "주기의 서",
+    grim_col_cycle: "주기", grim_col_songs: "미션곡", grim_col_destiny: "진행 방식",
+    grim_prerank_songs: "자유곡 오디션 (11월 1일 – 13일)", grim_prerank_destiny: "48명의 입문자 선발 및 3개 서클 배정",
+    grim_tba: "추후 공개 (To Be Announced)",
+    grim_rubric_title: "100점 만점 보컬 평가 기준",
+    grim_rubric_sub: "100점 만점의 보컬 점수는 다음 11가지 항목으로 평가됩니다:"
+  },
+  zh: {
+    tagline: "神谕学院", menu_sub: "KÆOS PROJECT • 选择你的命运",
+    card_sun: "太阳", card_moon: "月亮", card_star: "星辰", card_world: "世界", enter_card: "进入",
+    btn_global: "全局", btn_sun: "太阳", btn_moon: "月亮", btn_star: "星辰",
+    welcome_title: "大占卜",
+    nav_contestants: "启蒙者", nav_rankings: "星象排列", nav_votes: "天平", nav_grimoire: "魔法书",
+    search_ph: "搜索选手...", all_status: "所有命运",
+    safe: "正位牌 (Safe)", nominee: "暗影区", saved_judges: "神谕之恩", saved_public: "天平之恩", eliminated: "已吞噬", tbd: "待定",
+    winner: "天选成员", second: "第2名", third: "第3名", fourth: "第4名", fifth: "第5名",
+    auto_updated: "当前星辰对齐周期：", no_contestants: "未找到卡牌。",
+    rank: "秘仪", pos: "位置", name: "启蒙者", rankings_desc: "各周期光环演变。",
+    nominations: "神谕的审判", nominee_lbl: "暗影区", saved_judges_lbl: "神谕之恩", saved_public_lbl: "天平之恩", eliminated_lbl: "被吞噬的卡牌",
+    global_chart: "命运之网", perf_score: "总分", official_rank: "法阵秘仪", overall_rank: "全局秘仪",
+    back_contestants: "← 返回卡牌", contestant_not_found: "未找到该卡牌。",
+    rounds_overview: "周期之书", round: "周期", official: "秘仪", status: "命运",
+    performances: "仪式 (舞台)", song: "曲目", links: "幻象", link_perf: "观看舞台", no_links: "暂无记录。",
+    indiv_chart: "光环波动", radar_chart: "光环五芒星",
+    radar_sun: "✹ 太阳 (Neitsu)", radar_moon: "☾ 月亮 (Kaina)", radar_star: "✦ 星辰 (Aya)", radar_eye: "Hauras", radar_vocal: "声乐 (/100)",
+    country: "地区", pronouns: "代词", instagram: "Instagram",
+    votes: "票", vote_now: "倾斜天平 (投票)", no_vote_data: "本周期天平尚无投票数据。", avail_vote_rounds: "有投票的周期：", total_votes: "总票数：", last_refresh: "最后更新：",
+    quota_shadow: "处于暗影区", quota_oracle: "神谕拯救", quota_public: "大众投票拯救", quota_elim: "被吞噬卡牌", public_save_zone: "天平之恩",
+    r_prerank: "预排位 (觉醒)", r_r1: "第1轮", r_r2: "第2轮", r_r3: "第3轮", r_r4: "第4轮", r_final: "总决赛 (神化)",
+    opening_soon: "海选通道已开启",
+    audition_sub: "11月1日至13日 • 海选将选出48名选手进入三大法阵，角逐最终组合的出道席位。",
+    audition_btn: "✦ 提交海选报名", demo_btn: "✧ 预览学院 (演示模式)", grimoire_btn: "✦ 查阅魔法书",
+    demo_banner_txt: "✧ 预览模式（演示）已开启：当前展示12位模拟选手数据。", demo_exit_btn: "退出预览",
+    cd_days: "天", cd_hours: "时", cd_mins: "分", cd_secs: "秒",
+    grim_title: "魔法书 — KÆOS PROJECT",
+    grim_intro: "Star KCA Academy 开启第三篇章：KÆOS PROJECT。本季将携手3位创始成员，招募5名新成员（男女不限），共同组成最终的8人组合：KÆOS。",
+    grim_oracles_title: "三大法阵与评审团",
+    grim_neitsu_title: "NEITSU — 太阳法阵",
+    grim_neitsu_desc: "比赛创始人兼组合 KÆOS（“Keep An Eye On Us”）创立者。与 Kaina 和 Aya 一同寻找新成员以完整组合，并统领太阳法阵。",
+    grim_kaina_title: "KAINA — 月亮法阵",
+    grim_kaina_desc: "组合 KÆOS 创始成员。共同发掘项目新秀，并统领月亮法阵。",
+    grim_aya_title: "AYA — 星辰法阵",
+    grim_aya_desc: "组合 KÆOS 创始成员。共同发掘项目新秀，并统领星辰法阵。",
+    grim_hauras_title: "HAURAS — 第四评审",
+    grim_hauras_desc: "第四位评审成员。来自 KCA 体系之外，提供独立的外部音乐视角，在排名中发挥同样重要的作用。",
+    grim_cycles_title: "周期之书",
+    grim_col_cycle: "周期", grim_col_songs: "曲目", grim_col_destiny: "赛制进程",
+    grim_prerank_songs: "自由曲目海选 (11月1日 – 13日)", grim_prerank_destiny: "选出48名启蒙者并分配至三大法阵",
+    grim_tba: "敬请期待 (To Be Announced)",
+    grim_rubric_title: "100分制声乐评分标准",
+    grim_rubric_sub: "100分声乐评分由以下11个维度构成："
   }
 };
-// Fallback automatique pour ES, DE, JA, KO, ZH vers EN si une nouvelle clé manque
-['es','de','ja','ko','zh'].forEach(l => { I18N[l] = { ...I18N.en }; });
 
 let currentLang = localStorage.getItem('kca_lang') || 'fr';
 function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.fr[key] || key; }
 
 // ==========================================
-// 2. CONFIGURATION SAISON 3 (5 ROUNDS)
+// 2. CONFIGURATION SAISON 3 (LIENS OFFICIELS)
 // ==========================================
 const CONFIG = {
   SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
   VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
   ROUND_TABS: { PRERANK: "PRERANK", ROUND_1: "R1", ROUND_2: "R2", ROUND_3: "R3", ROUND_4: "R4", FINAL: "R5" },
   VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
-  AUDITION_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
+  AUDITION_FORM_URL: "https://forms.gle/q3V1uG6XnYNNQKXf8",
   REFRESH_MS: 45000
 };
 
@@ -589,7 +884,6 @@ const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "FIN
 const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"];
 const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
 
-// Règles officielles de chaque Round par Cercle (pour la Balance et le Grimoire)
 const ROUND_RULES = {
   PRERANK: { total: 48, safe: 48, shadow: 0, oracleSave: 0, publicSave: 0, elim: 0 },
   ROUND_1: { total: 16, safe: 8,  shadow: 8, oracleSave: 3, publicSave: 2, elim: 3 },
@@ -632,14 +926,12 @@ function generateDemoData() {
       id: dc.id, name: dc.name, photo_url: `${dc.id}.png`,
       country: dc.country, pronouns: dc.pronouns, instagram: dc.instagram, teamClass: dc.teamClass
     });
-    // Pré-rank
     scores.push({ round_id: 'PRERANK', contestant_id: dc.id, total: dc.s_r1 - 3 });
     round_status.push({ round_id: 'PRERANK', contestant_id: dc.id, status: 'safe' });
     JUDGE_NAMES.forEach((jn, jIdx) => {
       judge_rankings.push({ round_id: 'PRERANK', judge_name: jn, contestant_id: dc.id, rank: (idx + jIdx) % 12 + 1 });
     });
 
-    // Round 1
     scores.push({ round_id: 'ROUND_1', contestant_id: dc.id, total: dc.s_r1 });
     round_status.push({ round_id: 'ROUND_1', contestant_id: dc.id, status: dc.st_r1 });
     JUDGE_NAMES.forEach((jn, jIdx) => {
@@ -647,12 +939,12 @@ function generateDemoData() {
     });
     submissions.push({
       round_id: 'ROUND_1', contestant_id: dc.id,
-      song_title: 'Cosmic Symphony (Mission 1)', group_song: 'Cercle Anthem',
+      song_title: 'Locked On Me', group_song: '',
       youtube_url: 'https://instagram.com', bandlab_url: ''
     });
 
     if (dc.st_r1 === 'nominee' || dc.st_r1 === 'saved_public') {
-      votes_live.push({ round_id: 'ROUND_1', contestant_id: dc.id, votes_count: 120 - idx * 7 });
+      votes_live.push({ round_id: 'ROUND_1', contestant_id: dc.id, votes_count: 135 - idx * 8 });
     }
   });
 
@@ -670,12 +962,15 @@ function toggleDemoMode() {
 }
 
 function applyActiveDataset() {
+  const banner = document.getElementById('demoBanner');
   if (state.isDemoMode) {
     state.data = generateDemoData();
-    document.getElementById('demoBanner').style.display = 'flex';
+    banner.style.display = 'flex';
+    document.getElementById('demoBannerText').textContent = t('demo_banner_txt');
+    document.getElementById('demoToggleBtn').textContent = t('demo_exit_btn');
   } else {
     state.data = state.realData;
-    document.getElementById('demoBanner').style.display = 'none';
+    banner.style.display = 'none';
   }
   normalizeData();
   state.latestRound = getLatestRound();
@@ -749,13 +1044,25 @@ function retourMenuPrincipale() {
 }
 
 // ==========================================
-// 5. LECTURE PARALLÈLE RAPIDE DU GOOGLE SHEETS
+// 5. LANGUES & LECTURE PARALLÈLE GOOGLE SHEETS
 // ==========================================
+function updateStaticTranslations() {
+  document.getElementById('brandTagline').textContent = t('tagline');
+  document.getElementById('menuTagline').textContent = t('menu_sub');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (k) el.textContent = t(k);
+  });
+  if (state.isDemoMode) {
+    document.getElementById('demoBannerText').textContent = t('demo_banner_txt');
+    document.getElementById('demoToggleBtn').textContent = t('demo_exit_btn');
+  }
+}
+
 function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('kca_lang', lang);
-  document.getElementById('brandTagline').textContent = t('tagline');
-  document.getElementById('menuTagline').textContent = "KÆOS PROJECT • " + (lang === 'fr' ? "Choisissez votre destinée" : "Choose your destiny");
+  updateStaticTranslations();
   setupNav();
   renderAll();
 }
@@ -785,7 +1092,6 @@ function getContestantName(id) {
 }
 function colorForIndex(i) { const hue = (i * 47) % 360; return `hsl(${hue} 65% 62%)`; }
 
-// Gestion automatique des photos (normale + Shadow Zone + fallback silhouette élégante)
 function handleImageFallback(img) {
   const step = Number(img.dataset.fallbackStep || '0');
   const contestantId = String(img.dataset.contestantId || '').trim();
@@ -800,18 +1106,17 @@ function handleImageFallback(img) {
     return;
   }
   img.onerror = null;
-  // Silhouette mystique SVG intégrée (aucune image externe cassée)
   img.src = "data:image/svg+xml;utf8," + encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
       <defs>
         <radialGradient id="g" cx="50%" cy="40%" r="55%">
-          <stop offset="0%" stop-color="#E2B961" stop-opacity="0.28"/>
+          <stop offset="0%" stop-color="#E2B961" stop-opacity="0.24"/>
           <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <circle cx="100" cy="95" r="80" fill="url(#g)"/>
-      <circle cx="100" cy="78" r="32" fill="#2a2a2a" stroke="#E2B961" stroke-width="1.5"/>
-      <path d="M42 215 C42 155, 158 155, 158 215 Z" fill="#2a2a2a" stroke="#E2B961" stroke-width="1.5"/>
+      <circle cx="100" cy="78" r="32" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
+      <path d="M42 215 C42 155, 158 155, 158 215 Z" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
     </svg>
   `);
 }
@@ -977,7 +1282,6 @@ function getOfficialRankingByRound(isGlobal = false) {
 }
 
 async function loadDataFromRoundTabs() {
-  // Téléchargement en PARALLÈLE de tous les onglets (5x plus rapide)
   const entries = Object.entries(CONFIG.ROUND_TABS);
   const results = await Promise.all(entries.map(([rid, tab]) => fetchSheetTab(tab).then(rows => [rid, rows])));
   const rowsByRound = Object.fromEntries(results);
@@ -1088,7 +1392,7 @@ function getJudgeRankingByRound(judgeName) {
 function getRankingViewOptions() {
   return [
     { value: 'default', label: state.activeTeam === 'Global' ? t('overall_rank') : t('official_rank') },
-    ...JUDGE_NAMES.map(j => ({ value: `judge:${j}`, label: `Oracle ${j}` })),
+    ...JUDGE_NAMES.map(j => ({ value: `judge:${j}`, label: j })),
     { value: 'performance_score', label: t('perf_score') }
   ];
 }
@@ -1138,49 +1442,51 @@ function sortedContestants() {
 // 7. RENDUS VISUELS (PAGES)
 // ==========================================
 
-function renderAuditionPortal(root) {
-  root.innerHTML = `
-    <div class="card-paper audition-hero">
-      <div style="font-size:2.4rem; color:var(--tarot-gold); letter-spacing:12px; margin-bottom:0.5rem;">✹ ☾ ✦</div>
-      <h2>${t('opening_soon')}</h2>
-      <p class="small" style="max-width:640px; margin:0 auto; font-size:0.95rem; line-height:1.6;">
-        ${t('audition_sub')}
-      </p>
-      <div class="countdown-grid" id="auditionCountdown">
-        <div class="countdown-box"><div class="countdown-num" id="cd-days">00</div><div class="countdown-lbl">Jours</div></div>
-        <div class="countdown-box"><div class="countdown-num" id="cd-hours">00</div><div class="countdown-lbl">Heures</div></div>
-        <div class="countdown-box"><div class="countdown-num" id="cd-mins">00</div><div class="countdown-lbl">Minutes</div></div>
-        <div class="countdown-box"><div class="countdown-num" id="cd-secs">00</div><div class="countdown-lbl">Secondes</div></div>
-      </div>
-      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
-        <a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.AUDITION_FORM_URL}">${t('audition_btn')}</a>
-        <button class="btn" onclick="toggleDemoMode()">${t('demo_btn')}</button>
-        <button class="btn" onclick="location.hash='#grimoire'">📖 Consulter le Grimoire</button>
-      </div>
-    </div>
-  `;
-
+// Décompte synchronisé sur TOUS les onglets (classes CSS au lieu d'ID unique)
+function startGlobalCountdown() {
   clearInterval(countdownInterval);
   const updateClock = () => {
     const now = new Date();
-    // Cible le 13 novembre à 23h59
     let targetYear = now.getFullYear();
     let target = new Date(targetYear, 10, 13, 23, 59, 59);
     if (now > target) target = new Date(targetYear + 1, 10, 13, 23, 59, 59);
     const diff = Math.max(0, target - now);
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const m = Math.floor((diff / 1000 / 60) % 60);
-    const s = Math.floor((diff / 1000) % 60);
-    const elD = document.getElementById('cd-days');
-    if (!elD) return;
-    elD.textContent = String(d).padStart(2, '0');
-    document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
-    document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
-    document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
+    const d = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+    const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
+    const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+    document.querySelectorAll('.cd-days').forEach(el => el.textContent = d);
+    document.querySelectorAll('.cd-hours').forEach(el => el.textContent = h);
+    document.querySelectorAll('.cd-mins').forEach(el => el.textContent = m);
+    document.querySelectorAll('.cd-secs').forEach(el => el.textContent = s);
   };
   updateClock();
   countdownInterval = setInterval(updateClock, 1000);
+}
+
+function renderAuditionPortal(root) {
+  root.innerHTML = `
+    <div class="card-paper audition-hero">
+      <div style="font-size:2.2rem; color:var(--tarot-gold); letter-spacing:14px; margin-bottom:0.6rem;">✹ ☾ ✦</div>
+      <h2>${t('opening_soon')}</h2>
+      <p class="small" style="max-width:640px; margin:0 auto; font-size:0.95rem; line-height:1.65;">
+        ${t('audition_sub')}
+      </p>
+      <div class="countdown-grid">
+        <div class="countdown-box"><div class="countdown-num cd-days">00</div><div class="countdown-lbl">${t('cd_days')}</div></div>
+        <div class="countdown-box"><div class="countdown-num cd-hours">00</div><div class="countdown-lbl">${t('cd_hours')}</div></div>
+        <div class="countdown-box"><div class="countdown-num cd-mins">00</div><div class="countdown-lbl">${t('cd_mins')}</div></div>
+        <div class="countdown-box"><div class="countdown-num cd-secs">00</div><div class="countdown-lbl">${t('cd_secs')}</div></div>
+      </div>
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2.2rem;">
+        <a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.AUDITION_FORM_URL}">${t('audition_btn')}</a>
+        <button class="btn" onclick="toggleDemoMode()">${t('demo_btn')}</button>
+        <button class="btn" onclick="location.hash='#grimoire'">${t('grimoire_btn')}</button>
+      </div>
+    </div>
+  `;
+  startGlobalCountdown();
 }
 
 function renderContestants() {
@@ -1192,9 +1498,9 @@ function renderContestants() {
   const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
   
   let teamTitle = "";
-  if (state.activeTeam === 'Soleil') teamTitle = " — ✹ Cercle du Soleil (Neitsu)";
-  if (state.activeTeam === 'Lune') teamTitle = " — ☾ Cercle de la Lune (Kaina)";
-  if (state.activeTeam === 'Etoile') teamTitle = " — ✦ Cercle de l'Étoile (Aya)";
+  if (state.activeTeam === 'Soleil') teamTitle = ` — ✹ ${t('btn_sun')} (Neitsu)`;
+  if (state.activeTeam === 'Lune') teamTitle = ` — ☾ ${t('btn_moon')} (Kaina)`;
+  if (state.activeTeam === 'Etoile') teamTitle = ` — ✦ ${t('btn_star')} (Aya)`;
 
   root.innerHTML = `
     <div class="card-paper">
@@ -1248,14 +1554,13 @@ function renderContestants() {
         else if (status === 'nominee') extraClass = 'danger-zone';
         
         const teamClass = c.teamClass || 'theme-global';
-        // Si en Shadow Zone, cherche d'abord id_shadow.png puis bascule automatiquement sur id.png avec halo rouge CSS
         const imgSrc = (status === 'nominee') ? `${c.id}_shadow.png` : c.photo_url;
 
         let badgeHtml = '';
         if (status === 'nominee') badgeHtml = `<div class="tarot-badge nominee">${t('nominee')}</div>`;
         else if (status === 'saved_judges') badgeHtml = `<div class="tarot-badge saved_judges">${t('saved_judges')}</div>`;
         else if (status === 'saved_public') badgeHtml = `<div class="tarot-badge saved_public">${t('saved_public')}</div>`;
-        else if (status === 'winner') badgeHtml = `<div class="tarot-badge winner">★ ${t('winner')}</div>`;
+        else if (status === 'winner') badgeHtml = `<div class="tarot-badge winner">✦ ${t('winner')}</div>`;
 
         return `
         <div class="tarot-card ${teamClass} ${extraClass}" onclick="location.hash='#profile/${c.id}'">
@@ -1354,8 +1659,8 @@ function renderRankings() {
       </div>
       <h3 style="margin-top:2.5rem;">${t('nominations')} (${getRoundLabel(activeRound)})</h3>
       <p class="small"><span style="color:var(--tarot-danger); font-weight:bold;">${t('nominee_lbl')} :</span> ${nominations.nominee.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:#9ed2f2; font-weight:bold;">${t('saved_judges_lbl')} :</span> ${nominations.saved_judges.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:#9ed2f2; font-weight:bold;">${t('saved_public_lbl')} :</span> ${nominations.saved_public.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
+      <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">${t('saved_judges_lbl')} :</span> ${nominations.saved_judges.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
+      <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">${t('saved_public_lbl')} :</span> ${nominations.saved_public.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
       <p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">${t('eliminated_lbl')} :</span> ${nominations.eliminated.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
     </div>
     <div class="card-paper">
@@ -1377,7 +1682,7 @@ function renderRankings() {
     if (!ctx || typeof Chart === 'undefined') return;
     
     Chart.defaults.color = '#888888';
-    Chart.defaults.borderColor = '#333333';
+    Chart.defaults.borderColor = '#2E2E2E';
 
     rankingChartInstance = new Chart(ctx, {
       type: 'line',
@@ -1520,7 +1825,6 @@ function renderProfile(contestantId) {
     </div>
   `;
 
-  // Calcul des 5 branches du Pentagramme d'Aura (sur 100) sans exposer de sous-notes conflictuelles
   const r = state.latestRound;
   const maxActive = getActiveCountForRound(r, c.teamClass);
   const rankToPct = (rk) => Number.isFinite(rk) && rk >= 1 ? Math.round(Math.max(15, ((maxActive - rk + 1) / maxActive) * 100)) : 50;
@@ -1538,14 +1842,14 @@ function renderProfile(contestantId) {
       radarChartInstance = new Chart(ctxRadar, {
         type: 'radar',
         data: {
-          labels: ['✹ Soleil (Neitsu)', '☾ Lune (Kaina)', '✦ Étoile (Aya)', '👁 Vision (Hauras)', '🎵 Maîtrise (/100)'],
+          labels: [t('radar_sun'), t('radar_moon'), t('radar_star'), t('radar_eye'), t('radar_vocal')],
           datasets: [{
             label: getContestantName(c.id),
             data: [neitsuPct, kainaPct, ayaPct, haurasPct, vocalPct],
-            backgroundColor: 'rgba(226, 185, 97, 0.22)',
+            backgroundColor: 'rgba(226, 185, 97, 0.2)',
             borderColor: '#E2B961',
-            pointBackgroundColor: '#D93838',
-            pointBorderColor: '#E2B961',
+            pointBackgroundColor: '#E2B961',
+            pointBorderColor: '#0A0A0A',
             borderWidth: 2
           }]
         },
@@ -1555,8 +1859,8 @@ function renderProfile(contestantId) {
           scales: {
             r: {
               min: 0, max: 100,
-              angleLines: { color: '#333' },
-              grid: { color: '#2a2a2a' },
+              angleLines: { color: '#2E2E2E' },
+              grid: { color: '#252525' },
               pointLabels: { color: '#E2B961', font: { family: 'Poppins', size: 11 } },
               ticks: { display: false }
             }
@@ -1630,16 +1934,46 @@ function renderVotes() {
       <div class="vote-row" style="${inPublicSaveZone ? 'border-color:var(--tarot-gold);' : ''}">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
           <div>
-            <strong style="font-family:'Playfair Display'; font-size:1.2rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
-            ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.62rem;">Zone Grâce Public</span>` : ''}
+            <strong style="font-family:'Cinzel', serif; font-size:1.15rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
+            ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.6rem;">${t('public_save_zone')}</span>` : ''}
           </div>
           <div style="font-weight:600;">${r.votes} ${t('votes').toLowerCase()} (${pct.toFixed(1)}%)</div>
         </div>
         <div class="bar"><span style="width:${barPct}%"></span></div>
       </div>`;
-  }).join('') : `<p>${t('no_vote_data')}</p>`;
+  }).join('') : `<p class="small" style="text-align:center; margin:1.5rem 0;">${t('no_vote_data')}</p>`;
+
+  const scaleHtml = `
+    <div class="scale-showcase">
+      <svg class="scale-svg" viewBox="0 0 220 130">
+        <line x1="110" y1="20" x2="110" y2="115" stroke="#E2B961" stroke-width="3"/>
+        <polygon points="85,115 135,115 125,105 95,105" fill="#E2B961"/>
+        <circle cx="110" cy="20" r="6" fill="#E2B961"/>
+        <g class="scale-beam-group">
+          <line x1="35" y1="35" x2="185" y2="35" stroke="#E2B961" stroke-width="3"/>
+          <line x1="35" y1="35" x2="20" y2="75" stroke="#E2B961" stroke-width="1.5"/>
+          <line x1="35" y1="35" x2="50" y2="75" stroke="#E2B961" stroke-width="1.5"/>
+          <path d="M12 75 Q35 90 58 75 Z" fill="rgba(226,185,97,0.3)" stroke="#E2B961" stroke-width="1.5"/>
+          <line x1="185" y1="35" x2="170" y2="75" stroke="#E2B961" stroke-width="1.5"/>
+          <line x1="185" y1="35" x2="200" y2="75" stroke="#E2B961" stroke-width="1.5"/>
+          <path d="M162 75 Q185 90 208 75 Z" fill="rgba(226,185,97,0.3)" stroke="#E2B961" stroke-width="1.5"/>
+        </g>
+      </svg>
+      <div class="scale-quotas">
+        <div class="quota-card shadow-quota"><strong>${rule.shadow}</strong><span class="small">${t('quota_shadow')}</span></div>
+        <div class="quota-card"><strong>${rule.oracleSave}</strong><span class="small">${t('quota_oracle')}</span></div>
+        <div class="quota-card"><strong>${rule.publicSave}</strong><span class="small">${t('quota_public')}</span></div>
+        <div class="quota-card"><strong>${rule.elim}</strong><span class="small">${t('quota_elim')}</span></div>
+      </div>
+    </div>
+  `;
 
   let roundsOptionsHtml = ROUND_ORDER.filter(r => r !== 'PRERANK').map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
+
+  // Si un vote est actif (rows.length > 0), les votes s'affichent EN HAUT et la Balance EN DESSOUS.
+  const mainVoteContent = rows.length > 0
+    ? `<div style="margin-top:2rem;">${votesListHtml}</div>${scaleHtml}`
+    : `${scaleHtml}<div style="margin-top:1.5rem;">${votesListHtml}</div>`;
 
   root.innerHTML = `
     <div class="card-paper">
@@ -1647,39 +1981,12 @@ function renderVotes() {
         <h2>${t('nav_votes')} — ${getRoundLabel(state.votesRound)}</h2>
         <div class="filters" style="margin:0;">
           <select id="votesRoundSelect">${roundsOptionsHtml}</select>
-          ${CONFIG.VOTE_FORM_URL ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.VOTE_FORM_URL}">${t('vote_now')}</a>` : ''}
+          ${CONFIG.VOTE_FORM_URL ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.VOTE_FORM_URL}">✦ ${t('vote_now')}</a>` : ''}
         </div>
       </div>
 
-      <!-- ANIMATION VISUELLE DE LA BALANCE DORÉE -->
-      <div class="scale-showcase">
-        <svg class="scale-svg" viewBox="0 0 220 130">
-          <!-- Pilier central -->
-          <line x1="110" y1="20" x2="110" y2="115" stroke="#E2B961" stroke-width="3"/>
-          <polygon points="85,115 135,115 125,105 95,105" fill="#E2B961"/>
-          <circle cx="110" cy="20" r="6" fill="#E2B961"/>
-          <!-- Fléau oscillant -->
-          <g class="scale-beam-group">
-            <line x1="35" y1="35" x2="185" y2="35" stroke="#E2B961" stroke-width="3"/>
-            <!-- Plateau Gauche (Oracle) -->
-            <line x1="35" y1="35" x2="20" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-            <line x1="35" y1="35" x2="50" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-            <path d="M12 75 Q35 90 58 75 Z" fill="rgba(226,185,97,0.35)" stroke="#E2B961" stroke-width="1.5"/>
-            <!-- Plateau Droit (Public) -->
-            <line x1="185" y1="35" x2="170" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-            <line x1="185" y1="35" x2="200" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-            <path d="M162 75 Q185 90 208 75 Z" fill="rgba(226,185,97,0.35)" stroke="#E2B961" stroke-width="1.5"/>
-          </g>
-        </svg>
-        <div class="scale-quotas">
-          <div class="quota-card"><strong style="color:var(--tarot-danger)">${rule.shadow}</strong><span class="small">En Shadow Zone (par Cercle)</span></div>
-          <div class="quota-card"><strong>${rule.oracleSave}</strong><span class="small">Sauvés par l'Oracle</span></div>
-          <div class="quota-card"><strong style="color:#9ed2f2">${rule.publicSave}</strong><span class="small">Sauvé(s) par le Public</span></div>
-          <div class="quota-card"><strong style="color:var(--tarot-ash)">${rule.elim}</strong><span class="small">Cartes Consumées</span></div>
-        </div>
-      </div>
+      ${mainVoteContent}
 
-      <div style="margin-top:2rem;">${votesListHtml}</div>
       <p class="small" style="margin-top:2rem; color:var(--tarot-gold)">
         ${t('total_votes')} ${totalVotes} · ${t('last_refresh')} ${new Date().toLocaleTimeString(currentLang)}
       </p>
@@ -1690,77 +1997,113 @@ function renderVotes() {
 }
 
 // ==========================================
-// 8. NOUVEL ONGLET : LE GRIMOIRE (LORE & RÈGLES)
+// 8. ONGLET : LE GRIMOIRE (MYSTIQUE & SANS SPOILER)
 // ==========================================
 function renderGrimoire() {
   const root = document.getElementById('grimoire');
+
+  // Œil géométrique ésotérique en SVG doré pour Hauras (sans émoji)
+  const mysticEyeSvg = `
+    <svg class="oracle-eye-svg" viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 20 C16 4, 48 4, 60 20 C48 36, 16 36, 4 20 Z" stroke="#E2B961" stroke-width="2"/>
+      <circle cx="32" cy="20" r="8" stroke="#E2B961" stroke-width="2"/>
+      <circle cx="32" cy="20" r="3" fill="#E2B961"/>
+      <line x1="32" y1="1" x2="32" y2="6" stroke="#E2B961" stroke-width="1.5"/>
+      <line x1="32" y1="34" x2="32" y2="39" stroke="#E2B961" stroke-width="1.5"/>
+      <line x1="16" y1="4" x2="19" y2="8" stroke="#E2B961" stroke-width="1.5"/>
+      <line x1="48" y1="4" x2="45" y2="8" stroke="#E2B961" stroke-width="1.5"/>
+    </svg>
+  `;
+
   root.innerHTML = `
     <div class="card-paper">
-      <h2>📖 Le Grimoire — KÆOS PROJECT (Saison 3)</h2>
-      <p class="small" style="font-size:0.95rem; line-height:1.6;">
-        La <strong>Star KCA Academy</strong> ouvre son troisième chapitre autour d'un objectif inédit : recruter <strong>5 nouveaux membres</strong> (filles et garçons) aux côtés des 3 fondateurs pour former un groupe final modulaire de <strong>8 artistes</strong> fonctionnant en sous-unités (inspiré du système NCT).
-      </p>
+      <div class="grimoire-intro">
+        <span class="grimoire-motto">KÆOS • KEEP AN EYE ON US</span>
+        <h2 style="margin-bottom:0.8rem;">${t('grim_title')}</h2>
+        <p class="small" style="font-size:0.95rem; line-height:1.7; color:var(--text); margin:0;">
+          ${t('grim_intro')}
+        </p>
+      </div>
 
-      <h3 style="margin-top:2.5rem;">Les 3 Cercles & Les 4 Oracles</h3>
+      <h3>${t('grim_oracles_title')}</h3>
       <div class="oracles-grid">
         <div class="oracle-box">
           <div class="oracle-symbol">✹</div>
-          <h4 style="margin:0 0 6px 0;">NEITSU — Cercle du Soleil</h4>
-          <p class="small" style="margin:0;">Fondateur & Créateur. Dirige 16 initiés, attribue le Score Technique sur 100 et dispose du pouvoir de grâce exclusif sur la Shadow Zone du Soleil.</p>
+          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">${t('grim_neitsu_title')}</h4>
+          <p class="small" style="margin:0; line-height:1.55;">${t('grim_neitsu_desc')}</p>
         </div>
         <div class="oracle-box">
           <div class="oracle-symbol">☾</div>
-          <h4 style="margin:0 0 6px 0;">KAINA — Cercle de la Lune</h4>
-          <p class="small" style="margin:0;">Fondatrice & Oracle de la Lune. Dirige ses 16 initiés, choisit leurs missions dès le Round 2 et sauve ses recrues en danger.</p>
+          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">${t('grim_kaina_title')}</h4>
+          <p class="small" style="margin:0; line-height:1.55;">${t('grim_kaina_desc')}</p>
         </div>
         <div class="oracle-box">
           <div class="oracle-symbol">✦</div>
-          <h4 style="margin:0 0 6px 0;">AYA — Cercle de l'Étoile</h4>
-          <p class="small" style="margin:0;">Fondatrice & Oracle de l'Étoile. Dirige ses 16 initiés, choisit leurs missions dès le Round 2 et détient le pouvoir de grâce sur son Cercle.</p>
+          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">${t('grim_aya_title')}</h4>
+          <p class="small" style="margin:0; line-height:1.55;">${t('grim_aya_desc')}</p>
         </div>
-        <div class="oracle-box" style="border-color:var(--line);">
-          <div class="oracle-symbol">👁</div>
-          <h4 style="margin:0 0 6px 0;">HAURAS — Le 4e Oracle</h4>
-          <p class="small" style="margin:0;">Juge d'Alignement. Participe au Pré-Rank et aux classements de chaque manche pour garantir l'équité des points, sans intervenir dans la Balance.</p>
+        <div class="oracle-box">
+          <div class="oracle-symbol">${mysticEyeSvg}</div>
+          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">${t('grim_hauras_title')}</h4>
+          <p class="small" style="margin:0; line-height:1.55;">${t('grim_hauras_desc')}</p>
         </div>
       </div>
 
-      <h3>Tableau de Marche des 5 Rounds (Par Cercle)</h3>
+      <h3>${t('grim_cycles_title')}</h3>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Cycle</th>
-              <th>Effectif par Cercle</th>
-              <th>Choix des Chansons</th>
-              <th>Safe (Carte Dorée)</th>
-              <th>Shadow Zone (Carte Rouge)</th>
-              <th>Grâce de l'Oracle</th>
-              <th>Grâce du Public</th>
-              <th>Consumés (Éliminés)</th>
+              <th>${t('grim_col_cycle')}</th>
+              <th>${t('grim_col_songs')}</th>
+              <th>${t('grim_col_destiny')}</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td><strong>Pré-Rank</strong></td><td>48 au total</td><td>Audition libre (1er - 13 nov.)</td><td colspan="5">Classement de 1 à 48 (4 cœurs de 1 à 5 pts) et répartition équitable en 3 Cercles de 16</td></tr>
-            <tr><td><strong>Round 1</strong></td><td>16 (48 total)</td><td>Imposées communes</td><td style="color:var(--tarot-gold)">8 Safe</td><td style="color:var(--tarot-danger)">8 Nominés</td><td>3 sauvés</td><td>2 sauvés</td><td>3 (9 total)</td></tr>
-            <tr><td><strong>Round 2</strong></td><td>13 (39 total)</td><td>Choix de l'Oracle</td><td style="color:var(--tarot-gold)">6 Safe</td><td style="color:var(--tarot-danger)">7 Nominés</td><td>3 sauvés</td><td>1 sauvé</td><td>3 (9 total)</td></tr>
-            <tr><td><strong>Round 3</strong></td><td>10 (30 total)</td><td>Choix de l'Oracle</td><td style="color:var(--tarot-gold)">4 Safe</td><td style="color:var(--tarot-danger)">6 Nominés</td><td>2 sauvés</td><td>1 sauvé</td><td>3 (9 total)</td></tr>
-            <tr><td><strong>Round 4</strong></td><td>7 (21 total)</td><td>Choix de l'Oracle</td><td style="color:var(--tarot-gold)">1 seul Safe</td><td style="color:var(--tarot-danger)">6 Nominés</td><td>2 sauvés</td><td>1 sauvé</td><td>3 (9 total)</td></tr>
-            <tr><td><strong>Round 5 (Finale)</strong></td><td><strong>12 Finalistes</strong> (4 par Cercle)</td><td>Explosion des Cercles</td><td colspan="4">Performance finale + Évolution sur la saison + Vote du Public</td><td><strong>5 Élus finaux</strong> (7 éliminés)</td></tr>
+            <tr>
+              <td><strong style="color:var(--tarot-gold)">${t('r_prerank')}</strong></td>
+              <td>${t('grim_prerank_songs')}</td>
+              <td>${t('grim_prerank_destiny')}</td>
+            </tr>
+            <tr>
+              <td><strong>${t('r_r1')}</strong></td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+            </tr>
+            <tr>
+              <td><strong>${t('r_r2')}</strong></td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+            </tr>
+            <tr>
+              <td><strong>${t('r_r3')}</strong></td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+            </tr>
+            <tr>
+              <td><strong>${t('r_r4')}</strong></td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+            </tr>
+            <tr>
+              <td><strong>${t('r_final')}</strong></td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+              <td style="color:var(--muted); font-style:italic;">${t('grim_tba')}</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <h3 style="margin-top:2.5rem;">Le Barème Vocal sur 100 Points</h3>
-      <p class="small">À chaque cycle, le score total additionne les points de classement des 4 Oracles et le Score sur 100 évalué selon ces 11 piliers :</p>
+      <h3 style="margin-top:2.8rem;">${t('grim_rubric_title')}</h3>
+      <p class="small">${t('grim_rubric_sub')}</p>
       <div class="rubric-grid">
-        <div class="rubric-item"><span>Pitch (Justesse)</span><span class="rubric-pts">/20</span></div>
+        <div class="rubric-item"><span>Pitch</span><span class="rubric-pts">/20</span></div>
         <div class="rubric-item"><span>Vocal Quality</span><span class="rubric-pts">/10</span></div>
         <div class="rubric-item"><span>Technique</span><span class="rubric-pts">/10</span></div>
         <div class="rubric-item"><span>Vocal Identity</span><span class="rubric-pts">/10</span></div>
         <div class="rubric-item"><span>Interpretation / Musicality</span><span class="rubric-pts">/10</span></div>
         <div class="rubric-item"><span>Audio & Mixing</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Attitude & Délais</span><span class="rubric-pts">/10</span></div>
+        <div class="rubric-item"><span>Attitude</span><span class="rubric-pts">/10</span></div>
         <div class="rubric-item"><span>Rhythm</span><span class="rubric-pts">/5</span></div>
         <div class="rubric-item"><span>Pronunciation</span><span class="rubric-pts">/5</span></div>
         <div class="rubric-item"><span>Vocal Presence</span><span class="rubric-pts">/5</span></div>
@@ -1831,8 +2174,7 @@ async function hydrate() {
 async function boot() {
   try {
     document.getElementById('langSelect').value = currentLang;
-    document.getElementById('brandTagline').textContent = t('tagline');
-    document.getElementById('menuTagline').textContent = "KÆOS PROJECT • " + (currentLang === 'fr' ? "Choisissez votre destinée" : "Choose your destiny");
+    updateStaticTranslations();
     updateCircleSwitcherUI();
     setupNav();
     await hydrate();
