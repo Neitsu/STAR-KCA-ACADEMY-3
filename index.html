@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KÆOS PROJECT — All-In-One 9:16 Video Studio</title>
+  <title>KÆOS PROJECT — Full-Screen 9:16 Video Studio (7 Videos + True Speed Control)</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      --pace: 1; /* Multiplicateur global qui pilote aussi toutes les animations CSS */
       --tarot-bg: #181818;
       --tarot-gold: #E2B961;
       --tarot-gold-bright: #F5D67B;
       --tarot-danger: #D93838;
       --tarot-ash: #555555;
       --tarot-ash-dark: #121212;
-      --bg: #0A0A0A; /* Noir pur #0A0A0A garanti pour un montage CapCut parfait */
+      --bg: #0A0A0A;
       --font-title: 'Cinzel', 'Playfair Display', serif;
       --font-primary: 'Playfair Display', serif;
       --font-secondary: 'Poppins', sans-serif;
@@ -33,7 +34,7 @@
     }
 
     /* =========================================
-       CADRE 9:16 VERROUILLÉ (TIKTOK / REELS)
+       CADRE 9:16 PLEIN ÉCRAN + AUTO-SCALING
        ========================================= */
     #stage-916 {
       position: relative;
@@ -41,10 +42,42 @@
       height: min(100vh, calc(100vw * 16 / 9));
       background-color: var(--bg);
       overflow: hidden;
-      display: flex; justify-content: center; align-items: center;
     }
     #stage-916.show-guide {
-      outline: 1px dashed rgba(226, 185, 97, 0.25);
+      outline: 1px dashed rgba(226, 185, 97, 0.3);
+    }
+
+    #cine-canvas {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 420px; height: 746.67px;
+      transform-origin: center center;
+      transform: translate(-50%, -50%) scale(1);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* =========================================
+       VIDÉO D'ARRIÈRE-PLAN + VOILE ASSOMBRISSANT
+       ========================================= */
+    #bg-video-layer {
+      position: absolute; inset: 0;
+      z-index: 1; pointer-events: none;
+      overflow: hidden;
+      background-color: #0A0A0A;
+    }
+    #bg-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.25;
+      filter: blur(1px) contrast(1.08);
+      transition: opacity 0.3s ease, filter 0.3s ease;
+      display: none;
+    }
+    #bg-video-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 42%, rgba(10, 10, 10, 0.2) 0%, rgba(10, 10, 10, 0.82) 92%);
+      pointer-events: none;
     }
 
     /* =========================================
@@ -53,57 +86,88 @@
     #start-overlay {
       position: absolute; inset: 0; z-index: 999;
       display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-      background: rgba(10, 10, 10, 0.98);
-      padding: 18px 16px; text-align: center;
+      background: rgba(10, 10, 10, 0.96);
+      padding: 12px 14px; text-align: center;
       overflow-y: auto;
-      transition: opacity 0.9s ease;
+      transition: opacity 0.7s ease;
     }
     .studio-sub {
       font-family: var(--font-secondary); color: #888;
-      letter-spacing: 4px; font-weight: 400; font-size: 0.65rem; margin: 4px 0 0;
+      letter-spacing: 4px; font-weight: 400; font-size: 0.62rem; margin: 2px 0 0;
     }
     .studio-title {
-      font-family: var(--font-title); font-size: 1.75rem; letter-spacing: 5px;
-      margin: 2px 0 10px; color: var(--tarot-gold); font-weight: 800;
+      font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 5px;
+      margin: 2px 0 6px; color: var(--tarot-gold); font-weight: 800;
       text-shadow: 0 0 20px rgba(226, 185, 97, 0.35); line-height: 1.1;
     }
 
     .studio-bar {
-      display: flex; gap: 5px; margin-bottom: 8px; width: 100%; max-width: 310px;
+      display: flex; gap: 4px; margin-bottom: 5px; width: 100%; max-width: 345px;
       background: #111; padding: 4px; border-radius: 5px; border: 1px solid #262626;
     }
     .bar-btn {
       flex: 1; background: transparent; color: #888; border: 1px solid transparent;
-      border-radius: 4px; padding: 5px 4px; font-family: var(--font-secondary);
-      font-size: 0.62rem; cursor: pointer; transition: all 0.2s;
+      border-radius: 4px; padding: 5px 2px; font-family: var(--font-secondary);
+      font-size: 0.58rem; cursor: pointer; transition: all 0.2s; white-space: nowrap;
     }
     .bar-btn.active {
-      background: rgba(226, 185, 97, 0.16); color: var(--tarot-gold);
+      background: rgba(226, 185, 97, 0.18); color: var(--tarot-gold);
       border-color: var(--tarot-gold); font-weight: 600;
     }
 
+    .bg-video-controls {
+      width: 100%; max-width: 345px;
+      background: #111; border: 1px solid rgba(226, 185, 97, 0.3);
+      border-radius: 5px; padding: 7px 10px; margin-bottom: 5px;
+      text-align: left;
+    }
+    .bg-upload-row {
+      display: flex; gap: 6px; align-items: center; justify-content: space-between; margin-bottom: 5px;
+    }
+    .bg-file-label {
+      flex: 1; background: #1a1a1a; border: 1px dashed var(--tarot-gold);
+      color: var(--tarot-gold); font-family: var(--font-secondary); font-size: 0.62rem;
+      font-weight: 600; padding: 5px 8px; border-radius: 4px; cursor: pointer;
+      text-align: center; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bg-file-label:hover { background: rgba(226, 185, 97, 0.15); }
+    .bg-file-label input { display: none; }
+    .bg-clear-btn {
+      background: #1a1a1a; border: 1px solid #333; color: #999;
+      font-family: var(--font-secondary); font-size: 0.6rem; padding: 5px 8px;
+      border-radius: 4px; cursor: pointer;
+    }
+    .bg-clear-btn:hover { color: #fff; border-color: var(--tarot-danger); }
+    .slider-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: var(--font-secondary); font-size: 0.58rem; color: #aaa; margin-top: 3px;
+    }
+    .slider-row input[type="range"] {
+      width: 140px; accent-color: var(--tarot-gold); height: 4px; cursor: pointer;
+    }
+
     .studio-section-box {
-      width: 100%; max-width: 310px;
-      border-top: 1px solid #222; padding-top: 9px; margin-top: 4px;
+      width: 100%; max-width: 345px;
+      border-top: 1px solid #222; padding-top: 6px; margin-top: 2px;
     }
     .studio-section-lbl {
-      font-family: var(--font-secondary); font-size: 0.6rem; color: var(--tarot-gold);
-      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; display: block; font-weight: 600;
+      font-family: var(--font-secondary); font-size: 0.58rem; color: var(--tarot-gold);
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; display: block; font-weight: 600;
     }
 
     .studio-btn {
-      width: 100%; max-width: 310px; padding: 10px 14px;
-      font-family: var(--font-title); font-size: 0.78rem;
+      width: 100%; max-width: 345px; padding: 8px 12px;
+      font-family: var(--font-title); font-size: 0.76rem;
       background: var(--tarot-gold); color: var(--bg);
       border: 1px solid var(--tarot-gold); border-radius: 4px;
       cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
-      transition: all 0.25s ease; font-weight: 800; margin-bottom: 6px;
+      transition: all 0.25s ease; font-weight: 800; margin-bottom: 5px;
       box-shadow: 0 0 18px rgba(226, 185, 97, 0.25);
     }
     .studio-btn:hover { background: #f3ce78; transform: scale(1.01); }
 
     .scene-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 4px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 4px;
     }
     .scene-chip {
       background: #141414; border: 1px solid #2a2a2a; color: #bbb;
@@ -113,43 +177,48 @@
     .scene-chip:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); }
 
     .mini-videos-list {
-      display: flex; flex-direction: column; gap: 6px; width: 100%;
+      display: flex; flex-direction: column; gap: 4px; width: 100%;
     }
     .mini-video-btn {
       width: 100%; background: #131313; border: 1px solid rgba(226, 185, 97, 0.35);
-      color: #F0EDE5; border-radius: 5px; padding: 8px 10px;
+      color: #F0EDE5; border-radius: 5px; padding: 6px 9px;
       text-align: left; cursor: pointer; transition: all 0.25s ease;
-      display: flex; flex-direction: column; gap: 2px;
+      display: flex; flex-direction: column; gap: 1px;
+    }
+    .mini-video-btn.highlight-teaser {
+      background: linear-gradient(90deg, rgba(226, 185, 97, 0.14), rgba(24, 24, 24, 0.95));
+      border-color: var(--tarot-gold);
     }
     .mini-video-btn:hover {
       border-color: var(--tarot-gold);
-      background: rgba(226, 185, 97, 0.1);
+      background: rgba(226, 185, 97, 0.12);
       box-shadow: 0 0 15px rgba(226, 185, 97, 0.18);
     }
     .mv-title {
       font-family: var(--font-title); color: var(--tarot-gold);
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
     }
     .mv-desc {
-      font-family: var(--font-secondary); color: #999; font-size: 0.58rem;
+      font-family: var(--font-secondary); color: #999; font-size: 0.55rem;
     }
 
     /* =========================================
-       TEXTE CINÉMATIQUE (MOTS CLÉS EN BLANC LUMINEUX)
+       TEXTE CINÉMATIQUE (PILOTÉ PAR --pace)
        ========================================= */
     #main-text {
       position: absolute; left: 5%; width: 90%;
       opacity: 0;
       filter: blur(10px);
       transform: translateY(-50%) scale(1.06);
-      transition: opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 1.5s cubic-bezier(0.22, 1, 0.36, 1),
-                  filter 1.35s cubic-bezier(0.22, 1, 0.36, 1),
-                  color 1.1s ease;
+      transition: opacity calc(0.85s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  transform calc(1s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  filter calc(0.85s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  color calc(0.75s * var(--pace)) ease;
       font-family: var(--font-primary);
-      font-size: 1.72rem; letter-spacing: 1.5px; line-height: 1.45;
+      font-size: 1.85rem; letter-spacing: 1.4px;
+      line-height: 1.15;
       color: var(--tarot-gold);
-      text-shadow: 0 0 28px rgba(226, 185, 97, 0.45);
+      text-shadow: 0 3px 15px rgba(0, 0, 0, 0.98), 0 0 28px rgba(226, 185, 97, 0.5);
       font-weight: 600; z-index: 60; text-align: center;
       pointer-events: none;
     }
@@ -162,33 +231,36 @@
       font-family: var(--font-title);
       color: #FFFFFF;
       font-weight: 800;
-      letter-spacing: 2.5px;
-      text-shadow: 0 0 22px rgba(226, 185, 97, 0.9);
+      letter-spacing: 2.2px;
+      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.98), 0 0 24px rgba(226, 185, 97, 0.95);
     }
     #main-text span {
       color: #F0EDE5; font-family: var(--font-secondary); font-weight: 400;
-      font-size: 0.82rem; display: block; margin-top: 10px;
-      letter-spacing: 3.5px; text-transform: uppercase; opacity: 0.9;
+      font-size: 0.9rem; display: block;
+      margin-top: 5px;
+      line-height: 1.15;
+      letter-spacing: 3.5px; text-transform: uppercase; opacity: 0.95;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.98);
     }
     #main-text.danger-text {
       color: var(--tarot-danger) !important;
-      text-shadow: 0 0 32px rgba(217, 56, 56, 0.7) !important;
+      text-shadow: 0 3px 15px rgba(0, 0, 0, 0.98), 0 0 32px rgba(217, 56, 56, 0.75) !important;
     }
     #main-text.danger-text strong {
       color: #FFD6D6;
-      text-shadow: 0 0 25px rgba(217, 56, 56, 1);
+      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.98), 0 0 25px rgba(217, 56, 56, 1);
     }
 
     /* =========================================
-       ÉLÉMENTS VISUELS & TRANSITIONS DOUCES
+       ÉLÉMENTS VISUELS GRAND FORMAT (PILOTÉS PAR --pace)
        ========================================= */
     .visual-element {
-      position: absolute; left: 50%; top: 44%;
+      position: absolute; left: 50%; top: 39%;
       transform: translate(-50%, -50%) scale(0.94);
       opacity: 0; filter: blur(6px);
-      transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 1.6s cubic-bezier(0.22, 1, 0.36, 1),
-                  filter 1.4s ease;
+      transition: opacity calc(1s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  transform calc(1.15s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  filter calc(1s * var(--pace)) ease;
       pointer-events: none; z-index: 10;
     }
     .visual-element.visible {
@@ -196,93 +268,98 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    .shift-up { transform: translate(-50%, calc(-50% - 125px)) scale(0.80) !important; }
-    .shift-down { transform: translate(-50%, calc(-50% + 135px)) scale(0.72) !important; }
+    .shift-up { transform: translate(-50%, calc(-50% - 118px)) scale(0.74) !important; }
+    .shift-down { transform: translate(-50%, calc(-50% + 98px)) scale(0.76) !important; }
 
     /* =========================================
-       ROUE ASTROLOGIQUE SACRÉE (LOGO & OUTRO)
+       ROUE ASTROLOGIQUE SACRÉE (350px)
        ========================================= */
     @keyframes spinSlow {
       from { transform: translate(-50%, -50%) rotate(0deg); }
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
     #sacred-wheel {
-      position: absolute; left: 50%; top: 48%;
-      width: 310px; height: 310px;
+      position: absolute; left: 50%; top: 45%;
+      width: 350px; height: 350px;
       transform: translate(-50%, -50%);
-      opacity: 0; transition: opacity 1.8s ease;
+      opacity: 0; transition: opacity calc(1.2s * var(--pace)) ease;
       pointer-events: none; z-index: 5;
       animation: spinSlow 36s linear infinite;
     }
-    #sacred-wheel.visible { opacity: 0.38; }
+    #sacred-wheel.visible { opacity: 0.42; }
 
     /* =========================================
-       1. LOGO PRINCIPAL
+       1. LOGO PRINCIPAL GRAND FORMAT
        ========================================= */
-    #logo-container { text-align: center; width: 92%; top: 48%; }
+    #logo-container { text-align: center; width: 95%; top: 45%; }
     #logo-welcome {
-      font-size: 0.72rem; letter-spacing: 9px; font-weight: 400; color: #999;
-      text-transform: uppercase; margin: 0 0 12px 0; font-family: var(--font-secondary);
+      font-size: 0.85rem; letter-spacing: 10px; font-weight: 400; color: #bbb;
+      text-transform: uppercase; margin: 0 0 14px 0; font-family: var(--font-secondary);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
     }
     #logo-star {
-      font-family: var(--font-title); font-size: 1.85rem; letter-spacing: 4px;
+      font-family: var(--font-title); font-size: 2.15rem; letter-spacing: 4px;
       text-transform: uppercase; margin: 0; color: var(--tarot-gold);
-      text-shadow: 0 0 25px rgba(226, 185, 97, 0.45); font-weight: 800;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 28px rgba(226, 185, 97, 0.5); font-weight: 800;
     }
-    #logo-cross { font-size: 1rem; color: var(--tarot-gold); margin: 10px 0; opacity: 0.8; }
+    #logo-cross { font-size: 1.2rem; color: var(--tarot-gold); margin: 12px 0; opacity: 0.85; }
     #logo-kaeos {
-      font-family: var(--font-title); font-size: 3.5rem; letter-spacing: 8px;
+      font-family: var(--font-title); font-size: 4rem; letter-spacing: 9px;
       text-transform: uppercase; margin: 0; color: var(--tarot-gold);
-      text-shadow: 0 0 35px rgba(226, 185, 97, 0.6); font-weight: 800; line-height: 1.05;
+      text-shadow: 0 2px 15px rgba(0,0,0,0.95), 0 0 38px rgba(226, 185, 97, 0.65); font-weight: 800; line-height: 1.05;
     }
     #logo-sub {
-      font-family: var(--font-secondary); font-size: 0.7rem; letter-spacing: 6px;
-      color: var(--tarot-gold); text-transform: uppercase; margin-top: 8px; opacity: 0.85;
+      font-family: var(--font-secondary); font-size: 0.8rem; letter-spacing: 6px;
+      color: var(--tarot-gold); text-transform: uppercase; margin-top: 10px; opacity: 0.92;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
     }
     @keyframes symbolPulse {
       0%, 100% { opacity: 0.75; transform: scale(1); text-shadow: 0 0 15px rgba(226, 185, 97, 0.4); }
       50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 30px rgba(226, 185, 97, 0.9); }
     }
     .symbols {
-      margin-top: 20px; display: flex; justify-content: center; gap: 26px;
-      font-size: 1.75rem; color: var(--tarot-gold);
+      margin-top: 22px; display: flex; justify-content: center; gap: 28px;
+      font-size: 2rem; color: var(--tarot-gold);
       animation: symbolPulse 3.2s infinite ease-in-out;
     }
 
     #outro-symbols {
-      font-size: 3.4rem; letter-spacing: 22px; margin-left: 11px; top: 48%;
-      color: var(--tarot-gold); text-shadow: 0 0 35px rgba(226, 185, 97, 0.75);
+      font-size: 3.8rem; letter-spacing: 24px; margin-left: 12px; top: 44%;
+      color: var(--tarot-gold); text-shadow: 0 2px 15px rgba(0,0,0,0.95), 0 0 38px rgba(226, 185, 97, 0.8);
       width: 100%; text-align: center;
     }
 
     /* =========================================
        2. LES 48 MICRO-CARTES, ORACLES & COMPTEUR
        ========================================= */
-    #forty-eight-cards { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; filter: none !important; }
+    #forty-eight-cards { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; top: 41%; filter: none !important; }
     .mini-card {
-      position: absolute; width: 17px; height: 27px;
-      background: var(--tarot-bg); border: 1px solid var(--tarot-gold);
-      border-radius: 2px; opacity: 0; transform: translate(0, 0) scale(0);
-      transition: transform 1.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.3s ease, filter 1.1s ease, box-shadow 1.1s ease, border-color 0.8s ease;
-      box-shadow: 0 0 8px rgba(226, 185, 97, 0.25);
+      position: absolute; width: 20px; height: 32px;
+      background: var(--tarot-bg); border: 1.2px solid var(--tarot-gold);
+      border-radius: 3px; opacity: 0; transform: translate(0, 0) scale(0);
+      transition: transform calc(1.2s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity calc(0.95s * var(--pace)) ease,
+                  filter calc(0.8s * var(--pace)) ease,
+                  box-shadow calc(0.8s * var(--pace)) ease,
+                  border-color calc(0.6s * var(--pace)) ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.85), 0 0 8px rgba(226, 185, 97, 0.25);
       display: flex; justify-content: center; align-items: center;
       background-image: linear-gradient(rgba(226, 185, 97, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.2) 1px, transparent 1px);
       background-size: 6px 6px; background-position: center;
       z-index: 1;
     }
-    .mini-card::after { content: ''; position: absolute; inset: 0; background: rgba(24, 24, 24, 0.85); }
+    .mini-card::after { content: ''; position: absolute; inset: 0; background: rgba(24, 24, 24, 0.88); }
     .mini-card-inner {
-      position: relative; z-index: 2; width: 12px; height: 12px;
+      position: relative; z-index: 2; width: 14px; height: 14px;
       border: 1px solid var(--tarot-gold); border-radius: 50%;
       background-color: var(--tarot-bg);
       display: flex; justify-content: center; align-items: center;
-      color: var(--tarot-gold); font-size: 0.44rem;
+      color: var(--tarot-gold); font-size: 0.5rem;
       transition: border-color 0.8s ease, color 0.8s ease;
     }
-    /* Surbrillance uniquement AUTOUR de la carte : le cercle central reste bien sombre ! */
     .mini-card.survivor-glow {
       border-color: var(--tarot-gold);
-      box-shadow: 0 0 22px rgba(226, 185, 97, 0.95), 0 0 8px rgba(226, 185, 97, 0.7);
+      box-shadow: 0 0 24px rgba(226, 185, 97, 0.98), 0 0 10px rgba(226, 185, 97, 0.75);
     }
     .mini-card.survivor-glow .mini-card-inner {
       background-color: var(--tarot-bg);
@@ -291,7 +368,7 @@
     }
     .mini-card.danger-mini {
       border-color: var(--tarot-danger);
-      box-shadow: 0 0 18px rgba(217, 56, 56, 0.85);
+      box-shadow: 0 0 20px rgba(217, 56, 56, 0.9);
     }
     .mini-card.danger-mini .mini-card-inner {
       background-color: var(--tarot-bg);
@@ -300,97 +377,105 @@
     }
 
     #split-laser {
-      position: absolute; left: 50%; top: 41%;
-      width: 0px; height: 2px;
+      position: absolute; left: 50%; top: 38.5%;
+      width: 0px; height: 3px;
       background: var(--tarot-gold);
-      box-shadow: 0 0 18px var(--tarot-gold), 0 0 35px var(--tarot-danger);
+      box-shadow: 0 0 20px var(--tarot-gold), 0 0 40px var(--tarot-danger);
       transform: translate(-50%, -50%);
-      opacity: 0; transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+      opacity: 0; transition: width calc(0.7s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
       z-index: 40; pointer-events: none;
     }
     #split-laser.active {
-      width: 280px; opacity: 1;
+      width: 340px; opacity: 1;
     }
 
-    #oracles-section { display: flex; gap: 10px; justify-content: center; width: 100%; top: 31%; filter: none !important; }
+    #oracles-section { display: flex; gap: 10px; justify-content: center; width: 100%; top: 24%; filter: none !important; }
     .oracle-showcase {
       display: flex; flex-direction: column; align-items: center;
-      width: 106px; opacity: 0; transform: translateY(30px);
-      transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+      width: 118px; opacity: 0; transform: translateY(28px);
+      transition: all calc(1.1s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1);
     }
     .oracle-showcase.appear { opacity: 1; transform: translateY(0); }
     .oracle-card-tiny {
-      width: 100%; height: 156px; background: var(--tarot-bg);
-      border: 2px solid var(--tarot-gold); border-radius: 5px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.85); position: relative; padding: 5px;
+      width: 100%; height: 172px; background: var(--tarot-bg);
+      border: 2px solid var(--tarot-gold); border-radius: 6px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.92); position: relative; padding: 5px;
       transition: box-shadow 0.8s ease, border-color 0.8s ease;
     }
     .oracle-showcase.active-glow .oracle-card-tiny {
-      box-shadow: 0 0 30px rgba(226, 185, 97, 0.85);
+      box-shadow: 0 0 32px rgba(226, 185, 97, 0.9);
       border-color: var(--tarot-gold);
     }
     .oracle-inner {
       width: 100%; height: 100%; border: 1px solid var(--tarot-gold);
       display: flex; flex-direction: column; align-items: center;
-      padding-top: 3px; overflow: hidden; position: relative;
+      padding-top: 4px; overflow: hidden; position: relative;
     }
-    .oracle-portrait { height: 66px; margin-top: 2px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.65)); object-fit: contain; }
+    .oracle-portrait { height: 74px; margin-top: 3px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.65)); object-fit: contain; }
     .oracle-title {
-      font-family: var(--font-title); font-size: 0.82rem; color: var(--tarot-gold);
-      letter-spacing: 2px; font-weight: 800; margin-top: 4px; line-height: 1.05; text-transform: uppercase;
+      font-family: var(--font-title); font-size: 0.9rem; color: var(--tarot-gold);
+      letter-spacing: 2px; font-weight: 800; margin-top: 5px; line-height: 1.05; text-transform: uppercase;
     }
     .oracle-subtitle {
-      font-family: var(--font-secondary); font-size: 0.48rem; color: var(--tarot-gold);
-      letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; margin-bottom: 12px;
+      font-family: var(--font-secondary); font-size: 0.52rem; color: var(--tarot-gold);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; margin-bottom: 12px;
       line-height: 1; opacity: 0.9;
     }
 
-    /* Carte Tarot du 4e Juge HAURAS (placée juste sous les 3 Leaders en Vidéo 3) */
     #hauras-judge-card {
-      top: 56%; width: 106px; height: 156px;
+      top: 48%; width: 118px; height: 172px;
       filter: none !important;
     }
 
     #survivor-counter {
-      position: absolute; top: 11%; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 11.5%; left: 50%; transform: translateX(-50%);
       font-family: var(--font-title); font-size: 1.25rem; font-weight: 800;
       color: var(--tarot-gold); letter-spacing: 4px;
-      background: #121212; border: 1px solid var(--tarot-gold);
-      padding: 6px 20px; border-radius: 99px;
-      box-shadow: 0 0 20px rgba(226, 185, 97, 0.3);
-      opacity: 0; transition: all 0.6s ease; z-index: 45; white-space: nowrap;
+      background: #121212; border: 1.5px solid var(--tarot-gold);
+      padding: 6px 22px; border-radius: 99px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.9), 0 0 22px rgba(226, 185, 97, 0.35);
+      opacity: 0; transition: all 0.5s ease; z-index: 45; white-space: nowrap;
     }
     #survivor-counter.visible { opacity: 1; }
 
     /* =========================================
-       3. CARTE DE DÉMONSTRATION + ONDE DE CHOC
+       3. GRANDE CARTE DE DÉMONSTRATION (228x352px)
        ========================================= */
-    #demo-card-container { width: 208px; height: 322px; perspective: 1500px; }
+    #demo-card-container { width: 228px; height: 352px; top: 38%; perspective: 1500px; }
     #demo-card-shaker { width: 100%; height: 100%; position: relative; }
     .tarot-flip-card {
       width: 100%; height: 100%; position: relative;
-      transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform calc(1.5s * var(--pace)) cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-style: preserve-3d;
     }
     .tarot-flip-card.flipped { transform: rotateY(180deg); }
+    @keyframes mysteryLevitate {
+      0%, 100% { transform: translateY(0px) rotateY(0deg); }
+      50% { transform: translateY(-12px) rotateY(12deg); }
+    }
+    .tarot-flip-card.levitate-mystery {
+      animation: mysteryLevitate 3.2s ease-in-out infinite;
+    }
+
     .card-face {
       position: absolute; width: 100%; height: 100%;
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold);
-      border-radius: 6px; box-shadow: 0 18px 40px rgba(0,0,0,0.85);
-      padding: 8px; transition: all 1.4s ease; overflow: hidden;
+      background-color: var(--tarot-bg); border: 2.5px solid var(--tarot-gold);
+      border-radius: 8px; box-shadow: 0 18px 42px rgba(0,0,0,0.92);
+      padding: 8px; transition: all calc(1s * var(--pace)) ease; overflow: hidden;
     }
     @keyframes goldSheen {
       0% { transform: translateX(-140%) rotate(25deg); }
       100% { transform: translateX(220%) rotate(25deg); }
     }
-    .card-back::after {
+    .card-back::after, .card-front::before {
       content: ''; position: absolute; top: -40%; left: -40%; width: 70%; height: 180%;
       background: linear-gradient(90deg, transparent, rgba(226, 185, 97, 0.35), transparent);
       transform: translateX(-140%) rotate(25deg); pointer-events: none; z-index: 15;
     }
-    .sheen-active .card-back::after {
-      animation: goldSheen 2s ease-in-out forwards;
+    .sheen-active .card-back::after,
+    .sheen-active .card-front::before {
+      animation: goldSheen calc(1.5s * var(--pace)) ease-in-out forwards;
     }
 
     .card-front {
@@ -405,67 +490,67 @@
       display: flex; justify-content: center; align-items: center;
     }
     .front-symbol {
-      width: 58px; height: 58px; border: 2px solid var(--tarot-gold); border-radius: 50%;
+      width: 64px; height: 64px; border: 2px solid var(--tarot-gold); border-radius: 50%;
       background-color: var(--tarot-bg); display: flex; justify-content: center; align-items: center;
-      font-size: 1.7rem; color: var(--tarot-gold);
-      box-shadow: 0 0 20px rgba(226, 185, 97, 0.3), inset 0 0 12px rgba(226, 185, 97, 0.25);
+      font-size: 1.85rem; color: var(--tarot-gold);
+      box-shadow: 0 0 22px rgba(226, 185, 97, 0.35), inset 0 0 12px rgba(226, 185, 97, 0.25);
     }
 
     .card-back { transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center; }
     .tarot-inner-border {
       position: absolute; inset: 8px; border: 1px solid var(--tarot-gold);
       display: flex; flex-direction: column; align-items: center;
-      transition: border-color 1.4s ease;
+      transition: border-color 1s ease;
     }
     .corner {
       position: absolute; width: 6px; height: 6px;
       border: 1px solid var(--tarot-gold); border-radius: 50%;
-      background-color: var(--tarot-bg); transition: border-color 1.4s ease, background-color 1.4s ease;
+      background-color: var(--tarot-bg); transition: border-color 1s ease, background-color 1s ease;
     }
     .corner-tl { top: -4px; left: -4px; } .corner-tr { top: -4px; right: -4px; }
     .corner-bl { bottom: -4px; left: -4px; } .corner-br { bottom: -4px; right: -4px; }
 
     .tarot-top-icon {
-      position: absolute; top: -9px; color: var(--tarot-gold); font-size: 11px;
-      background: var(--tarot-bg); padding: 0 6px; transition: color 1.4s ease, background-color 1.4s ease;
+      position: absolute; top: -10px; color: var(--tarot-gold); font-size: 12px;
+      background: var(--tarot-bg); padding: 0 6px; transition: color 1s ease, background-color 1s ease;
     }
     .tarot-name {
-      font-family: var(--font-title); color: var(--tarot-gold); font-size: 1.25rem;
+      font-family: var(--font-title); color: var(--tarot-gold); font-size: 1.35rem;
       font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
-      margin-top: 18px; transition: color 1.4s ease;
+      margin-top: 20px; transition: color 1s ease;
     }
     .tarot-image-container {
-      position: absolute; top: 52px; width: 100%; height: 175px;
+      position: absolute; top: 56px; width: 100%; height: 192px;
       display: flex; justify-content: center; align-items: center;
     }
     .tarot-image-container img {
       position: absolute; max-width: 90%; max-height: 95%; object-fit: contain;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.65));
-      transition: opacity 1.4s ease, filter 1.4s ease;
+      transition: opacity 1s ease, filter 1s ease;
     }
     .img-danger { opacity: 0; }
     #demo-mystery-symbol {
-      width: 92px; height: 92px; border: 2px solid var(--tarot-gold); border-radius: 50%;
+      width: 100px; height: 100px; border: 2.5px solid var(--tarot-gold); border-radius: 50%;
       background-color: var(--tarot-bg); color: var(--tarot-gold);
-      font-family: var(--font-title); font-size: 3rem; font-weight: 800;
+      font-family: var(--font-title); font-size: 3.2rem; font-weight: 800;
       display: none; justify-content: center; align-items: center;
-      box-shadow: 0 0 25px rgba(226, 185, 97, 0.35);
+      box-shadow: 0 0 28px rgba(226, 185, 97, 0.4);
     }
 
     .tarot-rank {
-      font-family: var(--font-title); position: absolute; bottom: 12px;
-      color: var(--tarot-gold); font-size: 0.76rem; letter-spacing: 3px;
-      text-transform: uppercase; transition: color 1.4s ease;
+      font-family: var(--font-title); position: absolute; bottom: 13px;
+      color: var(--tarot-gold); font-size: 0.82rem; letter-spacing: 3px;
+      text-transform: uppercase; transition: color 1s ease;
     }
 
     #demo-status-pill {
-      position: absolute; bottom: 38px; z-index: 20;
-      font-family: var(--font-secondary); font-size: 0.58rem; font-weight: 700;
+      position: absolute; bottom: 42px; z-index: 20;
+      font-family: var(--font-secondary); font-size: 0.64rem; font-weight: 700;
       letter-spacing: 2px; text-transform: uppercase;
-      padding: 3px 10px; border-radius: 4px;
+      padding: 3px 12px; border-radius: 4px;
       background: rgba(226, 185, 97, 0.15); color: var(--tarot-gold);
       border: 1px solid var(--tarot-gold);
-      opacity: 0; transition: all 0.8s ease;
+      opacity: 0; transition: all 0.6s ease;
     }
     #demo-status-pill.show { opacity: 1; }
 
@@ -475,18 +560,17 @@
     }
     #shockwave-ring {
       position: absolute; left: 50%; top: 50%;
-      width: 200px; height: 290px; border-radius: 12px;
+      width: 220px; height: 320px; border-radius: 12px;
       border: 3px solid var(--tarot-danger);
       box-shadow: 0 0 35px var(--tarot-danger);
       transform: translate(-50%, -50%) scale(0.7);
       opacity: 0; pointer-events: none; z-index: 1;
     }
     .trigger-shockwave #shockwave-ring {
-      animation: dangerShockwave 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: dangerShockwave calc(1.1s * var(--pace)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* État SHADOW ZONE (Rouge Sang) */
-    .state-danger .card-face { border-color: var(--tarot-danger); box-shadow: 0 0 45px rgba(217, 56, 56, 0.6); }
+    .state-danger .card-face { border-color: var(--tarot-danger); box-shadow: 0 0 45px rgba(217, 56, 56, 0.65); }
     .state-danger .tarot-inner-border, .state-danger .corner { border-color: var(--tarot-danger); }
     .state-danger .tarot-name, .state-danger .tarot-rank, .state-danger .tarot-top-icon {
       color: var(--tarot-danger); text-shadow: 0 0 15px rgba(217, 56, 56, 0.45);
@@ -503,7 +587,7 @@
 
     .state-hope .card-face {
       border-color: var(--tarot-gold) !important;
-      box-shadow: 0 0 35px rgba(226, 185, 97, 0.55) !important;
+      box-shadow: 0 0 35px rgba(226, 185, 97, 0.6) !important;
     }
     .state-hope #demo-status-pill {
       background: #141414 !important;
@@ -519,7 +603,6 @@
     }
     .shake-animation { animation: shake 0.85s cubic-bezier(.36,.07,.19,.97) both; }
 
-    /* État CONSUMÉ (Cendres + Particules) */
     .state-eliminated .card-face { border-color: var(--tarot-ash); background-color: var(--tarot-ash-dark); box-shadow: 0 10px 25px rgba(0,0,0,0.7); }
     .state-eliminated .tarot-inner-border, .state-eliminated .corner { border-color: var(--tarot-ash); }
     .state-eliminated .corner, .state-eliminated .tarot-top-icon { background-color: var(--tarot-ash-dark); }
@@ -532,38 +615,22 @@
     .fade-away {
       transform: translate(-50%, calc(-50% - 30px)) scale(0.84) !important;
       filter: blur(8px) !important; opacity: 0 !important;
-      transition: all 2.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      transition: all calc(2.1s * var(--pace)) cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
     #ash-particles { position: absolute; inset: 0; pointer-events: none; z-index: 30; }
     .ash-speck {
-      position: absolute; width: 5px; height: 5px; border-radius: 50%;
+      position: absolute; width: 6px; height: 6px; border-radius: 50%;
       background: var(--tarot-ash); opacity: 0;
     }
 
     /* =========================================
-       4. LA BALANCE (✹ LEADER / PUBLIC ☉)
+       4. LA BALANCE ÉPURÉE (SANS TEXTE PAR-DESSUS)
        ========================================= */
-    #scale-container { width: 310px; height: 290px; display: flex; flex-direction: column; align-items: center; }
-    .scale-labels-row {
-      width: 100%; display: flex; justify-content: space-between;
-      padding: 0 12px; position: absolute; top: 8px;
-    }
-    .scale-plate-text {
-      font-family: var(--font-title); font-size: 0.95rem; color: #666;
-      letter-spacing: 3px; text-transform: uppercase; font-weight: 800;
-      transition: all 0.9s ease;
-    }
-    .tilt-scale-public #text-plate-right,
-    .tilt-scale-leader #text-plate-left {
-      color: var(--tarot-gold);
-      text-shadow: 0 0 18px rgba(226, 185, 97, 0.9);
-      transform: scale(1.12);
-    }
-
-    #scale-svg { width: 100%; height: 100%; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.85)); margin-top: 32px; }
-    #beam { transform-origin: 160px 65px; transition: transform 2s cubic-bezier(0.22, 1, 0.36, 1); }
-    #pan-left, #pan-right { transition: transform 2s cubic-bezier(0.22, 1, 0.36, 1); }
+    #scale-container { width: 330px; height: 250px; top: 38%; display: flex; flex-direction: column; align-items: center; }
+    #scale-svg { width: 100%; height: 100%; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.92)); margin-top: 0px; }
+    #beam { transform-origin: 160px 65px; transition: transform calc(1.4s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1); }
+    #pan-left, #pan-right { transition: transform calc(1.4s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1); }
     .tilt-scale-public #beam { transform: rotate(16deg); }
     .tilt-scale-public #pan-left { transform: translateY(-28px); }
     .tilt-scale-public #pan-right { transform: translateY(28px); }
@@ -572,50 +639,51 @@
     .tilt-scale-leader #pan-right { transform: translateY(-28px); }
 
     /* =========================================
-       5. EXPLOSION DES 3 CERCLES & FINALE (12 ➔ 5 ➔ FORMATION 3+2+3)
+       5. EXPLOSION DES 3 CERCLES & FINALE GRAND FORMAT
        ========================================= */
     #shatter-triad {
-      display: flex; gap: 28px; font-size: 3.6rem; color: var(--tarot-gold);
-      text-shadow: 0 0 30px rgba(226, 185, 97, 0.7); top: 42%;
+      display: flex; gap: 32px; font-size: 4rem; color: var(--tarot-gold);
+      text-shadow: 0 0 35px rgba(226, 185, 97, 0.75); top: 40%;
     }
     .triad-glyph {
       display: inline-block;
-      transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.3s ease, filter 1.3s ease;
+      transition: transform calc(1.1s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity calc(1s * var(--pace)) ease,
+                  filter calc(1s * var(--pace)) ease;
     }
-    #shatter-triad.explode .triad-glyph:nth-child(1) { transform: translate(-110px, -70px) rotate(-35deg) scale(1.6); opacity: 0; filter: blur(6px); }
-    #shatter-triad.explode .triad-glyph:nth-child(2) { transform: translate(0px, -110px) scale(1.8); opacity: 0; filter: blur(6px); }
-    #shatter-triad.explode .triad-glyph:nth-child(3) { transform: translate(110px, -70px) rotate(35deg) scale(1.6); opacity: 0; filter: blur(6px); }
+    #shatter-triad.explode .triad-glyph:nth-child(1) { transform: translate(-120px, -75px) rotate(-35deg) scale(1.6); opacity: 0; filter: blur(6px); }
+    #shatter-triad.explode .triad-glyph:nth-child(2) { transform: translate(0px, -115px) scale(1.8); opacity: 0; filter: blur(6px); }
+    #shatter-triad.explode .triad-glyph:nth-child(3) { transform: translate(120px, -75px) rotate(35deg) scale(1.6); opacity: 0; filter: blur(6px); }
 
     #finale-cards {
-      width: 100%; height: 100%; top: 44%;
+      width: 100%; height: 100%; top: 38%;
       filter: none !important;
     }
     .finale-card {
       position: absolute; left: 50%; top: 50%;
-      width: 66px; height: 99px;
-      margin-left: -33px; margin-top: -49.5px;
+      width: 72px; height: 108px;
+      margin-left: -36px; margin-top: -54px;
       background: var(--tarot-bg);
-      border: 1.5px solid var(--tarot-gold); border-radius: 4px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.7);
-      transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1),
-                  opacity 1.5s ease,
-                  box-shadow 1.5s ease,
-                  border-color 1.5s ease,
-                  filter 1.5s ease;
+      border: 1.8px solid var(--tarot-gold); border-radius: 5px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.85);
+      transition: transform calc(1.3s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity calc(1.1s * var(--pace)) ease,
+                  box-shadow calc(1.1s * var(--pace)) ease,
+                  border-color calc(1.1s * var(--pace)) ease,
+                  filter calc(1.1s * var(--pace)) ease;
       opacity: 0;
       display: flex; justify-content: center; align-items: center;
       background-image: linear-gradient(rgba(226, 185, 97, 0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.18) 1px, transparent 1px);
       background-size: 8px 8px; background-position: center;
     }
-    .finale-card::after { content: ''; position: absolute; inset: 0; background: rgba(24, 24, 24, 0.85); }
+    .finale-card::after { content: ''; position: absolute; inset: 0; background: rgba(24, 24, 24, 0.88); }
     .finale-card-inner {
-      position: relative; z-index: 2; width: 26px; height: 26px;
+      position: relative; z-index: 2; width: 28px; height: 28px;
       border: 1px solid var(--tarot-gold); border-radius: 50%;
       background-color: var(--tarot-bg);
       display: flex; justify-content: center; align-items: center;
-      color: var(--tarot-gold); font-size: 0.78rem; transition: all 1.5s ease;
+      color: var(--tarot-gold); font-size: 0.85rem; transition: all 1s ease;
     }
-    /* Surbrillance uniquement AUTOUR de la carte : le cercle central reste bien sombre ! */
     .finale-card.winner {
       box-shadow: 0 0 28px rgba(226, 185, 97, 0.95), 0 0 10px rgba(226, 185, 97, 0.6);
       border-color: var(--tarot-gold);
@@ -631,10 +699,9 @@
     }
     .finale-card.loser .finale-card-inner { color: var(--tarot-ash); border-color: var(--tarot-ash); }
 
-    /* Style Tarot Détaillé pour les 5 Cartes "FUTURE MEMBER" (Vidéo 1) */
     .finale-card.detailed-member {
-      width: 72px; height: 108px;
-      margin-left: -36px; margin-top: -54px;
+      width: 78px; height: 116px;
+      margin-left: -39px; margin-top: -58px;
       background-image: none;
       background-color: var(--tarot-bg);
       padding: 3px;
@@ -648,81 +715,80 @@
       padding: 5px 2px 4px;
     }
     .fc-detailed-top {
-      font-family: var(--font-title); font-size: 0.42rem; color: var(--tarot-gold);
+      font-family: var(--font-title); font-size: 0.45rem; color: var(--tarot-gold);
       letter-spacing: 1px; font-weight: 700; text-transform: uppercase;
     }
     .fc-detailed-avatar {
-      width: 34px; height: 42px;
+      width: 36px; height: 44px;
       display: flex; justify-content: center; align-items: center;
     }
     .fc-detailed-pill {
-      font-family: var(--font-secondary); font-size: 0.34rem; font-weight: 700;
+      font-family: var(--font-secondary); font-size: 0.36rem; font-weight: 700;
       color: var(--tarot-gold); border: 1px solid var(--tarot-gold);
       background: rgba(226, 185, 97, 0.14); padding: 1px 4px; border-radius: 2px;
       letter-spacing: 0.8px; text-transform: uppercase;
     }
     .fc-detailed-rank {
-      font-family: var(--font-title); font-size: 0.36rem; color: var(--tarot-gold);
+      font-family: var(--font-title); font-size: 0.38rem; color: var(--tarot-gold);
       letter-spacing: 1px; text-transform: uppercase;
     }
 
     /* =========================================
-       6. VISUEL MINI-VIDÉO 3 : PENTAGRAMME & LES 11 CRITÈRES (100 PTS)
+       6. VISUEL MINI-VIDÉO 3 : PENTAGRAMME & LES 11 CRITÈRES
        ========================================= */
     #judges-pentagram-view {
-      width: 330px; height: 430px; top: 39%;
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      width: 374px; height: auto; top: 36%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .pentagram-stage {
-      position: relative; width: 185px; height: 185px;
+      position: relative; width: 175px; height: 175px;
       display: flex; justify-content: center; align-items: center;
-      opacity: 0; transform: scale(0.85); transition: all 1.3s cubic-bezier(0.22, 1, 0.36, 1);
-      margin-bottom: 12px;
+      opacity: 0; transform: scale(0.85); transition: all calc(1s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1);
+      margin-bottom: 10px;
     }
     .pentagram-stage.show { opacity: 1; transform: scale(1); }
     .pentagram-svg {
       position: absolute; inset: 0; width: 100%; height: 100%;
-      filter: drop-shadow(0 0 15px rgba(226, 185, 97, 0.4));
+      filter: drop-shadow(0 0 15px rgba(226, 185, 97, 0.45));
     }
     .pentagram-path {
       stroke-dasharray: 900;
       stroke-dashoffset: 900;
-      transition: stroke-dashoffset 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: stroke-dashoffset calc(2.2s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1);
     }
     .pentagram-stage.show .pentagram-path {
       stroke-dashoffset: 0;
     }
     #score-100-counter {
-      font-family: var(--font-title); font-size: 1.75rem; font-weight: 800;
+      font-family: var(--font-title); font-size: 1.65rem; font-weight: 800;
       color: var(--tarot-gold); text-shadow: 0 0 22px rgba(226, 185, 97, 0.85);
-      z-index: 5; background: rgba(10, 10, 10, 0.9);
-      padding: 6px 12px; border-radius: 50%; border: 1px solid var(--tarot-gold);
+      z-index: 5; background: rgba(10, 10, 10, 0.92);
+      padding: 6px 12px; border-radius: 50%; border: 1.5px solid var(--tarot-gold);
     }
 
-    /* Grille complète des 11 critères = 100 Points exacts */
     .rubric-100-grid {
-      width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
-      padding: 0 6px;
+      width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+      padding: 0 4px;
     }
     .crit-pill {
-      background: #131313; border: 1px solid rgba(226, 185, 97, 0.55);
-      color: #F0EDE5; font-family: var(--font-secondary); font-size: 0.55rem;
-      font-weight: 600; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+      background: rgba(19, 19, 19, 0.94); border: 1px solid rgba(226, 185, 97, 0.6);
+      color: #F0EDE5; font-family: var(--font-secondary); font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 1px; padding: 5px 9px; border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.85);
       display: flex; justify-content: space-between; align-items: center;
-      opacity: 0; transform: translateY(8px); transition: all 0.55s ease;
+      opacity: 0; transform: translateY(8px); transition: all calc(0.45s * var(--pace)) ease;
     }
     .crit-pill.full-width {
       grid-column: span 2; justify-content: center; gap: 8px;
-      border-color: var(--tarot-gold); background: rgba(226, 185, 97, 0.12);
-      font-size: 0.62rem;
+      border-color: var(--tarot-gold); background: rgba(226, 185, 97, 0.16);
+      font-size: 0.68rem; padding: 6px 10px;
     }
-    .crit-pill strong { color: var(--tarot-gold); font-family: var(--font-title); font-size: 0.64rem; }
+    .crit-pill strong { color: var(--tarot-gold); font-family: var(--font-title); font-size: 0.72rem; }
     .crit-pill.show { opacity: 1; transform: translateY(0); }
 
     #replay-btn {
-      position: absolute; bottom: 4.5%; left: 50%; transform: translateX(-50%);
-      padding: 10px 26px; font-family: var(--font-title); font-size: 0.78rem;
+      position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+      padding: 10px 26px; font-family: var(--font-title); font-size: 0.82rem;
       background: #111; color: var(--tarot-gold); border: 1px solid var(--tarot-gold);
       border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
       transition: all 0.3s ease; opacity: 0; pointer-events: none; z-index: 999;
@@ -736,17 +802,51 @@
   <div id="stage-916" class="show-guide">
 
     <!-- =========================================
-         MENU STUDIO 6-EN-1 (TRAILER + 5 MINI-VIDÉOS)
+         CALQUE VIDÉO D'ARRIÈRE-PLAN (AVEC SON)
+         ========================================= -->
+    <div id="bg-video-layer">
+      <video id="bg-video" src="bg.mp4" loop playsinline></video>
+      <div id="bg-video-vignette"></div>
+    </div>
+
+    <!-- =========================================
+         MENU STUDIO 7-EN-1 (TRAILER + 6 MINI-VIDÉOS)
          ========================================= -->
     <div id="start-overlay">
       <p class="studio-sub">STAR KCA ACADEMY • S3</p>
       <h1 class="studio-title">KÆOS STUDIO</h1>
 
-      <!-- Réglage 1 : Vitesse -->
+      <!-- CONTRÔLE DE LA VIDÉO D'ARRIÈRE-PLAN & SON -->
+      <div class="bg-video-controls">
+        <span class="studio-section-lbl" style="margin-bottom:4px;">🎬 Vidéo de Fond &amp; Son (Clip Musical)</span>
+        <div class="bg-upload-row">
+          <label class="bg-file-label">
+            <span id="bg-file-name">📂 Choisir une vidéo (.mp4 / .mov)</span>
+            <input type="file" accept="video/*" onchange="loadCustomBgVideo(event)">
+          </label>
+          <button class="bg-clear-btn" onclick="clearBgVideo()" title="Fond Noir Pur">✕ Noir Pur</button>
+        </div>
+        <div class="slider-row">
+          <span>Luminosité de la vidéo : <strong id="lbl-opacity" style="color:var(--tarot-gold)">25%</strong></span>
+          <input type="range" id="rng-opacity" min="0" max="80" value="25" oninput="updateBgVideoStyle()">
+        </div>
+        <div class="slider-row">
+          <span>Flou du fond (Blur) : <strong id="lbl-blur" style="color:var(--tarot-gold)">1px</strong></span>
+          <input type="range" id="rng-blur" min="0" max="8" value="1" oninput="updateBgVideoStyle()">
+        </div>
+        <div class="slider-row">
+          <span>🔊 Volume du son : <strong id="lbl-volume" style="color:var(--tarot-gold)">100%</strong></span>
+          <input type="range" id="rng-volume" min="0" max="100" value="100" oninput="updateBgVideoStyle()">
+        </div>
+      </div>
+
+      <!-- Réglage 1 : 5 Vraies Vitesses (pilote JS + CSS) -->
       <div class="studio-bar">
-        <button class="bar-btn" onclick="setSpeed(1.0, this)">Normal</button>
-        <button class="bar-btn active" onclick="setSpeed(1.35, this)">Lent &amp; Posé (Idéal)</button>
-        <button class="bar-btn" onclick="setSpeed(1.65, this)">Très Lent</button>
+        <button class="bar-btn" onclick="setSpeed(0.55, this)">⚡ 2x Rapide</button>
+        <button class="bar-btn" onclick="setSpeed(0.75, this)">Rapide</button>
+        <button class="bar-btn active" onclick="setSpeed(1.0, this)">Normal</button>
+        <button class="bar-btn" onclick="setSpeed(1.35, this)">Lent</button>
+        <button class="bar-btn" onclick="setSpeed(1.75, this)">Très Lent</button>
       </div>
 
       <!-- Réglage 2 : Avec Texte ou Sans Texte (Clean) -->
@@ -769,10 +869,14 @@
         </div>
       </div>
 
-      <!-- SECTION B : LES 5 MINI-VIDÉOS TIKTOK / REELS -->
+      <!-- SECTION B : LES 6 MINI-VIDÉOS TIKTOK / REELS -->
       <div class="studio-section-box">
-        <span class="studio-section-lbl">2. Les 5 Mini-Vidéos (Teasers TikTok / Reels)</span>
+        <span class="studio-section-lbl">2. Les 6 Mini-Vidéos &amp; Teasers (TikTok / Reels)</span>
         <div class="mini-videos-list">
+          <button class="mini-video-btn highlight-teaser" onclick="playMini6_MysteryTeaser()">
+            <span class="mv-title">🔥 Vidéo 6 (NOUVEAU) : Teaser Mystère — S3 Approche</span>
+            <span class="mv-desc">Teaser subtil &amp; mystique sans spoiler les règles (idéal pour annoncer la S3)</span>
+          </button>
           <button class="mini-video-btn" onclick="playMini1_LoreGroup()">
             <span class="mv-title">✦ Vidéo 1 : L'Histoire de KÆOS (Neitsu ➔ Kaina ➔ Aya)</span>
             <span class="mv-desc">La vraie genèse (il y a 2 ans) + 5 vraies cartes Future Member</span>
@@ -799,190 +903,256 @@
 
     <button id="replay-btn" onclick="location.reload()">↺ Studio Menu</button>
 
-    <!-- ROUE ASTROLOGIQUE SACRÉE -->
-    <svg id="sacred-wheel" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="150" cy="150" r="138" stroke="#E2B961" stroke-width="1" stroke-dasharray="6 6"/>
-      <circle cx="150" cy="150" r="118" stroke="#E2B961" stroke-width="1.5"/>
-      <polygon points="150,18 282,150 150,282 18,150" stroke="#E2B961" stroke-width="1"/>
-      <polygon points="56,56 244,56 244,244 56,244" stroke="#E2B961" stroke-width="1"/>
-      <circle cx="150" cy="18" r="4" fill="#E2B961"/>
-      <circle cx="282" cy="150" r="4" fill="#E2B961"/>
-      <circle cx="150" cy="282" r="4" fill="#E2B961"/>
-      <circle cx="18" cy="150" r="4" fill="#E2B961"/>
-    </svg>
+    <!-- =========================================
+         CANEVAS CINÉMATIQUE PLEIN ÉCRAN (420x746.67 AUTO-SCALÉ)
+         ========================================= -->
+    <div id="cine-canvas">
 
-    <!-- 1. LOGO -->
-    <div id="logo-container" class="visual-element">
-      <h2 id="logo-welcome">WELCOME TO</h2>
-      <h1 id="logo-star">STAR KCA ACADEMY</h1>
-      <div id="logo-cross">✦</div>
-      <h1 id="logo-kaeos">KÆOS</h1>
-      <div id="logo-sub">KEEP AN EYE ON US</div>
-      <div class="symbols"><span>✹</span><span>☾</span><span>✦</span></div>
-    </div>
-
-    <!-- COMPTEUR SUPÉRIEUR DYNAMIQUE -->
-    <div id="survivor-counter">16 IN THE CIRCLE</div>
-
-    <!-- LASER DE SCISSION (VIDÉO 2) -->
-    <div id="split-laser"></div>
-
-    <!-- 2. LES 48 CARTES & LES 3 ORACLES -->
-    <div id="forty-eight-cards" class="visual-element"></div>
-
-    <div id="oracles-section" class="visual-element">
-      <div id="o-1" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
-        <span style="font-size:1.05rem; color: var(--tarot-gold)">✹</span>
-        <img class="oracle-portrait" src="neitsu.png" onerror="setMysticFallback(this, '#E2B961')">
-        <div class="oracle-title">Neitsu</div>
-        <div class="oracle-subtitle">The Sun</div>
-      </div></div></div>
-      <div id="o-2" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
-        <span style="font-size:1.05rem; color: var(--tarot-gold)">☾</span>
-        <img class="oracle-portrait" src="kaina.png" onerror="setMysticFallback(this, '#E2B961')">
-        <div class="oracle-title">Kaina</div>
-        <div class="oracle-subtitle">The Moon</div>
-      </div></div></div>
-      <div id="o-3" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
-        <span style="font-size:1.05rem; color: var(--tarot-gold)">✦</span>
-        <img class="oracle-portrait" src="aya.png" onerror="setMysticFallback(this, '#E2B961')">
-        <div class="oracle-title">Aya</div>
-        <div class="oracle-subtitle">The Star</div>
-      </div></div></div>
-    </div>
-
-    <!-- CARTE DU 4e JUGE HAURAS (SOUS LES 3 LEADERS EN VIDÉO 3) -->
-    <div id="hauras-judge-card" class="visual-element">
-      <div class="oracle-card-tiny" style="box-shadow: 0 0 28px rgba(226, 185, 97, 0.55);">
-        <div class="oracle-inner" style="justify-content: center;">
-          <span style="font-size:0.85rem; color: var(--tarot-gold)">✦</span>
-          <svg style="width: 68px; height: 46px; margin: 10px 0 6px; filter: drop-shadow(0 0 10px rgba(226,185,97,0.5));" viewBox="0 0 80 50" fill="none">
-            <path d="M5 25 C20 5, 60 5, 75 25 C60 45, 20 45, 5 25 Z" stroke="#E2B961" stroke-width="2.5"/>
-            <circle cx="40" cy="25" r="10" stroke="#E2B961" stroke-width="2"/>
-            <circle cx="40" cy="25" r="4" fill="#E2B961"/>
-            <line x1="40" y1="1" x2="40" y2="7" stroke="#E2B961" stroke-width="2"/>
-            <line x1="40" y1="43" x2="40" y2="49" stroke="#E2B961" stroke-width="2"/>
-            <line x1="20" y1="5" x2="24" y2="10" stroke="#E2B961" stroke-width="1.8"/>
-            <line x1="60" y1="5" x2="56" y2="10" stroke="#E2B961" stroke-width="1.8"/>
-          </svg>
-          <div class="oracle-title">Hauras</div>
-          <div class="oracle-subtitle">4th Judge</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. CARTE DE DÉMONSTRATION -->
-    <div id="demo-card-container" class="visual-element">
-      <div id="shockwave-ring"></div>
-      <div id="ash-particles"></div>
-      <div id="demo-card-shaker">
-        <div id="demo-card" class="tarot-flip-card">
-          <div class="card-face card-front">
-            <div class="card-front-inner">
-              <div class="front-symbol" id="demo-front-glyph">✹</div>
-            </div>
-          </div>
-          <div class="card-face card-back">
-            <div class="tarot-inner-border">
-              <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
-              <div class="corner corner-bl"></div><div class="corner corner-br"></div>
-              <div class="tarot-top-icon" id="demo-top-glyph">✹</div>
-              <div class="tarot-name" id="demo-card-title">NEITSU</div>
-              <div class="tarot-image-container">
-                <img src="neitsu.png" id="demo-img-normal" class="img-normal" onerror="setMysticFallback(this, '#E2B961')">
-                <img src="neitsu_shadow_zone.png" id="demo-img-danger" class="img-danger" onerror="this.onerror=null; this.src='neitsu.png';">
-                <div id="demo-mystery-symbol">?</div>
-              </div>
-              <div id="demo-status-pill">SAFE</div>
-              <div class="tarot-rank" id="demo-card-rank">✹ THE SUN ✹</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. LA BALANCE (✹ LEADER / PUBLIC ☉) -->
-    <div id="scale-container" class="visual-element">
-      <div class="scale-labels-row">
-        <span id="text-plate-left" class="scale-plate-text">✹ LEADER</span>
-        <span id="text-plate-right" class="scale-plate-text">PUBLIC ☉</span>
-      </div>
-      <svg id="scale-svg" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M160 50 L160 250" stroke="#E2B961" stroke-width="6" stroke-linecap="round"/>
-        <path d="M110 250 L210 250 L185 265 L135 265 Z" fill="#E2B961" stroke="#BA9547" stroke-width="2"/>
-        <circle cx="160" cy="65" r="10" fill="#181818" stroke="#E2B961" stroke-width="3"/>
-        <g id="beam">
-          <path d="M40 65 L280 65" stroke="#E2B961" stroke-width="5" stroke-linecap="round"/>
-          <circle cx="160" cy="65" r="4" fill="#E2B961"/>
-          <circle cx="55" cy="65" r="3" fill="#E2B961"/>
-          <circle cx="265" cy="65" r="3" fill="#E2B961"/>
-          <path d="M125 65 L115 55 M195 65 L205 55 M160 65 L160 40" stroke="#E2B961" stroke-width="2"/>
-        </g>
-        <g id="pan-left">
-          <line x1="55" y1="65" x2="30" y2="150" stroke="#BA9547" stroke-width="2"/>
-          <line x1="55" y1="65" x2="80" y2="150" stroke="#BA9547" stroke-width="2"/>
-          <path d="M20 150 L90 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
-          <path d="M20 150 C20 165 90 165 90 150 Z" fill="rgba(226,185,97,0.18)" stroke="#E2B961" stroke-width="1.5"/>
-        </g>
-        <g id="pan-right">
-          <line x1="265" y1="65" x2="240" y2="150" stroke="#BA9547" stroke-width="2"/>
-          <line x1="265" y1="65" x2="290" y2="150" stroke="#BA9547" stroke-width="2"/>
-          <path d="M230 150 L300 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
-          <path d="M230 150 C230 165 300 165 300 150 Z" fill="rgba(226,185,97,0.18)" stroke="#E2B961" stroke-width="1.5"/>
-        </g>
+      <!-- ROUE ASTROLOGIQUE SACRÉE -->
+      <svg id="sacred-wheel" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="150" cy="150" r="138" stroke="#E2B961" stroke-width="1" stroke-dasharray="6 6"/>
+        <circle cx="150" cy="150" r="118" stroke="#E2B961" stroke-width="1.5"/>
+        <polygon points="150,18 282,150 150,282 18,150" stroke="#E2B961" stroke-width="1"/>
+        <polygon points="56,56 244,56 244,244 56,244" stroke="#E2B961" stroke-width="1"/>
+        <circle cx="150" cy="18" r="4" fill="#E2B961"/>
+        <circle cx="282" cy="150" r="4" fill="#E2B961"/>
+        <circle cx="150" cy="282" r="4" fill="#E2B961"/>
+        <circle cx="18" cy="150" r="4" fill="#E2B961"/>
       </svg>
-    </div>
 
-    <!-- 5. EXPLOSION DES 3 CERCLES & LES 12 CARTES DE LA FINALE -->
-    <div id="shatter-triad" class="visual-element">
-      <span class="triad-glyph">✹</span>
-      <span class="triad-glyph">☾</span>
-      <span class="triad-glyph">✦</span>
-    </div>
+      <!-- 1. LOGO -->
+      <div id="logo-container" class="visual-element">
+        <h2 id="logo-welcome">WELCOME TO</h2>
+        <h1 id="logo-star">STAR KCA ACADEMY</h1>
+        <div id="logo-cross">✦</div>
+        <h1 id="logo-kaeos">KÆOS</h1>
+        <div id="logo-sub">KEEP AN EYE ON US</div>
+        <div class="symbols"><span>✹</span><span>☾</span><span>✦</span></div>
+      </div>
 
-    <div id="finale-cards" class="visual-element"></div>
+      <!-- COMPTEUR SUPÉRIEUR DYNAMIQUE -->
+      <div id="survivor-counter">16 IN THE CIRCLE</div>
 
-    <!-- 6. VISUEL MINI-VIDÉO 3 : PENTAGRAMME & LES 11 CRITÈRES = 100 POINTS EXACTS -->
-    <div id="judges-pentagram-view" class="visual-element">
-      <div class="pentagram-stage" id="pentagram-stage">
-        <svg class="pentagram-svg" viewBox="0 0 200 200" fill="none">
-          <circle cx="100" cy="100" r="88" stroke="rgba(226,185,97,0.3)" stroke-width="1.5"/>
-          <polygon class="pentagram-path" points="100,14 152,172 18,74 182,74 48,172" stroke="#E2B961" stroke-width="2" fill="rgba(226,185,97,0.05)"/>
+      <!-- LASER DE SCISSION (VIDÉO 2) -->
+      <div id="split-laser"></div>
+
+      <!-- 2. LES 48 CARTES & LES 3 ORACLES -->
+      <div id="forty-eight-cards" class="visual-element"></div>
+
+      <div id="oracles-section" class="visual-element">
+        <div id="o-1" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+          <span style="font-size:1.1rem; color: var(--tarot-gold)">✹</span>
+          <img class="oracle-portrait" src="neitsu.png" onerror="setMysticFallback(this, '#E2B961')">
+          <div class="oracle-title">Neitsu</div>
+          <div class="oracle-subtitle">The Sun</div>
+        </div></div></div>
+        <div id="o-2" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+          <span style="font-size:1.1rem; color: var(--tarot-gold)">☾</span>
+          <img class="oracle-portrait" src="kaina.png" onerror="setMysticFallback(this, '#E2B961')">
+          <div class="oracle-title">Kaina</div>
+          <div class="oracle-subtitle">The Moon</div>
+        </div></div></div>
+        <div id="o-3" class="oracle-showcase"><div class="oracle-card-tiny"><div class="oracle-inner">
+          <span style="font-size:1.1rem; color: var(--tarot-gold)">✦</span>
+          <img class="oracle-portrait" src="aya.png" onerror="setMysticFallback(this, '#E2B961')">
+          <div class="oracle-title">Aya</div>
+          <div class="oracle-subtitle">The Star</div>
+        </div></div></div>
+      </div>
+
+      <!-- CARTE DU 4e JUGE HAURAS (SOUS LES 3 LEADERS EN VIDÉO 3) -->
+      <div id="hauras-judge-card" class="visual-element">
+        <div class="oracle-card-tiny" style="box-shadow: 0 0 28px rgba(226, 185, 97, 0.55);">
+          <div class="oracle-inner" style="justify-content: center;">
+            <span style="font-size:0.9rem; color: var(--tarot-gold)">✦</span>
+            <svg style="width: 72px; height: 48px; margin: 8px 0 6px; filter: drop-shadow(0 0 10px rgba(226,185,97,0.5));" viewBox="0 0 80 50" fill="none">
+              <path d="M5 25 C20 5, 60 5, 75 25 C60 45, 20 45, 5 25 Z" stroke="#E2B961" stroke-width="2.5"/>
+              <circle cx="40" cy="25" r="10" stroke="#E2B961" stroke-width="2"/>
+              <circle cx="40" cy="25" r="4" fill="#E2B961"/>
+              <line x1="40" y1="1" x2="40" y2="7" stroke="#E2B961" stroke-width="2"/>
+              <line x1="40" y1="43" x2="40" y2="49" stroke="#E2B961" stroke-width="2"/>
+              <line x1="20" y1="5" x2="24" y2="10" stroke="#E2B961" stroke-width="1.8"/>
+              <line x1="60" y1="5" x2="56" y2="10" stroke="#E2B961" stroke-width="1.8"/>
+            </svg>
+            <div class="oracle-title">Hauras</div>
+            <div class="oracle-subtitle">4th Judge</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. CARTE DE DÉMONSTRATION -->
+      <div id="demo-card-container" class="visual-element">
+        <div id="shockwave-ring"></div>
+        <div id="ash-particles"></div>
+        <div id="demo-card-shaker">
+          <div id="demo-card" class="tarot-flip-card">
+            <div class="card-face card-front">
+              <div class="card-front-inner">
+                <div class="front-symbol" id="demo-front-glyph">✹</div>
+              </div>
+            </div>
+            <div class="card-face card-back">
+              <div class="tarot-inner-border">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                <div class="tarot-top-icon" id="demo-top-glyph">✹</div>
+                <div class="tarot-name" id="demo-card-title">NEITSU</div>
+                <div class="tarot-image-container">
+                  <img src="neitsu.png" id="demo-img-normal" class="img-normal" onerror="setMysticFallback(this, '#E2B961')">
+                  <img src="neitsu_shadow_zone.png" id="demo-img-danger" class="img-danger" onerror="this.onerror=null; this.src='neitsu.png';">
+                  <div id="demo-mystery-symbol">?</div>
+                </div>
+                <div id="demo-status-pill">SAFE</div>
+                <div class="tarot-rank" id="demo-card-rank">✹ THE SUN ✹</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. LA BALANCE (SANS TEXTE PAR-DESSUS) -->
+      <div id="scale-container" class="visual-element">
+        <svg id="scale-svg" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M160 50 L160 250" stroke="#E2B961" stroke-width="6" stroke-linecap="round"/>
+          <path d="M110 250 L210 250 L185 265 L135 265 Z" fill="#E2B961" stroke="#BA9547" stroke-width="2"/>
+          <circle cx="160" cy="65" r="10" fill="#181818" stroke="#E2B961" stroke-width="3"/>
+          <g id="beam">
+            <path d="M40 65 L280 65" stroke="#E2B961" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="160" cy="65" r="4" fill="#E2B961"/>
+            <circle cx="55" cy="65" r="3" fill="#E2B961"/>
+            <circle cx="265" cy="65" r="3" fill="#E2B961"/>
+            <path d="M125 65 L115 55 M195 65 L205 55 M160 65 L160 40" stroke="#E2B961" stroke-width="2"/>
+          </g>
+          <g id="pan-left">
+            <line x1="55" y1="65" x2="30" y2="150" stroke="#BA9547" stroke-width="2"/>
+            <line x1="55" y1="65" x2="80" y2="150" stroke="#BA9547" stroke-width="2"/>
+            <path d="M20 150 L90 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
+            <path d="M20 150 C20 165 90 165 90 150 Z" fill="rgba(226,185,97,0.18)" stroke="#E2B961" stroke-width="1.5"/>
+          </g>
+          <g id="pan-right">
+            <line x1="265" y1="65" x2="240" y2="150" stroke="#BA9547" stroke-width="2"/>
+            <line x1="265" y1="65" x2="290" y2="150" stroke="#BA9547" stroke-width="2"/>
+            <path d="M230 150 L300 150" stroke="#E2B961" stroke-width="3" stroke-linecap="round"/>
+            <path d="M230 150 C230 165 300 165 300 150 Z" fill="rgba(226,185,97,0.18)" stroke="#E2B961" stroke-width="1.5"/>
+          </g>
         </svg>
-        <div id="score-100-counter">00</div>
       </div>
 
-      <!-- Les 11 Critères Officiels (20 + 6x10 + 4x5 = 100 PTS) -->
-      <div class="rubric-100-grid">
-        <div class="crit-pill full-width"><span>PITCH (ACCURACY)</span><strong>/20</strong></div>
-        <div class="crit-pill"><span>VOCAL QUALITY</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>TECHNIQUE</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>VOCAL IDENTITY</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>MUSICALITY</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>AUDIO &amp; MIXING</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>ATTITUDE</span><strong>/10</strong></div>
-        <div class="crit-pill"><span>RHYTHM</span><strong>/5</strong></div>
-        <div class="crit-pill"><span>PRONUNCIATION</span><strong>/5</strong></div>
-        <div class="crit-pill"><span>VOCAL PRESENCE</span><strong>/5</strong></div>
-        <div class="crit-pill"><span>HARMONIES</span><strong>/5</strong></div>
+      <!-- 5. EXPLOSION DES 3 CERCLES & LES 12 CARTES DE LA FINALE -->
+      <div id="shatter-triad" class="visual-element">
+        <span class="triad-glyph">✹</span>
+        <span class="triad-glyph">☾</span>
+        <span class="triad-glyph">✦</span>
       </div>
-    </div>
 
-    <!-- 7. SYMBOLES D'OUTRO -->
-    <div id="outro-symbols" class="visual-element">✹ ☾ ✦</div>
+      <div id="finale-cards" class="visual-element"></div>
 
-    <!-- TEXTE CINÉMATIQUE -->
-    <div id="main-text"></div>
+      <!-- 6. VISUEL MINI-VIDÉO 3 : PENTAGRAMME & LES 11 CRITÈRES = 100 POINTS EXACTS -->
+      <div id="judges-pentagram-view" class="visual-element">
+        <div class="pentagram-stage" id="pentagram-stage">
+          <svg class="pentagram-svg" viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="88" stroke="rgba(226,185,97,0.3)" stroke-width="1.5"/>
+            <polygon class="pentagram-path" points="100,14 152,172 18,74 182,74 48,172" stroke="#E2B961" stroke-width="2" fill="rgba(226,185,97,0.05)"/>
+          </svg>
+          <div id="score-100-counter">00</div>
+        </div>
+
+        <div class="rubric-100-grid">
+          <div class="crit-pill full-width"><span>PITCH (ACCURACY)</span><strong>/20</strong></div>
+          <div class="crit-pill"><span>VOCAL QUALITY</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>TECHNIQUE</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>VOCAL IDENTITY</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>MUSICALITY</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>AUDIO &amp; MIXING</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>ATTITUDE</span><strong>/10</strong></div>
+          <div class="crit-pill"><span>RHYTHM</span><strong>/5</strong></div>
+          <div class="crit-pill"><span>PRONUNCIATION</span><strong>/5</strong></div>
+          <div class="crit-pill"><span>VOCAL PRESENCE</span><strong>/5</strong></div>
+          <div class="crit-pill"><span>HARMONIES</span><strong>/5</strong></div>
+        </div>
+      </div>
+
+      <!-- 7. SYMBOLES D'OUTRO -->
+      <div id="outro-symbols" class="visual-element">✹ ☾ ✦</div>
+
+      <!-- TEXTE CINÉMATIQUE -->
+      <div id="main-text"></div>
+
+    </div><!-- Fin #cine-canvas -->
 
   </div>
 
 <script>
-  let PACE = 1.35;
+  // PACE = 1.0 par défaut (pilote à la fois tous les timers JS et la variable CSS --pace)
+  let PACE = 1.0;
   let isCleanMode = false;
   let orbitRafId = null;
 
+  // Fonction utilitaire qui adapte tous les délais à la vitesse choisie
+  const pMs = ms => Math.round(ms * PACE);
+  const delay = ms => new Promise(res => setTimeout(res, pMs(ms)));
+  const rawDelay = ms => new Promise(res => setTimeout(res, pMs(ms)));
+
+  // =========================================================
+  // AUTO-SCALING PLEIN ÉCRAN DU CANEVAS 9:16 (420 x 746.67)
+  // =========================================================
+  function resizeCineCanvas() {
+    const stage = document.getElementById('stage-916');
+    const canvas = document.getElementById('cine-canvas');
+    if (!stage || !canvas) return;
+    const scale = stage.clientHeight / 746.67;
+    canvas.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(4)})`;
+  }
+  window.addEventListener('resize', resizeCineCanvas);
+  window.addEventListener('DOMContentLoaded', resizeCineCanvas);
+  resizeCineCanvas();
+
+  // =========================================================
+  // GESTION DE LA VIDÉO D'ARRIÈRE-PLAN (IMPORT, SON & ASSOMBRISSEMENT)
+  // =========================================================
+  const bgVideo = document.getElementById('bg-video');
+
+  bgVideo.addEventListener('loadeddata', () => {
+    bgVideo.style.display = 'block';
+    updateBgVideoStyle();
+  });
+
+  function loadCustomBgVideo(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    bgVideo.src = url;
+    bgVideo.style.display = 'block';
+    updateBgVideoStyle();
+    bgVideo.muted = true;
+    bgVideo.play().catch(() => {});
+    document.getElementById('bg-file-name').textContent = "✔ " + file.name;
+  }
+
+  function clearBgVideo() {
+    bgVideo.pause();
+    bgVideo.removeAttribute('src');
+    bgVideo.style.display = 'none';
+    document.getElementById('bg-file-name').textContent = "📂 Choisir une vidéo (.mp4 / .mov)";
+  }
+
+  function updateBgVideoStyle() {
+    const op = document.getElementById('rng-opacity').value;
+    const bl = document.getElementById('rng-blur').value;
+    const vol = Number(document.getElementById('rng-volume').value);
+
+    document.getElementById('lbl-opacity').textContent = op + "%";
+    document.getElementById('lbl-blur').textContent = bl + "px";
+    document.getElementById('lbl-volume').textContent = vol + "%";
+
+    bgVideo.style.opacity = (op / 100).toFixed(2);
+    bgVideo.style.filter = `blur(${bl}px) contrast(1.08)`;
+    bgVideo.volume = (vol / 100);
+  }
+
   function setSpeed(mult, btnEl) {
     PACE = mult;
+    document.documentElement.style.setProperty('--pace', mult);
     btnEl.parentElement.querySelectorAll('.bar-btn').forEach(b => b.classList.remove('active'));
     btnEl.classList.add('active');
   }
@@ -1022,13 +1192,12 @@
     finaleContainer.appendChild(div);
   }
 
-  // Génère le design détaillé d'une vraie carte Tarot "FUTURE MEMBER" (pour la Vidéo 1)
   function getDetailedFutureMemberHTML(spotNum) {
     return `
       <div class="fc-detailed-inner">
         <div class="fc-detailed-top">INITIATE</div>
         <div class="fc-detailed-avatar">
-          <svg viewBox="0 0 60 72" width="32" height="38" fill="none">
+          <svg viewBox="0 0 60 72" width="32" height="40" fill="none">
             <circle cx="30" cy="22" r="11" fill="#141414" stroke="#E2B961" stroke-width="2"/>
             <path d="M10 66 C10 44, 50 44, 50 66 Z" fill="#141414" stroke="#E2B961" stroke-width="2"/>
           </svg>
@@ -1045,10 +1214,10 @@
     for (let i = 0; i < 44; i++) {
       const sp = document.createElement('div');
       sp.className = 'ash-speck';
-      const startX = 18 + Math.random() * 170;
-      const startY = 35 + Math.random() * 245;
-      const driftX = (Math.random() - 0.5) * 100;
-      const driftY = -65 - Math.random() * 120;
+      const startX = 18 + Math.random() * 190;
+      const startY = 35 + Math.random() * 270;
+      const driftX = (Math.random() - 0.5) * 110;
+      const driftY = -65 - Math.random() * 130;
       const isEmber = Math.random() < 0.35;
       sp.style.left = startX + 'px';
       sp.style.top = startY + 'px';
@@ -1057,16 +1226,15 @@
       box.appendChild(sp);
 
       setTimeout(() => {
-        sp.style.transition = 'transform 2.6s ease-out, opacity 2.6s ease-out';
+        sp.style.transition = `transform ${2.2 * PACE}s ease-out, opacity ${2.2 * PACE}s ease-out`;
         sp.style.opacity = '0.95';
         sp.style.transform = `translate(${driftX}px, ${driftY}px) scale(0.15)`;
-        setTimeout(() => { sp.style.opacity = '0'; }, 1050);
-      }, i * 48);
+        setTimeout(() => { sp.style.opacity = '0'; }, pMs(900));
+      }, pMs(i * 40));
     }
   }
 
-  // Rotation continue en sens opposés (24 extérieures horaires / 24 intérieures anti-horaires)
-  function startContinuousDualCircle(minis, centerY = -15, maxCards = 48) {
+  function startContinuousDualCircle(minis, centerY = -12, maxCards = 48, targetOpacity = '1') {
     cancelAnimationFrame(orbitRafId);
     const startTime = performance.now();
 
@@ -1075,7 +1243,7 @@
     });
 
     function animateOrbit(now) {
-      const elapsed = now - startTime;
+      const elapsed = (now - startTime) / PACE;
       minis.forEach((m, i) => {
         if (i >= maxCards) {
           m.style.opacity = '0';
@@ -1089,11 +1257,11 @@
         const p = Math.min(1, localTime / 1100);
         const easeOut = 1 - Math.pow(1 - p, 3);
 
-        const baseRadius = isOuter ? 124 : 78;
+        const baseRadius = isOuter ? 146 : 92;
         const radius = easeOut * baseRadius;
 
         const direction = isOuter ? 1 : -1;
-        const speed = isOuter ? 0.00042 : 0.00052;
+        const speed = isOuter ? 0.00048 : 0.00060;
         const baseAngle = (idxInRing / 24) * Math.PI * 2 - Math.PI / 2;
         const angle = baseAngle + direction * (elapsed * speed);
 
@@ -1101,7 +1269,7 @@
         const y = centerY + Math.sin(angle) * radius;
         const deg = (angle * 180 / Math.PI) + 90;
 
-        m.style.opacity = p > 0.02 ? '1' : '0';
+        m.style.opacity = p > 0.02 ? targetOpacity : '0';
         m.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${deg.toFixed(2)}deg) scale(${easeOut.toFixed(3)})`;
       });
 
@@ -1115,42 +1283,49 @@
     cancelAnimationFrame(orbitRafId);
     orbitRafId = null;
     minis.forEach(m => {
-      m.style.transition = 'transform 1.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.3s ease, filter 1.1s ease, box-shadow 1.1s ease, border-color 0.8s ease';
+      m.style.transition = `transform calc(1.2s * var(--pace)) cubic-bezier(0.22, 1, 0.36, 1), opacity calc(0.95s * var(--pace)) ease, filter calc(0.8s * var(--pace)) ease, box-shadow calc(0.8s * var(--pace)) ease, border-color calc(0.6s * var(--pace)) ease`;
     });
     void cardsContainer.offsetWidth;
   }
 
-  const delay = ms => new Promise(res => setTimeout(res, Math.round(ms * PACE)));
-  const rawDelay = ms => new Promise(res => setTimeout(res, ms));
   const mainText = document.getElementById('main-text');
 
   async function showText(htmlContent, duration, position = 'center', isDanger = false) {
     if (isCleanMode) {
-      await delay(duration + 1600);
+      await delay(duration + 1300);
       return;
     }
     mainText.classList.remove('visible');
-    await rawDelay(750);
+    await rawDelay(550);
 
     mainText.innerHTML = htmlContent;
 
-    if (position === 'center') mainText.style.top = '50%';
-    else if (position === 'bottom') mainText.style.top = '83%';
-    else if (position === 'top') mainText.style.top = '14%';
+    if (position === 'center') mainText.style.top = '47%';
+    else if (position === 'bottom') mainText.style.top = '73%';
+    else if (position === 'top') mainText.style.top = '16%';
 
     mainText.classList.toggle('danger-text', isDanger);
     mainText.classList.add('visible');
     await delay(duration);
     mainText.classList.remove('visible');
-    await rawDelay(1050);
+    await rawDelay(750);
   }
 
   async function hideMenuAndPrepare() {
+    resizeCineCanvas();
     document.getElementById('stage-916').classList.remove('show-guide');
     const overlay = document.getElementById('start-overlay');
     overlay.style.opacity = '0';
-    setTimeout(() => overlay.style.display = 'none', 900);
-    await rawDelay(1200);
+    setTimeout(() => overlay.style.display = 'none', 700);
+
+    if (bgVideo.src) {
+      const vol = Number(document.getElementById('rng-volume').value);
+      bgVideo.currentTime = 0;
+      bgVideo.volume = vol / 100;
+      bgVideo.muted = (vol === 0);
+      bgVideo.play().catch(() => {});
+    }
+    await rawDelay(900);
   }
 
   function setDemoCardMode(mode = 'neitsu') {
@@ -1182,7 +1357,65 @@
   }
 
   // =========================================================
-  // 1. TRAILER PRINCIPAL COMPLET (SCÈNES 1 À 6)
+  // MINI-VIDÉO 6 (NOUVEAU) : LE TEASER MYSTÈRE (ANNONCE S3 SUBTILE)
+  // =========================================================
+  async function playMini6_MysteryTeaser() {
+    await hideMenuAndPrepare();
+
+    const minis = document.querySelectorAll('.mini-card');
+    const sacredWheel = document.getElementById('sacred-wheel');
+    const triad = document.getElementById('shatter-triad');
+    const cardContainer = document.getElementById('demo-card-container');
+    const card = document.getElementById('demo-card');
+
+    // 1. La roue astrologique émerge dans l'ombre
+    sacredWheel.classList.add('visible');
+    await showText("The silence is <strong>almost over</strong>.", 3200, 'center');
+
+    // 2. Évocation subtile des Saisons 1 et 2
+    await showText("Season 1 crowned a voice.<span>Season 2 wrote history.</span>", 3800, 'center');
+    await showText("For <strong>Season 3</strong>...<span>Everything changes.</span>", 3800, 'center');
+
+    // 3. Les 3 symboles sacrés (✹ ☾ ✦) s'allument entourés d'un double anneau de cartes dans la pénombre
+    sacredWheel.classList.remove('visible');
+    document.getElementById('forty-eight-cards').classList.add('visible');
+    startContinuousDualCircle(minis, -15, 48, '0.35');
+    triad.classList.add('visible');
+
+    await showText("<strong>Three signs</strong> in the dark.", 3500, 'bottom');
+
+    // 4. Une grande Lame de Tarot scellée (face cachée) lévite au centre sans dévoiler son secret
+    triad.classList.remove('visible');
+    setDemoCardMode('mystery');
+    card.classList.remove('flipped');
+    card.classList.add('levitate-mystery');
+    cardContainer.classList.add('visible', 'sheen-active');
+
+    await showText("A new chapter is <strong>calling</strong>.", 3600, 'bottom');
+
+    // 5. Révélation du Nom KÆOS et de la date du 1er Novembre
+    cardContainer.classList.remove('visible', 'sheen-active');
+    card.classList.remove('levitate-mystery');
+    stopContinuousDualCircle(minis);
+    document.getElementById('forty-eight-cards').classList.remove('visible');
+    await rawDelay(900);
+
+    sacredWheel.classList.add('visible');
+    document.getElementById('logo-container').classList.add('visible');
+    await delay(4000);
+    document.getElementById('logo-container').classList.remove('visible');
+    await rawDelay(800);
+
+    document.getElementById('outro-symbols').classList.add('visible');
+    await showText("<strong>November 1st.</strong><span>Keep an eye on us.</span>", 4800, 'bottom');
+    document.getElementById('outro-symbols').classList.remove('visible');
+    sacredWheel.classList.remove('visible');
+
+    document.getElementById('replay-btn').classList.add('visible');
+  }
+
+  // =========================================================
+  // 1. TRAILER PRINCIPAL COMPLET (PLEIN ÉCRAN & ZÉRO OVERLAP)
   // =========================================================
   async function startMainTrailer(startScene = 1) {
     await hideMenuAndPrepare();
@@ -1195,58 +1428,58 @@
 
     // SCÈNE 1 : INTRO & LOGO
     if (startScene <= 1) {
-      await showText("Have you ever dreamed of joining a <strong>real project</strong>?", 3800, 'center');
-      await showText("A <strong>real group</strong>?", 3200, 'center');
-      await showText("A whole new <strong>universe</strong>?", 3800, 'center');
+      await showText("Have you ever dreamed of joining a <strong>real project</strong>?", 3400, 'center');
+      await showText("A <strong>real group</strong>?", 2800, 'center');
+      await showText("A whole new <strong>universe</strong>?", 3400, 'center');
 
       sacredWheel.classList.add('visible');
       document.getElementById('logo-container').classList.add('visible');
-      await delay(5200);
+      await delay(4600);
       document.getElementById('logo-container').classList.remove('visible');
       sacredWheel.classList.remove('visible');
-      await rawDelay(1500);
+      await rawDelay(1100);
     }
 
-    // SCÈNE 2 : DOUBLE CERCLE EN ROTATION CONTINUE ➔ 3 ÉQUIPES DE 16
+    // SCÈNE 2 : DOUBLE CERCLE PLEIN ÉCRAN ➔ 3 ÉQUIPES DE 16
     if (startScene <= 2) {
-      await showText("This survival show is <strong>different</strong>.", 3800, 'center');
+      await showText("This survival show is <strong>different</strong>.", 3400, 'center');
 
       document.getElementById('forty-eight-cards').classList.add('visible');
       startContinuousDualCircle(minis, -15, 48);
-      await rawDelay(1400);
+      await rawDelay(1100);
 
-      await showText("<strong>48 singers</strong> will be chosen.", 4200, 'bottom');
-      await showText("Split into <strong>3 Teams</strong> of 16.", 4200, 'bottom');
+      await showText("<strong>48 singers</strong> will be chosen.", 3800, 'bottom');
+      await showText("Split into <strong>3 Teams</strong> of 16.", 3800, 'bottom');
 
       stopContinuousDualCircle(minis);
-      oracles.style.top = '31%';
+      oracles.style.top = '23%';
       oracles.style.transform = 'translate(-50%, -50%) scale(1)';
       oracles.classList.add('visible');
 
       minis.forEach((m, i) => {
         const angle = (i / 48) * Math.PI * 2;
-        const x = Math.cos(angle) * 52;
-        const y = 175 + Math.sin(angle) * 22;
+        const x = Math.cos(angle) * 58;
+        const y = 175 + Math.sin(angle) * 20;
         const deg = (angle * 180 / Math.PI) + 90;
-        m.style.transform = `translate(${x}px, ${y}px) rotate(${deg}deg) scale(0.85)`;
+        m.style.transform = `translate(${x}px, ${y}px) rotate(${deg}deg) scale(0.9)`;
       });
-      await rawDelay(1200);
+      await rawDelay(950);
 
       const o1 = document.getElementById('o-1');
       o1.classList.add('appear', 'active-glow');
       minis.forEach((m, i) => {
         if (i < 16) {
           const row = Math.floor(i / 4); const col = i % 4;
-          const x = -116 + (col - 1.5) * 20;
-          const y = 32 + (row * 29);
+          const x = -128 + (col - 1.5) * 23;
+          const y = -8 + (row * 35);
           setTimeout(() => {
             m.style.zIndex = 100 + i;
             m.innerHTML = `<div class="mini-card-inner">✹</div>`;
-            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`;
-          }, i * 55);
+            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.05)`;
+          }, pMs(i * 42));
         }
       });
-      await showText("The Circle of the <strong>Sun</strong><span>Leader: Neitsu</span>", 4200, 'top');
+      await showText("The Circle of the <strong>Sun</strong><span>Leader: Neitsu</span>", 3800, 'bottom');
       o1.classList.remove('active-glow');
 
       const o2 = document.getElementById('o-2');
@@ -1255,16 +1488,16 @@
         if (i >= 16 && i < 32) {
           const j = i - 16;
           const row = Math.floor(j / 4); const col = j % 4;
-          const x = 0 + (col - 1.5) * 20;
-          const y = 32 + (row * 29);
+          const x = 0 + (col - 1.5) * 23;
+          const y = -8 + (row * 35);
           setTimeout(() => {
             m.style.zIndex = 100 + j;
             m.innerHTML = `<div class="mini-card-inner">☾</div>`;
-            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`;
-          }, j * 55);
+            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.05)`;
+          }, pMs(j * 42));
         }
       });
-      await showText("The Circle of the <strong>Moon</strong><span>Leader: Kaina</span>", 4200, 'top');
+      await showText("The Circle of the <strong>Moon</strong><span>Leader: Kaina</span>", 3800, 'bottom');
       o2.classList.remove('active-glow');
 
       const o3 = document.getElementById('o-3');
@@ -1273,16 +1506,16 @@
         if (i >= 32) {
           const j = i - 32;
           const row = Math.floor(j / 4); const col = j % 4;
-          const x = 116 + (col - 1.5) * 20;
-          const y = 32 + (row * 29);
+          const x = 128 + (col - 1.5) * 23;
+          const y = -8 + (row * 35);
           setTimeout(() => {
             m.style.zIndex = 100 + j;
             m.innerHTML = `<div class="mini-card-inner">✦</div>`;
-            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`;
-          }, j * 55);
+            m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.05)`;
+          }, pMs(j * 42));
         }
       });
-      await showText("The Circle of the <strong>Star</strong><span>Leader: Aya</span>", 4400, 'top');
+      await showText("The Circle of the <strong>Star</strong><span>Leader: Aya</span>", 4000, 'bottom');
       o3.classList.remove('active-glow');
     }
 
@@ -1290,32 +1523,34 @@
     if (startScene <= 3) {
       if (startScene === 3) {
         document.getElementById('forty-eight-cards').classList.add('visible');
-        oracles.style.top = '31%';
+        oracles.style.top = '26%';
         oracles.classList.add('visible');
         document.getElementById('o-1').classList.add('appear');
+      } else {
+        oracles.style.top = '26%';
       }
-      await rawDelay(800);
+      await rawDelay(650);
       document.getElementById('o-2').style.opacity = '0';
       document.getElementById('o-3').style.opacity = '0';
-      document.getElementById('o-1').style.transform = 'translateX(116px) scale(1.08)';
+      document.getElementById('o-1').style.transform = 'translateX(128px) scale(1.06)';
 
       minis.forEach((m, i) => {
         if (i >= 16) {
           m.style.opacity = '0';
         } else {
           const row = Math.floor(i / 4); const col = i % 4;
-          const x = (col - 1.5) * 24;
-          const y = 52 + (row * 34);
+          const x = (col - 1.5) * 28;
+          const y = 12 + (row * 38);
           m.style.opacity = '1';
           m.innerHTML = `<div class="mini-card-inner">✹</div>`;
-          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.1)`;
+          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.22)`;
         }
       });
 
       counterEl.textContent = "16 IN THE CIRCLE";
       counterEl.classList.add('visible');
 
-      await showText("Every round, you compete <strong>only inside your own Circle</strong>.", 4800, 'bottom');
+      await showText("Every round, you compete <strong>only inside your own Circle</strong>.", 4200, 'bottom');
 
       const sunIndices = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].sort(() => Math.random() - 0.5);
       const eliminated = sunIndices.slice(0, 12);
@@ -1325,34 +1560,34 @@
         setTimeout(() => {
           const m = minis[eliminated[i]];
           m.style.filter = 'grayscale(100%) brightness(30%)';
-          m.style.transform += ' translateY(24px) scale(0.8)';
+          m.style.transform += ' translateY(22px) scale(0.8)';
           m.style.opacity = '0';
           const leftCount = 16 - (i + 1);
           counterEl.textContent = leftCount === 4 ? "✹ ONLY 4 LEFT ✹" : `${leftCount} IN THE CIRCLE`;
-        }, i * 380);
+        }, pMs(i * 300));
       }
 
-      await rawDelay(4800);
+      await rawDelay(3900);
 
       survivors.forEach((idx, sPos) => {
         const m = minis[idx];
-        const x = (sPos - 1.5) * 34;
-        const y = 92;
+        const x = (sPos - 1.5) * 42;
+        const y = 55;
         m.classList.add('survivor-glow');
-        m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.45)`;
+        m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.75)`;
       });
 
-      await showText("Until only <strong>4 are left</strong> in each Circle.", 4800, 'bottom');
+      await showText("Until only <strong>4 are left</strong> in each Circle.", 4200, 'bottom');
 
       counterEl.classList.remove('visible');
       document.getElementById('forty-eight-cards').classList.remove('visible');
       oracles.classList.remove('visible');
-      await rawDelay(1500);
+      await rawDelay(1100);
     }
 
-    // SCÈNE 4 : CARTE DORÉE, CARTE ROUGE & LA BALANCE
+    // SCÈNE 4 : GRANDE CARTE DORÉE, CARTE ROUGE & LA BALANCE
     if (startScene <= 4) {
-      await showText("How does a <strong>round</strong> work?", 3800, 'center');
+      await showText("How does a <strong>round</strong> work?", 3400, 'center');
 
       const cardContainer = document.getElementById('demo-card-container');
       const cardShaker = document.getElementById('demo-card-shaker');
@@ -1360,14 +1595,14 @@
       const statusPill = document.getElementById('demo-status-pill');
 
       cardContainer.classList.add('visible');
-      await rawDelay(1500);
-      card.classList.add('flipped');
       await rawDelay(1100);
+      card.classList.add('flipped');
+      await rawDelay(900);
       cardContainer.classList.add('sheen-active');
       statusPill.textContent = "SAFE";
       statusPill.classList.add('show');
 
-      await showText("If your card stays <strong>golden</strong>, you are <strong>SAFE</strong>.", 4800, 'bottom');
+      await showText("If your card stays <strong>golden</strong>, you are <strong>SAFE</strong>.", 4200, 'bottom');
 
       cardContainer.classList.remove('sheen-active');
       cardContainer.classList.add('trigger-shockwave');
@@ -1375,8 +1610,8 @@
       cardContainer.classList.add('state-danger');
       statusPill.textContent = "SHADOW ZONE";
 
-      await showText("If your card turns <strong>red</strong>, you are in the <strong>SHADOW ZONE</strong>.", 5000, 'bottom', true);
-      await showText("You are in <strong>danger</strong> of elimination.", 4400, 'bottom', true);
+      await showText("If your card turns <strong>red</strong>, you are in the <strong>SHADOW ZONE</strong>.", 4400, 'bottom', true);
+      await showText("You are in <strong>danger</strong> of elimination.", 3800, 'bottom', true);
       cardShaker.classList.remove('shake-animation');
 
       cardContainer.classList.add('shift-up');
@@ -1384,41 +1619,41 @@
       scaleContainer.classList.add('shift-down');
       scaleContainer.classList.add('visible');
 
-      await showText("Only <strong>2 things</strong> can save you:", 4200, 'bottom');
+      await showText("Only <strong>2 things</strong> can save you:", 3600, 'bottom');
 
       scaleContainer.classList.add('tilt-scale-public');
       cardContainer.classList.add('state-hope');
       statusPill.textContent = "PUBLIC SAVE";
-      await showText("1. The <strong>Public Vote</strong>...", 4400, 'bottom');
+      await showText("1. The <strong>Public Vote</strong>...", 3800, 'bottom');
 
       scaleContainer.classList.remove('tilt-scale-public');
       scaleContainer.classList.add('tilt-scale-leader');
       statusPill.textContent = "LEADER SAVE";
-      await showText("2. Or your <strong>Circle Leader</strong>.", 4600, 'bottom');
+      await showText("2. Or your <strong>Circle Leader</strong>.", 4000, 'bottom');
 
       cardContainer.classList.remove('state-hope');
       scaleContainer.classList.remove('visible');
       cardContainer.classList.remove('shift-up');
-      await rawDelay(1400);
+      await rawDelay(1100);
 
       cardContainer.classList.add('state-eliminated');
       statusPill.textContent = "ELIMINATED";
       triggerAshParticles();
-      await showText("If nobody saves you... your card <strong>burns to ash</strong>.", 5000, 'bottom');
+      await showText("If nobody saves you... your card <strong>burns to ash</strong>.", 4400, 'bottom');
 
       cardContainer.classList.add('fade-away');
-      await showText("And you are <strong>out</strong>.", 3800, 'center');
-      await rawDelay(1300);
+      await showText("And you are <strong>out</strong>.", 3400, 'center');
+      await rawDelay(1000);
     }
 
     // SCÈNE 5 : EXPLOSION DES 3 CERCLES & FINALE (12 ➔ 5 ➔ FORMATION 3 + 2 + 3)
     if (startScene <= 5) {
       const triad = document.getElementById('shatter-triad');
       triad.classList.add('visible');
-      await showText("In the end, the <strong>3 Circles break</strong>.", 4400, 'bottom');
+      await showText("In the end, the <strong>3 Circles break</strong>.", 3800, 'bottom');
 
       triad.classList.add('explode');
-      await rawDelay(1100);
+      await rawDelay(900);
       triad.classList.remove('visible');
 
       finaleContainer.classList.add('visible');
@@ -1428,24 +1663,24 @@
         c.className = 'finale-card';
         const col = i % 4;
         const row = Math.floor(i / 4);
-        const x = (col - 1.5) * 76;
-        const y = (row - 1) * 110 - 15;
+        const x = (col - 1.5) * 84;
+        const y = (row - 1) * 116 - 8;
         c.innerHTML = `<div class="finale-card-inner">${circleSymbols[i]}</div>`;
         c.style.transform = `translate(${x}px, ${y + 25}px) scale(0.9)`;
         setTimeout(() => {
           c.style.opacity = '1';
           c.style.transform = `translate(${x}px, ${y}px) scale(1)`;
-        }, i * 140);
+        }, pMs(i * 110));
       });
 
-      await showText("The <strong>12 finalists</strong> come together for the Grand Finale.", 4800, 'bottom');
+      await showText("The <strong>12 finalists</strong> come together for the Grand Finale.", 4200, 'bottom');
 
       const winners = [1, 3, 5, 8, 10];
       fCards.forEach((c, i) => {
         const col = i % 4;
         const row = Math.floor(i / 4);
-        const x = (col - 1.5) * 76;
-        const y = (row - 1) * 110 - 15;
+        const x = (col - 1.5) * 84;
+        const y = (row - 1) * 116 - 8;
         if (winners.includes(i)) {
           c.classList.add('winner');
           c.style.transform = `translate(${x}px, ${y - 10}px) scale(1.08)`;
@@ -1455,7 +1690,7 @@
         }
       });
 
-      await showText("Only <strong>5 will win</strong>...", 4200, 'bottom');
+      await showText("Only <strong>5 will win</strong>...", 3600, 'bottom');
 
       document.getElementById('o-1').style.transform = 'translateY(0) scale(1)';
       document.getElementById('o-2').style.opacity = '1';
@@ -1463,44 +1698,44 @@
       document.getElementById('o-1').classList.add('appear');
       document.getElementById('o-2').classList.add('appear');
       document.getElementById('o-3').classList.add('appear');
-      oracles.style.top = '44%';
-      oracles.style.transform = 'translate(-50%, calc(-50% - 140px)) scale(0.68)';
+      oracles.style.top = '38%';
+      oracles.style.transform = 'translate(-50%, calc(-50% - 140px)) scale(0.72)';
       oracles.classList.add('visible');
 
       const targetCoords = [
-        { x: -42, y: -15 },
-        { x:  42, y: -15 },
-        { x: -82, y: 100 },
-        { x:   0, y: 100 },
-        { x:  82, y: 100 }
+        { x: -46, y: -15 },
+        { x:  46, y: -15 },
+        { x: -90, y: 102 },
+        { x:   0, y: 102 },
+        { x:  90, y: 102 }
       ];
 
       let wIdx = 0;
       fCards.forEach((c, i) => {
         if (winners.includes(i)) {
           const pos = targetCoords[wIdx++];
-          c.style.transform = `translate(${pos.x}px, ${pos.y}px) scale(1.06)`;
+          c.style.transform = `translate(${pos.x}px, ${pos.y}px) scale(1.02)`;
         } else {
           c.style.opacity = '0';
           c.style.transform = 'translate(0px, 60px) scale(0.3)';
         }
       });
 
-      await showText("...and join the <strong>3 Leaders</strong> to form the 8-member group: <strong>KÆOS</strong>.", 5800, 'bottom');
+      await showText("...and join the <strong>3 Leaders</strong> to form the 8-member group: <strong>KÆOS</strong>.", 5000, 'bottom');
 
       finaleContainer.classList.remove('visible');
       oracles.classList.remove('visible');
-      await rawDelay(1600);
+      await rawDelay(1200);
     }
 
-    // SCÈNE 6 : OUTRO & DATES D'AUDITION (November 1st to November 13th)
-    await showText("Are you ready to <strong>try your luck</strong>?", 4200, 'center');
-    await showText("Apply now via the <strong>link in our bio</strong>.", 4400, 'center');
-    await showText("Auditions open from <strong>November 1st to November 13th</strong>", 5200, 'center');
+    // SCÈNE 6 : OUTRO & DATES D'AUDITION
+    await showText("Are you ready to <strong>try your luck</strong>?", 3600, 'center');
+    await showText("Apply now via the <strong>link in our bio</strong>.", 3800, 'center');
+    await showText("Auditions open from <strong>November 1st to November 13th</strong>", 4600, 'center');
 
     sacredWheel.classList.add('visible');
     document.getElementById('outro-symbols').classList.add('visible');
-    await showText("<strong>Choose your destiny.</strong>", 5600, 'bottom');
+    await showText("<strong>Choose your destiny.</strong>", 4800, 'bottom');
     document.getElementById('outro-symbols').classList.remove('visible');
     sacredWheel.classList.remove('visible');
 
@@ -1520,85 +1755,78 @@
     const o2 = document.getElementById('o-2');
     const o3 = document.getElementById('o-3');
 
-    // 1. Logo KÆOS + Roue sacrée
     sacredWheel.classList.add('visible');
     document.getElementById('logo-container').classList.add('visible');
-    await showText("Every group has a <strong>story</strong>.", 4000, 'bottom');
+    await showText("Every group has a <strong>story</strong>.", 3600, 'bottom');
     document.getElementById('logo-container').classList.remove('visible');
     sacredWheel.classList.remove('visible');
-    await rawDelay(1100);
+    await rawDelay(900);
 
-    // 2. Étape 1 de l'histoire : Neitsu crée KÆOS il y a 2 ans (centré seul au départ)
     oracles.style.top = '36%';
-    oracles.style.transform = 'translate(-50%, -50%) scale(1.05)';
+    oracles.style.transform = 'translate(-50%, -50%) scale(1.06)';
     oracles.classList.add('visible');
 
     o2.style.opacity = '0';
     o3.style.opacity = '0';
-    o1.style.transform = 'translateX(116px) scale(1.12)';
+    o1.style.transform = 'translateX(128px) scale(1.12)';
     o1.classList.add('appear', 'active-glow');
 
-    await showText("2 years ago, <strong>Neitsu</strong> created a group: <strong>KÆOS</strong><span>Keep An Eye On Us</span>", 5000, 'bottom');
+    await showText("2 years ago, <strong>Neitsu</strong> created a group: <strong>KÆOS</strong><span>Keep An Eye On Us</span>", 4400, 'bottom');
     o1.classList.remove('active-glow');
 
-    // 3. Étape 2 : Kaina rejoint lors du 1er concours
     o1.style.transform = 'translateX(0px) scale(1)';
     o2.style.opacity = '1';
     o2.classList.add('appear', 'active-glow');
 
-    await showText("<strong>Kaina</strong> was chosen in the very first season...", 4600, 'bottom');
+    await showText("<strong>Kaina</strong> was chosen in the very first season...", 4000, 'bottom');
     o2.classList.remove('active-glow');
 
-    // 4. Étape 3 : Aya rejoint lors du 2e concours
     o3.style.opacity = '1';
     o3.classList.add('appear', 'active-glow');
 
-    await showText("...and <strong>Aya</strong> joined in the second chapter.", 4600, 'bottom');
+    await showText("...and <strong>Aya</strong> joined in the second chapter.", 4000, 'bottom');
     o3.classList.remove('active-glow');
 
-    // 5. La renaissance à 3
     o1.classList.add('active-glow');
     o2.classList.add('active-glow');
     o3.classList.add('active-glow');
-    await showText("After past members left, the <strong>3 survivors</strong> never gave up.", 5000, 'bottom');
+    await showText("After past members left, the <strong>3 survivors</strong> never gave up.", 4400, 'bottom');
     o1.classList.remove('active-glow');
     o2.classList.remove('active-glow');
     o3.classList.remove('active-glow');
 
-    // 6. Les 3 Leaders montent en haut + 5 VRAIES CARTES DÉTAILLÉES "FUTURE MEMBER" s'alignent en 2 + 3 !
-    oracles.style.top = '44%';
-    oracles.style.transform = 'translate(-50%, calc(-50% - 140px)) scale(0.68)';
+    oracles.style.top = '38%';
+    oracles.style.transform = 'translate(-50%, calc(-50% - 140px)) scale(0.72)';
 
     finaleContainer.classList.add('visible');
     const targetCoords = [
-      { x: -45, y: -12 },
-      { x:  45, y: -12 },
-      { x: -86, y: 104 },
-      { x:   0, y: 104 },
-      { x:  86, y: 104 }
+      { x: -48, y: -15 },
+      { x:  48, y: -15 },
+      { x: -92, y: 102 },
+      { x:   0, y: 102 },
+      { x:  92, y: 102 }
     ];
 
     fCards.forEach((c, i) => {
       if (i < 5) {
         c.className = 'finale-card detailed-member winner';
         c.innerHTML = getDetailedFutureMemberHTML(i + 1);
-        c.style.transform = `translate(0px, 160px) scale(0.5)`;
+        c.style.transform = `translate(0px, 140px) scale(0.5)`;
         setTimeout(() => {
           c.style.opacity = '1';
-          c.style.transform = `translate(${targetCoords[i].x}px, ${targetCoords[i].y}px) scale(1)`;
-        }, i * 220);
+          c.style.transform = `translate(${targetCoords[i].x}px, ${targetCoords[i].y}px) scale(0.95)`;
+        }, pMs(i * 180));
       } else {
         c.style.opacity = '0';
       }
     });
 
-    await showText("Today, <strong>KÆOS</strong> is back.", 4000, 'bottom');
-    await showText("And we are looking for <strong>5 new members</strong> to complete the group.", 5200, 'bottom');
+    await showText("Today, <strong>KÆOS</strong> is back.", 3600, 'bottom');
+    await showText("And we are looking for <strong>5 new members</strong> to complete the group.", 4600, 'bottom');
 
-    // 7. Zoom sur la grande carte FUTURE MEMBER
     finaleContainer.classList.remove('visible');
     oracles.classList.remove('visible');
-    await rawDelay(1100);
+    await rawDelay(900);
 
     setDemoCardMode('mystery');
     const cardContainer = document.getElementById('demo-card-container');
@@ -1606,15 +1834,15 @@
     const statusPill = document.getElementById('demo-status-pill');
 
     cardContainer.classList.add('visible');
-    await rawDelay(1000);
+    await rawDelay(800);
     card.classList.add('flipped');
-    await rawDelay(900);
+    await rawDelay(700);
     cardContainer.classList.add('sheen-active');
     statusPill.textContent = "FUTURE MEMBER?";
     statusPill.classList.add('show');
 
-    await showText("Will one of these 5 cards be <strong>yours</strong>?", 4600, 'bottom');
-    await showText("Auditions open from <strong>November 1st to November 13th</strong><span>Link in bio</span>", 5400, 'bottom');
+    await showText("Will one of these 5 cards be <strong>yours</strong>?", 4000, 'bottom');
+    await showText("Auditions open from <strong>November 1st to November 13th</strong><span>Link in bio</span>", 4800, 'bottom');
 
     document.getElementById('replay-btn').classList.add('visible');
   }
@@ -1629,52 +1857,52 @@
     const minis = document.querySelectorAll('.mini-card');
     const laser = document.getElementById('split-laser');
 
-    await showText("Afraid to lose because you have a <strong>small account</strong>?", 4500, 'center');
-    await showText("In <strong>KÆOS PROJECT</strong>, talent comes first.", 4200, 'center');
+    await showText("Afraid to lose because you have a <strong>small account</strong>?", 4000, 'center');
+    await showText("In <strong>KÆOS PROJECT</strong>, talent comes first.", 3800, 'center');
 
     document.getElementById('forty-eight-cards').classList.add('visible');
     minis.forEach((m, i) => {
       if (i < 16) {
         const row = Math.floor(i / 4);
         const col = i % 4;
-        const x = (col - 1.5) * 44;
-        const y = (row - 1.5) * 58 - 25;
+        const x = (col - 1.5) * 52;
+        const y = (row - 1.5) * 66 - 22;
         m.innerHTML = `<div class="mini-card-inner">✹</div>`;
         setTimeout(() => {
           m.style.opacity = '1';
-          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.65)`;
-        }, i * 45);
+          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.75)`;
+        }, pMs(i * 38));
       } else {
         m.style.opacity = '0';
       }
     });
 
-    await showText("Public votes <strong>never</strong> decide who is nominated.", 4800, 'bottom');
-    await showText("Only the <strong>4 Judges</strong> rank your performance.", 4600, 'bottom');
+    await showText("Public votes <strong>never</strong> decide who is nominated.", 4200, 'bottom');
+    await showText("Only the <strong>4 Judges</strong> rank your performance.", 4000, 'bottom');
 
     laser.classList.add('active');
     minis.forEach((m, i) => {
       if (i < 16) {
         const row = Math.floor(i / 4);
         const col = i % 4;
-        const x = (col - 1.5) * 44;
+        const x = (col - 1.5) * 52;
         if (row < 2) {
-          const y = (row - 1.5) * 58 - 40;
+          const y = (row - 1.5) * 66 - 38;
           m.classList.add('survivor-glow');
-          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.68)`;
+          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.78)`;
         } else {
-          const y = (row - 1.5) * 58 - 8;
+          const y = (row - 1.5) * 66 - 4;
           m.classList.add('danger-mini');
-          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.62)`;
+          m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.72)`;
         }
       }
     });
 
-    await showText("Top half is <strong>SAFE</strong>.<span>Bottom half enters the SHADOW ZONE.</span>", 5200, 'bottom');
+    await showText("Top half is <strong>SAFE</strong>.<span>Bottom half enters the SHADOW ZONE.</span>", 4600, 'bottom');
 
     laser.classList.remove('active');
     document.getElementById('forty-eight-cards').classList.remove('visible');
-    await rawDelay(1200);
+    await rawDelay(950);
 
     const cardContainer = document.getElementById('demo-card-container');
     const card = document.getElementById('demo-card');
@@ -1691,19 +1919,19 @@
     scaleContainer.classList.add('tilt-scale-leader');
     cardContainer.classList.add('state-hope');
     statusPill.textContent = "LEADER SAVE";
-    await showText("In danger, your <strong>Circle Leader</strong> saves the most singers...", 5000, 'bottom');
+    await showText("In danger, your <strong>Circle Leader</strong> saves the most singers...", 4400, 'bottom');
 
     scaleContainer.classList.remove('tilt-scale-leader');
     scaleContainer.classList.add('tilt-scale-public');
     statusPill.textContent = "PUBLIC SAVE";
-    await showText("...and the <strong>Public Vote</strong> gives a second chance.", 4800, 'bottom');
+    await showText("...and the <strong>Public Vote</strong> gives a second chance.", 4200, 'bottom');
 
     scaleContainer.classList.remove('visible');
     cardContainer.classList.remove('visible');
-    await rawDelay(1100);
+    await rawDelay(900);
 
     document.getElementById('outro-symbols').classList.add('visible');
-    await showText("<strong>Pure talent. Fair rules.</strong><span>Apply now via the link in bio</span>", 5400, 'bottom');
+    await showText("<strong>Pure talent. Fair rules.</strong><span>Apply now via the link in bio</span>", 4800, 'bottom');
 
     document.getElementById('replay-btn').classList.add('visible');
   }
@@ -1721,33 +1949,31 @@
     const scoreCounter = document.getElementById('score-100-counter');
     const pills = document.querySelectorAll('.crit-pill');
 
-    await showText("How are you judged in <strong>KÆOS PROJECT</strong>?", 4200, 'center');
+    await showText("How are you judged in <strong>KÆOS PROJECT</strong>?", 3800, 'center');
 
-    // 1. Les 3 Leaders apparaissent en haut (top: 26%)
-    oracles.style.top = '26%';
+    oracles.style.top = '24%';
     oracles.style.transform = 'translate(-50%, -50%) scale(0.95)';
     oracles.classList.add('visible');
     document.getElementById('o-1').classList.add('appear', 'active-glow');
-    setTimeout(() => document.getElementById('o-2').classList.add('appear', 'active-glow'), 280);
-    setTimeout(() => document.getElementById('o-3').classList.add('appear', 'active-glow'), 560);
+    setTimeout(() => document.getElementById('o-2').classList.add('appear', 'active-glow'), pMs(220));
+    setTimeout(() => document.getElementById('o-3').classList.add('appear', 'active-glow'), pMs(440));
 
-    await showText("By the <strong>3 Circle Leaders</strong>: Neitsu, Kaina &amp; Aya...", 4600, 'bottom');
+    await showText("By the <strong>3 Circle Leaders</strong>: Neitsu, Kaina &amp; Aya...", 4000, 'bottom');
 
-    // 2. La carte d'Hauras apparaît JUSTE EN DESSOUS des 3 Leaders (les 4 Juges sont réunis à l'écran !)
+    haurasCard.style.top = '48%';
+    haurasCard.style.transform = 'translate(-50%, -50%) scale(0.95)';
     haurasCard.classList.add('visible');
-    await showText("...and a 4th external Judge: <strong>Hauras</strong><span>An outside musical perspective</span>", 5200, 'bottom');
+    await showText("...and a 4th external Judge: <strong>Hauras</strong><span>An outside musical perspective</span>", 4600, 'bottom');
 
-    // 3. On fait disparaître les 4 Juges ensemble avant d'afficher l'étoile des 100 points
     oracles.classList.remove('visible');
     haurasCard.classList.remove('visible');
-    await rawDelay(1200);
+    await rawDelay(950);
 
-    // 4. Tracé du Pentagramme doré + Affichage des 11 critères = 100 PTS exacts !
     judgeView.classList.add('visible');
     pentaStage.classList.add('show');
 
     pills.forEach((p, idx) => {
-      setTimeout(() => p.classList.add('show'), 250 + idx * 180);
+      setTimeout(() => p.classList.add('show'), pMs(200 + idx * 140));
     });
 
     let currentScore = 0;
@@ -1760,10 +1986,10 @@
       } else {
         scoreCounter.textContent = String(currentScore).padStart(2, '0');
       }
-    }, 35);
+    }, pMs(30));
 
-    await showText("Combined with a pure <strong>100-Point Vocal Score</strong>.", 5200, 'bottom');
-    await showText("Every detail of your voice matters.<span>Auditions: November 1st to November 13th</span>", 5400, 'bottom');
+    await showText("Combined with a pure <strong>100-Point Vocal Score</strong>.", 4600, 'bottom');
+    await showText("Every detail of your voice matters.<span>Auditions: November 1st to November 13th</span>", 4800, 'bottom');
 
     document.getElementById('replay-btn').classList.add('visible');
   }
@@ -1778,9 +2004,9 @@
     const oracles = document.getElementById('oracles-section');
     const counterEl = document.getElementById('survivor-counter');
 
-    await showText("<strong>3 Circles. 3 Leaders.</strong><span>Which one will be yours?</span>", 4400, 'center');
+    await showText("<strong>3 Circles. 3 Leaders.</strong><span>Which one will be yours?</span>", 3800, 'center');
 
-    oracles.style.top = '31%';
+    oracles.style.top = '24%';
     oracles.style.transform = 'translate(-50%, -50%) scale(1)';
     oracles.classList.add('visible');
     document.getElementById('forty-eight-cards').classList.add('visible');
@@ -1791,29 +2017,28 @@
       const j = i % 16;
       const row = Math.floor(j / 4);
       const col = j % 4;
-      const baseX = (g - 1) * 116;
-      const x = baseX + (col - 1.5) * 20;
-      const y = 32 + (row * 29);
+      const baseX = (g - 1) * 128;
+      const x = baseX + (col - 1.5) * 23;
+      const y = -4 + (row * 35);
       m.innerHTML = `<div class="mini-card-inner">${symbolsByGroup[g]}</div>`;
       setTimeout(() => {
         m.style.opacity = '1';
-        m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1)`;
-      }, i * 22);
+        m.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(1.05)`;
+      }, pMs(i * 18));
     });
 
     document.getElementById('o-1').classList.add('appear', 'active-glow');
-    await showText("✹ <strong>The Circle of the Sun</strong><span>Leader: Neitsu</span>", 3800, 'top');
+    await showText("✹ <strong>The Circle of the Sun</strong><span>Leader: Neitsu</span>", 3400, 'bottom');
     document.getElementById('o-1').classList.remove('active-glow');
 
     document.getElementById('o-2').classList.add('appear', 'active-glow');
-    await showText("☾ <strong>The Circle of the Moon</strong><span>Leader: Kaina</span>", 3800, 'top');
+    await showText("☾ <strong>The Circle of the Moon</strong><span>Leader: Kaina</span>", 3400, 'bottom');
     document.getElementById('o-2').classList.remove('active-glow');
 
     document.getElementById('o-3').classList.add('appear', 'active-glow');
-    await showText("✦ <strong>The Circle of the Star</strong><span>Leader: Aya</span>", 3800, 'top');
+    await showText("✦ <strong>The Circle of the Star</strong><span>Leader: Aya</span>", 3400, 'bottom');
     document.getElementById('o-3').classList.remove('active-glow');
 
-    // 1. Éliminations 3 par 3 EN PARTANT DU BAS VERS LE HAUT (15..4), laissant la rangée 0..3 en haut !
     counterEl.textContent = "16 PER CIRCLE";
     counterEl.classList.add('visible');
 
@@ -1832,7 +2057,7 @@
             [0, 16, 32].forEach(offset => {
               const cardEl = minis[offset + jIdx];
               cardEl.style.filter = 'grayscale(100%) brightness(30%)';
-              cardEl.style.transform += ' translateY(-16px) scale(0.8)';
+              cardEl.style.transform += ' translateY(-16px) scale(0.75)';
               cardEl.style.opacity = '0';
             });
           });
@@ -1843,14 +2068,13 @@
               });
             });
           }
-        }, sIdx * 1050);
+        }, pMs(sIdx * 850));
       });
-    }, 600);
+    }, pMs(450));
 
-    await showText("Round after round, 3 are eliminated in every Circle...", 5200, 'bottom');
-    await showText("Until only <strong>4 per Circle</strong> survive.", 4400, 'bottom');
+    await showText("Round after round, 3 are eliminated in every Circle...", 4600, 'bottom');
+    await showText("Until only <strong>4 per Circle</strong> survive.", 3800, 'bottom');
 
-    // 2. Fusion des 4 de chaque Cercle (12 finalistes) au centre pour la Finale !
     oracles.classList.remove('visible');
     counterEl.textContent = "12 FINALISTS MERGE";
 
@@ -1863,34 +2087,33 @@
     survivorCards.forEach((cardEl, idx) => {
       const col = idx % 4;
       const row = Math.floor(idx / 4);
-      const x = (col - 1.5) * 58;
-      const y = (row - 1) * 78 - 10;
+      const x = (col - 1.5) * 66;
+      const y = (row - 1) * 90 - 12;
       cardEl.classList.remove('survivor-glow');
       cardEl.style.transform = `translate(${x}px, ${y}px) rotate(0deg) scale(2.4)`;
     });
 
-    await showText("The 4 survivors of each Circle <strong>merge into 12 finalists</strong>...", 5000, 'bottom');
+    await showText("The 4 survivors of each Circle <strong>merge into 12 finalists</strong>...", 4400, 'bottom');
 
-    // 3. Seulement 5 gagnants s'élèvent et brillent en doré !
     counterEl.textContent = "✹ ONLY 5 WINNERS ✹";
     const winIdx = [1, 3, 5, 8, 10];
     survivorCards.forEach((cardEl, idx) => {
       const col = idx % 4;
       const row = Math.floor(idx / 4);
-      const x = (col - 1.5) * 58;
-      const y = (row - 1) * 78 - 10;
+      const x = (col - 1.5) * 66;
+      const y = (row - 1) * 90 - 12;
       if (winIdx.includes(idx)) {
         cardEl.classList.add('survivor-glow');
         cardEl.style.zIndex = 200 + idx;
-        cardEl.style.transform = `translate(${x}px, ${y - 12}px) rotate(0deg) scale(2.65)`;
+        cardEl.style.transform = `translate(${x}px, ${y - 10}px) rotate(0deg) scale(2.65)`;
       } else {
         cardEl.style.filter = 'grayscale(100%) brightness(35%)';
         cardEl.style.opacity = '0.25';
-        cardEl.style.transform = `translate(${x}px, ${y + 12}px) rotate(0deg) scale(2.1)`;
+        cardEl.style.transform = `translate(${x}px, ${y + 10}px) rotate(0deg) scale(2.1)`;
       }
     });
 
-    await showText("...and only <strong>5 will win</strong> to join <strong>KÆOS</strong>!", 5400, 'bottom');
+    await showText("...and only <strong>5 will win</strong> to join <strong>KÆOS</strong>!", 4800, 'bottom');
 
     document.getElementById('replay-btn').classList.add('visible');
   }
@@ -1904,13 +2127,13 @@
     const minis = document.querySelectorAll('.mini-card');
     const counterEl = document.getElementById('survivor-counter');
 
-    await showText("Only <strong>48 spots</strong> are available for Season 3.", 4200, 'center');
+    await showText("Only <strong>48 spots</strong> are available for Season 3.", 3800, 'center');
 
     document.getElementById('forty-eight-cards').classList.add('visible');
     counterEl.textContent = "01 / 48 SPOTS";
     counterEl.classList.add('visible');
 
-    startContinuousDualCircle(minis, -10, 47);
+    startContinuousDualCircle(minis, -15, 47);
 
     let count = 1;
     const countInterval = setInterval(() => {
@@ -1922,9 +2145,9 @@
       } else {
         counterEl.textContent = `${String(count).padStart(2, '0')} / 48 SPOTS`;
       }
-    }, 65);
+    }, pMs(55));
 
-    await showText("The cards are being drawn...", 4400, 'bottom');
+    await showText("The cards are being drawn...", 3800, 'bottom');
 
     setDemoCardMode('mystery');
     const cardContainer = document.getElementById('demo-card-container');
@@ -1933,15 +2156,15 @@
 
     counterEl.textContent = "✦ CARD #48 : YOU? ✦";
     cardContainer.classList.add('visible');
-    await rawDelay(1100);
-    card.classList.add('flipped');
     await rawDelay(900);
+    card.classList.add('flipped');
+    await rawDelay(750);
     cardContainer.classList.add('sheen-active');
     statusPill.textContent = "CARD #48";
     statusPill.classList.add('show');
 
-    await showText("One card is still waiting for <strong>your voice</strong>.", 4800, 'bottom');
-    await showText("Auditions close on <strong>November 13th</strong><span>Apply now via the link in bio</span>", 5600, 'bottom');
+    await showText("One card is still waiting for <strong>your voice</strong>.", 4200, 'bottom');
+    await showText("Auditions close on <strong>November 13th</strong><span>Apply now via the link in bio</span>", 4800, 'bottom');
 
     stopContinuousDualCircle(minis);
     document.getElementById('replay-btn').classList.add('visible');
