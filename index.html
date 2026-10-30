@@ -1,1669 +1,2620 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KÆOS PROJECT — Star KCA Academy</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --tarot-bg: #181818;      
-      --tarot-gold: #E2B961;    
-      --tarot-gold-dim: rgba(226, 185, 97, 0.22);
-      --tarot-danger: #D93838;  
-      --tarot-ash: #555555;
-      --tarot-ash-dark: #121212;
-      --bg: #0A0A0A;
-      --panel: #121212;
-      --panel2: #1A1A1A;
-      --text: #F0EDE5;
-      --muted: #888888;
-      --line: #2E2E2E;
-    }
-    
-    * { box-sizing: border-box; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--tarot-gold); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star KCA Academy — Finale Ranking Video Studio V5</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fcfaf6;
+    --paper-warm: #f2ece1;
+    --ink: #1a1715;
+    --ink-muted: #6e665e;
+    --gold: #f5b73b;
+    --gold-light: #ffe596;
+    --up-green: #10b981;
+    --down-red: #f43f5e;
+  }
 
-    body {
-      margin: 0; font-family: 'Poppins', sans-serif; color: var(--text);
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, #1a150e 0%, #0A0A0A 65%);
-      background-attachment: fixed; overflow-x: hidden;
-    }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    /* ==========================================
-       CELESTIAL RISING SPARKS BACKGROUND CANVAS
-       ========================================== */
-    #celestial-sparks {
-      position: fixed; inset: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 0;
-    }
-    #landing-menu, #app-dashboard { position: relative; z-index: 2; }
-    
-    h1, h2, h3, h4 {
-      font-family: 'Cinzel', 'Playfair Display', serif;
-      color: var(--tarot-gold); font-weight: 700; letter-spacing: 2.5px;
-    }
-    .container { width: min(1320px, 94vw); margin: 0 auto; }
+  body {
+    background-color: #0d0d12;
+    color: #f2f2f5;
+    font-family: 'Outfit', 'Montserrat', sans-serif;
+    overflow-x: hidden;
+  }
 
-    /* ==========================================
-       LANDING MENU (4 3D TAROT CARDS)
-       ========================================== */
-    #landing-menu {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 2rem 0; transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    .menu-header { text-align: center; margin-bottom: 2.5rem; color: var(--tarot-gold); padding: 0 1rem; }
-    .menu-header h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: 6px; text-transform: uppercase; margin: 0 0 10px 0; text-shadow: 0 0 25px rgba(226, 185, 97, 0.35); }
-    .menu-header p { font-size: clamp(0.75rem, 2vw, 1rem); letter-spacing: 6px; text-transform: uppercase; margin: 0; color: #999; }
-    
-    .cards-layout { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; max-width: 1400px; padding: 20px; }
-    .card-container { width: 270px; height: 430px; perspective: 1500px; cursor: pointer; position: relative; }
-    .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
-    
-    @media (hover: hover) {
-      .card-container:hover .tarot-flip-card { transform: rotateY(180deg) translateY(-16px); }
-    }
-    .card-container.flipped .tarot-flip-card { transform: rotateY(180deg) translateY(-10px); }
-    
-    .card-face {
-      position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.85); padding: 10px;
-    }
-    .card-front {
-      display: flex; justify-content: center; align-items: center;
-      background-image: linear-gradient(rgba(226, 185, 97, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.14) 1px, transparent 1px);
-      background-size: 20px 20px; background-position: center;
-    }
-    .card-front::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.55) 0%, rgba(10,10,10,0.94) 100%); }
-    .card-front-inner { position: relative; z-index: 2; width: 88%; height: 92%; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; }
-    .card-front-label { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.85rem; text-transform: uppercase; opacity: 0.85; }
+  /* ================= STUDIO CONFIG PANEL ================= */
+  #studio-panel {
+    max-width: 1540px;
+    margin: 0 auto;
+    padding: 22px;
+  }
 
-    .front-symbol {
-      width: 84px; height: 84px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg);
-      display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: var(--tarot-gold);
-      box-shadow: 0 0 25px rgba(226, 185, 97, 0.25), inset 0 0 15px rgba(226, 185, 97, 0.3); text-shadow: 0 0 15px rgba(226, 185, 97, 0.8);
-    }
-    .card-back { transform: rotateY(180deg); }
-    .enter-hint {
-      position: absolute; bottom: 52px; background: rgba(226, 185, 97, 0.95); color: #0A0A0A;
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; padding: 4px 14px; border-radius: 99px;
-      text-transform: uppercase; z-index: 5; box-shadow: 0 0 15px rgba(226, 185, 97, 0.5);
-    }
+  .studio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(145deg, #1b1b24, #13131a);
+    padding: 20px 26px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 
-    /* ==========================================
-       HEADER & CIRCLE SWITCHER
-       ========================================== */
-    #app-dashboard { display: none; opacity: 0; transition: opacity 0.6s ease; }
-    header {
-      position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px);
-      background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.7);
-    }
-    .topbar { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; padding: 0.7rem 0; }
-    
-    .brand { cursor: pointer; transition: transform 0.3s ease; }
-    .brand:hover { transform: scale(1.02); }
-    .brand h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); }
-    .brand p { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; }
-    
-    .circle-switcher { display: flex; align-items: center; gap: 0.35rem; background: #0d0d0d; padding: 4px; border-radius: 6px; border: 1px solid var(--line); }
-    .circle-btn {
-      background: transparent; color: var(--muted); border: 1px solid transparent; border-radius: 4px;
-      padding: 0.32rem 0.65rem; font-size: 0.76rem; font-family: 'Poppins'; cursor: pointer;
-      transition: all 0.25s ease; display: flex; align-items: center; gap: 5px; white-space: nowrap;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-    .circle-btn:hover { color: var(--tarot-gold); }
-    .circle-btn.active { background: rgba(226, 185, 97, 0.14); color: var(--tarot-gold); border-color: var(--tarot-gold); font-weight: 600; box-shadow: 0 0 10px rgba(226, 185, 97, 0.18); }
+  .studio-header h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #fff, #ffd166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-    nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-    .nav-link {
-      text-decoration: none; color: var(--text); background: var(--panel);
-      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.78rem; font-size: 0.78rem;
-      transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .nav-link:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); }
-    .nav-link.active { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 600; }
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 
-    main { padding: 2rem 0 4rem; }
-    @keyframes fadeInSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .page { display: none; }
-    .page.active { display: block; animation: fadeInSlide 0.45s ease forwards; }
+  button, .file-btn, .header-select {
+    background: #252532;
+    color: #f0f0f0;
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.83rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    outline: none;
+  }
 
-    .card-paper {
-      background: rgba(18, 18, 18, 0.92); backdrop-filter: blur(8px);
-      border: 1px solid var(--tarot-gold-dim); border-radius: 6px; padding: 2rem; margin-bottom: 2rem;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(226,185,97,0.02); position: relative;
-    }
-    h2 { font-size: clamp(1.45rem, 3vw, 1.95rem); text-transform: uppercase; margin-top: 0; }
-    h3 { font-size: 1.25rem; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-    .small { color: var(--muted); font-size: 0.84rem; }
-    
-    .filters { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem; align-items: center; }
-    input, select { border-radius: 4px; border: 1px solid var(--line); outline: none; background: var(--bg); color: var(--text); padding: 0.6rem 0.8rem; transition: all 0.3s; font-family: 'Poppins'; }
-    input:focus, select:focus { border-color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
-    
-    /* ==========================================
-       CONTESTANTS TAROT CARDS
-       ========================================== */
-    .contestants-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); align-items: center; justify-items: center; padding: 1rem 0; }
-    .tarot-card {
-      width: 270px; height: 415px; background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold);
-      border-radius: 6px; padding: 10px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.85);
-      cursor: pointer; transition: transform 0.35s ease, box-shadow 0.35s ease; overflow: hidden;
-    }
-    .tarot-card::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(125deg, transparent 30%, rgba(226, 185, 97, 0.12) 50%, transparent 70%);
-      transform: translateX(-100%); transition: transform 0.6s ease; pointer-events: none;
-    }
-    .tarot-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 25px var(--tarot-gold-dim); z-index: 10; }
-    .tarot-card:hover::after { transform: translateX(100%); }
+  button:hover, .file-btn:hover, .header-select:hover {
+    background: #333345;
+    border-color: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+  }
 
-    .tarot-inner-border { position: absolute; inset: 10px; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; align-items: center; }
-    .corner { position: absolute; width: 6px; height: 6px; border: 1px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg); }
-    .corner-tl { top: -4px; left: -4px; } .corner-tr { top: -4px; right: -4px; }
-    .corner-bl { bottom: -4px; left: -4px; } .corner-br { bottom: -4px; right: -4px; }
-    .tarot-top-icon { position: absolute; top: -11px; color: var(--tarot-gold); font-size: 14px; background: var(--tarot-bg); padding: 0 8px; }
+  .btn-launch {
+    background: linear-gradient(135deg, #ff3366, #ff6b35);
+    border: none;
+    color: #fff;
+    font-size: 0.94rem;
+    padding: 12px 22px;
+    box-shadow: 0 8px 20px rgba(255, 51, 102, 0.35);
+  }
 
-    .tarot-name {
-      color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 1.55rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase; margin-top: 24px; z-index: 2; text-align: center;
-      width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px;
-    }
-    .tarot-image-container { position: absolute; top: 76px; width: 100%; height: 230px; display: flex; justify-content: center; align-items: center; }
-    .tarot-image-container img { max-width: 95%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.65)); transition: filter 0.3s ease, transform 0.3s ease; }
-    .tarot-card:hover .tarot-image-container img { transform: scale(1.03); }
+  .btn-launch:hover {
+    background: linear-gradient(135deg, #ff4778, #ff7d4d);
+    box-shadow: 0 10px 25px rgba(255, 51, 102, 0.5);
+  }
 
-    .tarot-badge { position: absolute; bottom: 50px; z-index: 3; font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; }
-    .tarot-rank { position: absolute; bottom: 16px; color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+  .panel-box {
+    background: #16161e;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
 
-    .theme-sun .front-symbol::before { content: '✹'; font-size: 2.8rem; }
-    .theme-sun .tarot-top-icon::before { content: '✹'; }
-    .theme-sun .tarot-rank::before, .theme-sun .tarot-rank::after { content: '✹'; font-size: 0.7rem; }
-    
-    .theme-moon .front-symbol::before { content: '☾'; font-size: 2.8rem; margin-top: -4px; }
-    .theme-moon .tarot-top-icon::before { content: '☾'; font-size: 15px; }
-    .theme-moon .tarot-rank::before { content: '☽'; font-size: 0.85rem; }
-    .theme-moon .tarot-rank::after { content: '☾'; font-size: 0.85rem; }
-    
-    .theme-star .front-symbol::before { content: '✦'; font-size: 2.9rem; }
-    .theme-star .tarot-top-icon::before { content: '✦'; }
-    .theme-star .tarot-rank::before, .theme-star .tarot-rank::after { content: '✦'; font-size: 0.75rem; }
-    
-    .theme-global .front-symbol::before { content: '☉'; font-size: 2.8rem; }
-    .theme-global .tarot-top-icon::before { content: '☉'; font-size: 15px; }
-    .theme-global .tarot-rank::before, .theme-global .tarot-rank::after { content: '☉'; font-size: 0.85rem; }
+  .panel-box h2 {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    color: #ffd166;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
 
-    @keyframes dangerPulse {
-      0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.85), 0 0 18px rgba(217, 56, 56, 0.35); }
-      50% { box-shadow: 0 20px 45px rgba(0,0,0,0.9), 0 0 32px rgba(217, 56, 56, 0.65); }
-    }
-    .danger-zone { border-color: var(--tarot-danger); animation: dangerPulse 3s infinite ease-in-out; }
-    .danger-zone:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 35px var(--tarot-danger); }
-    .danger-zone .tarot-inner-border, .danger-zone .corner { border-color: var(--tarot-danger); }
-    .danger-zone .tarot-name, .danger-zone .tarot-rank, .danger-zone .tarot-top-icon { color: var(--tarot-danger); }
-    .danger-zone .tarot-image-container img { filter: drop-shadow(0 0 14px rgba(217, 56, 56, 0.75)) drop-shadow(0 8px 15px rgba(0,0,0,0.8)); }
+  /* SCORE TABLE FULL WIDTH */
+  .table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #2b2b3a;
+    background: #111117;
+  }
 
-    .eliminated { border-color: var(--tarot-ash); background-color: var(--tarot-ash-dark); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .eliminated:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
-    .eliminated .tarot-inner-border, .eliminated .corner { border-color: var(--tarot-ash); }
-    .eliminated .corner, .eliminated .tarot-top-icon { background-color: var(--tarot-ash-dark); }
-    .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
-    .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(45%); opacity: 0.75; }
+  table.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
 
-    .pill { display: inline-block; padding: 0.26rem 0.72rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
-    .safe { background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold); border-color: var(--tarot-gold); }
-    .nominee { background: var(--tarot-danger); color: #ffffff; border-color: var(--tarot-danger); }
-    .saved_judges, .saved_public { background: #141414; color: var(--tarot-gold); border-color: var(--tarot-gold-dim); }
-    .eliminated-pill { background: var(--tarot-ash-dark); color: #777777; border-color: var(--tarot-ash); }
-    .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
-    .winner { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.45); }
-    
-    .row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-    @media (min-width: 880px) {
-      .row.two { grid-template-columns: 330px 1fr; gap: 2.5rem; align-items: start; }
-      .row.charts-split { grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: center; }
-    }
-    
-    .profile-img-wrap { width: 100%; max-width: 330px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; padding: 12px; display: flex; justify-content: center; position: relative; }
-    .profile-img-wrap::before { content:''; position: absolute; inset: 6px; border: 1px solid var(--tarot-gold); pointer-events: none; }
-    .profile-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2; }
-    .profile-content { min-width: 0; width: 100%; }
-    .circle-badge-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(226, 185, 97, 0.12); border: 1px solid var(--tarot-gold);
-      color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 0.78rem;
-      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 4px; margin-bottom: 0.8rem;
-    }
-    
-    .btn { text-decoration: none; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); background: transparent; border-radius: 4px; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins'; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; }
-    .btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 15px var(--tarot-gold-dim); }
-    .btn-primary { background: var(--tarot-gold); color: var(--bg); }
-    .btn-primary:hover { background: #f0ca70; box-shadow: 0 0 22px rgba(226, 185, 97, 0.45); }
-    
-    .profile-nav { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
-    .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.9rem 0.5rem; text-align: left; white-space: nowrap; letter-spacing: 1.5px; }
-    td { border-bottom: 1px dotted var(--line); padding: 0.85rem 0.5rem; text-align: left; white-space: nowrap; }
-    .table-wrap a { color: var(--tarot-gold); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-    .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
-    .chip { display: inline-block; border: 1px solid var(--tarot-gold); border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.74rem; background: rgba(226,185,97,0.1); font-weight: 600; }
+  table.score-table th, table.score-table td {
+    border: 1px solid #232330;
+    padding: 7px 4px;
+    text-align: center;
+  }
 
-    /* ==========================================
-       AUDITION PORTAL & 7 PROPHECY CARDS
-       ========================================== */
-    .audition-hero {
-      text-align: center; padding: 2.8rem 1.5rem;
-      background: radial-gradient(circle at center, rgba(226,185,97,0.06) 0%, transparent 70%);
-    }
-    .countdown-phase-lbl {
-      font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--tarot-gold);
-      letter-spacing: 4px; text-transform: uppercase; margin-top: 1.6rem; display: block;
-    }
-    .countdown-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 2rem; }
-    .countdown-box {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      width: 95px; padding: 0.9rem 0.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-    }
-    .countdown-num { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--tarot-gold); font-weight: 800; line-height: 1; }
-    .countdown-lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 6px; }
+  table.score-table th {
+    background: #15151e;
+    color: #ffd166;
+    font-weight: 800;
+    min-width: 78px;
+    font-size: 0.71rem;
+    line-height: 1.25;
+    padding: 10px 4px;
+  }
 
-    .prophecies-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-      gap: 1rem; margin-top: 1.4rem;
-    }
-    .prophecy-card {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      padding: 1.2rem 0.8rem; text-align: center; text-decoration: none;
-      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-      min-height: 190px; position: relative; transition: all 0.3s ease;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-    }
-    .prophecy-card::before {
-      content: ''; position: absolute; inset: 5px; border: 1px solid rgba(226, 185, 97, 0.28);
-      border-radius: 3px; pointer-events: none;
-    }
-    .prophecy-card.unlocked:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 22px rgba(226, 185, 97, 0.32);
-      background: radial-gradient(circle at center, rgba(226,185,97,0.12) 0%, #0d0d0d 75%);
-    }
-    .prophecy-card.locked {
-      border-color: #262626; background: #090909; opacity: 0.6; cursor: default;
-    }
-    .prophecy-card.locked::before { border-color: #1c1c1c; }
-    .prophecy-num { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 2.5px; color: var(--tarot-gold); text-transform: uppercase; }
-    .prophecy-card.locked .prophecy-num { color: #666; }
-    .prophecy-glyph {
-      width: 44px; height: 44px; border: 1px solid var(--tarot-gold); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.35rem; color: var(--tarot-gold); margin: 0.6rem 0;
-      background: #141414; box-shadow: 0 0 15px rgba(226, 185, 97, 0.2);
-    }
-    .prophecy-card.locked .prophecy-glyph { border-color: #333; color: #555; box-shadow: none; }
-    .prophecy-title { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--text); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 0.6rem 0; line-height: 1.25; }
-    .prophecy-card.locked .prophecy-title { color: #666; }
-    .prophecy-status {
-      font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 3px 9px; border-radius: 3px; background: var(--tarot-gold); color: var(--bg);
-    }
-    .prophecy-card.locked .prophecy-status {
-      background: #151515; color: #666; border: 1px solid #2a2a2a;
-    }
+  table.score-table th.grp-ov { border-top: 3px solid #f5b73b; color: #ffe596; }
+  table.score-table th.grp-sc { border-top: 3px solid #38bdf8; color: #bae6fd; }
+  table.score-table th.grp-fn { border-top: 3px solid #a855f7; color: #e9d5ff; }
+  table.score-table th.grp-sg { border-top: 3px solid #fb7185; color: #fecdd3; }
 
-    /* ==========================================
-       ANIMATED SCALE (VOTES PAGE) & GRIMOIRE
-       ========================================== */
-    .scale-showcase {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 1.8rem 1rem; margin: 1.5rem 0; background: #0d0d0d; border: 1px solid var(--line); border-radius: 6px;
-    }
-    @keyframes rockBeam { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
-    .scale-svg { width: 220px; height: 130px; overflow: visible; }
-    .scale-beam-group { transform-origin: 110px 35px; animation: rockBeam 6s ease-in-out infinite; }
-    .scale-quotas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.2rem; }
-    .quota-card { background: #121212; border: 1px solid var(--line); border-radius: 6px; padding: 0.75rem 1.2rem; text-align: center; min-width: 155px; }
-    .quota-card.shadow-quota { border-color: rgba(217, 56, 56, 0.5); }
-    .quota-card strong { display: block; font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--text); }
-    .quota-card.shadow-quota strong { color: var(--tarot-danger); }
+  table.score-table td.name-cell {
+    background: #181822;
+    font-weight: 800;
+    text-align: left;
+    padding-left: 14px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    min-width: 105px;
+    color: #fff;
+    border-right: 2px solid #2e2e40;
+  }
 
-    .vote-row { margin-bottom: 1.2rem; background: #0e0e0e; padding: 0.95rem 1.15rem; border-radius: 6px; border: 1px solid var(--line); }
-    .bar { width: 100%; height: 7px; background: #222; border-radius: 999px; overflow: hidden; margin-top: 0.55rem; }
-    .bar > span { display: block; height: 100%; background: var(--tarot-gold); transition: width 0.6s ease; box-shadow: 0 0 10px rgba(226, 185, 97, 0.5); }
+  table.score-table td.total-cell {
+    background: #181822;
+    font-weight: 900;
+    color: #10b981;
+    min-width: 82px;
+    font-size: 0.92rem;
+    border-left: 2px solid #2e2e40;
+  }
 
-    .grimoire-intro { text-align: center; max-width: 820px; margin: 0 auto 2.5rem; padding: 1.8rem; background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px; }
-    .grimoire-motto { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 5px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
-    .oracles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin: 1.5rem 0 2.8rem; }
-    .oracle-box {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
-      padding: 1.6rem 1.3rem; text-align: center; display: flex; flex-direction: column; align-items: center;
-      transition: border-color 0.3s ease, transform 0.3s ease;
-    }
-    .oracle-box:hover { border-color: var(--tarot-gold); transform: translateY(-4px); }
-    .oracle-symbol { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: var(--tarot-gold); margin-bottom: 0.6rem; text-shadow: 0 0 15px rgba(226, 185, 97, 0.35); }
-    .oracle-eye-svg { width: 46px; height: 32px; overflow: visible; filter: drop-shadow(0 0 8px rgba(226, 185, 97, 0.35)); }
-    .rubric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
-    .rubric-item { background: #0d0d0d; border: 1px solid var(--line); border-radius: 4px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-    .rubric-pts { font-family: 'Cinzel', serif; color: var(--tarot-gold); font-weight: 700; font-size: 1.05rem; }
+  table.score-table input {
+    width: 68px;
+    background: #0d0d12;
+    border: 1px solid #272736;
+    color: #fff;
+    text-align: center;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 6px 3px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
 
-    @media (max-width: 720px) {
-      .topbar { justify-content: center; text-align: center; }
-      .circle-switcher { width: 100%; justify-content: center; overflow-x: auto; }
-      nav { width: 100%; justify-content: center; }
-      .card-paper { padding: 1.25rem; }
-    }
-  </style>
+  table.score-table input:focus {
+    background: #050508;
+    border-color: #ffd166;
+    box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.25);
+    outline: none;
+  }
+
+  table.score-table input.zero-val {
+    color: #55556b;
+    background: transparent;
+    border-color: transparent;
+  }
+
+  table.score-table input.zero-val:hover,
+  table.score-table input.zero-val:focus {
+    background: #0d0d12;
+    border-color: #3a3a4e;
+    color: #fff;
+  }
+
+  .studio-bottom-grid {
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    gap: 22px;
+  }
+
+  @media (max-width: 1100px) {
+    .studio-bottom-grid { grid-template-columns: 1fr; }
+  }
+
+  .setting-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .setting-row label {
+    font-size: 0.79rem;
+    color: #b5b5c5;
+    font-weight: 600;
+  }
+
+  .setting-row select, .setting-row input[type="text"] {
+    background: #101016;
+    border: 1px solid #2e2e3d;
+    color: #fff;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.84rem;
+  }
+
+  .contestant-uploads {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 12px;
+  }
+
+  .upload-card {
+    background: #101016;
+    border: 1px solid #262633;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .upload-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #1e1e28;
+    object-fit: cover;
+    object-position: top center;
+    border: 1px solid #3a3a4c;
+    flex-shrink: 0;
+  }
+
+  .upload-info strong {
+    display: block;
+    font-size: 0.86rem;
+    margin-bottom: 5px;
+  }
+
+  .upload-info label {
+    font-size: 0.72rem;
+    padding: 5px 10px;
+    background: #252532;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 700;
+  }
+
+  input[type="file"] { display: none; }
+
+  /* ================= 9:16 STAGE (1080x1920) ================= */
+  #stage-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  #stage-container {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center center;
+    background: radial-gradient(circle at 50% 40%, #c89b6e 0%, #9c6d44 65%, #734b29 100%);
+  }
+
+  #custom-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    display: none;
+  }
+
+  #stage-lighting {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(255, 242, 210, 0.14) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, transparent 52%, rgba(18, 9, 4, 0.28) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  #particles-canvas {
+    position: absolute;
+    inset: 0;
+    width: 1080px;
+    height: 1920px;
+    z-index: 68;
+    pointer-events: none;
+  }
+
+  /* Center Logo Watermark */
+  #center-logo-wrap {
+    position: absolute;
+    top: 53%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    text-align: center;
+    pointer-events: none;
+    width: 780px;
+    opacity: 0.22;
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+
+  #center-logo-img {
+    max-width: 720px;
+    max-height: 390px;
+    object-fit: contain;
+    display: none;
+    margin: 0 auto;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.35));
+  }
+
+  #center-logo-text {
+    font-family: 'Caveat', cursive;
+    font-size: 125px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 0.88;
+    text-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    transform: rotate(-3deg);
+  }
+
+  /* ================= INTRO SPLASH SCREEN ================= */
+  #intro-splash {
+    position: absolute;
+    inset: 0;
+    z-index: 75;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(16px);
+    transition:
+      opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1.55s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  #intro-splash.active {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+
+  #intro-splash.exit {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.93);
+    filter: blur(14px);
+  }
+
+  .intro-card {
+    background: rgba(24, 19, 15, 0.84);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px solid rgba(255, 235, 190, 0.35);
+    padding: 58px 72px;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 35px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+    max-width: 850px;
+    position: relative;
+  }
+
+  .intro-eyebrow {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 11px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .intro-main {
+    font-size: 88px;
+    font-weight: 900;
+    letter-spacing: 9px;
+    color: #fff;
+    line-height: 0.95;
+    text-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+
+  .intro-sub {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: 14px;
+    color: #ffffff;
+    opacity: 0.92;
+    margin-top: 14px;
+  }
+
+  /* ================= CLEAN TOP HUD (STRICTLY INSIDE WOODEN FRAME) ================= */
+  #top-bar {
+    position: absolute;
+    top: 78px;
+    left: 92px;
+    right: 92px;
+    height: 58px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 60;
+    opacity: 0;
+    transform: translateY(-18px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  #top-bar.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hud-badge-left {
+    background: rgba(24, 20, 17, 0.78);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 9px 18px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.32);
+  }
+
+  .hud-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ff4757;
+    box-shadow: 0 0 10px #ff4757;
+    animation: pulseRed 2s infinite;
+  }
+
+  @keyframes pulseRed {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.25); opacity: 0.7; }
+  }
+
+  .hud-badge-left .t1 {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2.8px;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .hud-badge-left .t2 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    color: var(--gold-light);
+  }
+
+  .hud-badge-right {
+    background: rgba(24, 20, 17, 0.78);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 9px 18px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1.4px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.32);
+  }
+
+  .hud-badge-right svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--gold-light);
+  }
+
+  /* Active Category Scrapbook Banner */
+  #active-cat-stage {
+    position: absolute;
+    top: 142px;
+    left: 92px;
+    right: 92px;
+    height: 114px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 58;
+    pointer-events: none;
+  }
+
+  #active-cat-box {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+    filter: blur(8px);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.85s ease;
+  }
+
+  #active-cat-box.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+
+  #active-cat-box.exit {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+    filter: blur(8px);
+  }
+
+  #active-cat-main {
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: 7px;
+    color: #ffffff;
+    line-height: 1;
+    text-transform: uppercase;
+    text-shadow: 0 6px 22px rgba(0,0,0,0.82), 0 2px 6px rgba(0,0,0,0.55);
+  }
+
+  .cat-sub-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 5px 24px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.48), inset 0 0 0 1px rgba(0,0,0,0.08);
+    transform: rotate(-0.6deg);
+    position: relative;
+  }
+
+  .cat-sub-wrap::before,
+  .cat-sub-wrap::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #d49b17);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  #active-cat-sub {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 5.5px;
+    text-transform: uppercase;
+  }
+
+  /* Smooth Sliding Category Ribbon */
+  #queue-viewport {
+    position: absolute;
+    top: 266px;
+    left: 96px;
+    right: 96px;
+    height: 48px;
+    z-index: 55;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%);
+  }
+
+  #queue-viewport.visible { opacity: 1; }
+
+  #queue-track {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    transition: transform 1.25s cubic-bezier(0.25, 1, 0.3, 1);
+    will-change: transform;
+  }
+
+  .q-pill {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    border-radius: 99px;
+    background: rgba(24, 20, 16, 0.62);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.78);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.8s ease;
+  }
+
+  .q-pill.next-up {
+    background: rgba(255, 245, 215, 0.25);
+    border-color: rgba(255, 230, 150, 0.65);
+    color: #fff;
+    transform: scale(1.04);
+  }
+
+  .q-pill.done {
+    opacity: 0.22;
+    transform: scale(0.92);
+  }
+
+  .q-pill span.q-sub-txt {
+    color: var(--gold-light);
+    font-weight: 900;
+  }
+
+  /* ================= POLAROID CARDS ================= */
+  #cards-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    pointer-events: none;
+  }
+
+  .polaroid-card {
+    position: absolute;
+    width: 204px;
+    height: 348px;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    transform: translate3d(0px, 0px, 0px) scale(0.88);
+    transition:
+      transform 2.25s cubic-bezier(0.25, 1, 0.3, 1),
+      opacity 0.9s ease,
+      filter 0.9s ease;
+    will-change: transform, opacity, filter;
+  }
+
+  .polaroid-card.song-dimmed {
+    opacity: 0.42 !important;
+    filter: grayscale(45%) brightness(0.82);
+  }
+
+  .polaroid-card.song-spotlight .polaroid-inner {
+    box-shadow:
+      0 22px 42px rgba(0, 0, 0, 0.65),
+      0 0 28px rgba(255, 220, 115, 0.55),
+      inset 0 0 0 2.5px var(--gold);
+  }
+
+  .polaroid-inner {
+    width: 100%;
+    height: 100%;
+    background: var(--paper);
+    background-image: linear-gradient(160deg, #ffffff 0%, #f4efe4 100%);
+    border-radius: 10px;
+    padding: 12px 11px 10px 11px;
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.48),
+      0 4px 9px rgba(0, 0, 0, 0.28),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition:
+      transform 1.15s cubic-bezier(0.25, 1, 0.3, 1),
+      box-shadow 1.15s ease;
+  }
+
+  .polaroid-card.is-leader .polaroid-inner {
+    box-shadow:
+      0 18px 36px rgba(0, 0, 0, 0.55),
+      0 0 24px rgba(245, 183, 59, 0.42),
+      inset 0 0 0 2px #f5b73b;
+  }
+
+  .polaroid-card.moving-up .polaroid-inner {
+    transform: translateY(-9px) scale(1.048) rotate(0deg) !important;
+    box-shadow:
+      0 28px 50px rgba(0, 0, 0, 0.68),
+      0 0 28px rgba(255, 215, 100, 0.6),
+      inset 0 0 0 2.5px var(--gold);
+  }
+
+  .polaroid-card.score-bump .polaroid-inner {
+    transform: scale(1.03);
+    box-shadow:
+      0 20px 36px rgba(0, 0, 0, 0.54),
+      0 0 24px rgba(255, 220, 120, 0.5);
+  }
+
+  .style-dark .polaroid-inner {
+    background: rgba(22, 22, 27, 0.94);
+    background-image: linear-gradient(160deg, rgba(38,38,46,0.95) 0%, rgba(16,16,20,0.95) 100%);
+    border-radius: 16px;
+    box-shadow:
+      0 18px 36px rgba(0, 0, 0, 0.65),
+      inset 0 0 0 1.5px rgba(255, 255, 255, 0.14);
+  }
+
+  /* Fastener (Tape or Pin) */
+  .card-fastener {
+    position: absolute;
+    z-index: 15;
+    pointer-events: none;
+  }
+
+  .style-tape .card-fastener {
+    top: -10px;
+    left: 50%;
+    width: 74px;
+    height: 22px;
+    transform: translateX(-50%) rotate(-2deg);
+    background: rgba(248, 237, 211, 0.82);
+    backdrop-filter: blur(2px);
+    border-left: 2px dashed rgba(0,0,0,0.08);
+    border-right: 2px dashed rgba(0,0,0,0.08);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+  }
+
+  .style-pin .card-fastener {
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 32%, #ff7b7b 0%, #d62828 60%, #800f0f 100%);
+    box-shadow:
+      0 5px 9px rgba(0,0,0,0.5),
+      inset 0 2px 4px rgba(255,255,255,0.65);
+  }
+  .style-pin .card-fastener::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+  }
+
+  .style-dark .card-fastener { display: none; }
+
+  /* Rank Badge + Movement Delta Badge */
+  .rank-cluster {
+    position: absolute;
+    top: 18px;
+    left: 17px;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .rank-badge {
+    min-width: 34px;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: rgba(24, 22, 21, 0.84);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    transition: all 0.6s ease;
+  }
+
+  .rank-badge.rk-1 {
+    background: linear-gradient(135deg, #ffe066, #d49b17);
+    color: #1a1405;
+    box-shadow: 0 4px 14px rgba(245, 183, 59, 0.65);
+  }
+  .rank-badge.rk-2 {
+    background: linear-gradient(135deg, #f0f4f8, #9fb3c8);
+    color: #102a43;
+  }
+  .rank-badge.rk-3 {
+    background: linear-gradient(135deg, #f3c69f, #b86b35);
+    color: #2b1405;
+  }
+
+  .delta-badge {
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  }
+
+  .delta-badge.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .delta-badge.up {
+    background: rgba(16, 185, 129, 0.92);
+    color: #fff;
+  }
+
+  .delta-badge.down {
+    background: rgba(244, 63, 94, 0.92);
+    color: #fff;
+  }
+
+  .song-unit-tag {
+    position: absolute;
+    top: 18px;
+    right: 17px;
+    z-index: 12;
+    background: rgba(24, 22, 21, 0.72);
+    backdrop-filter: blur(4px);
+    color: var(--gold-light);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 229, 150, 0.28);
+  }
+
+  /* Photo Frame inside Polaroid */
+  .card-photo-frame {
+    width: 100%;
+    height: 214px;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, #ffffff 0%, #e6dfd3 65%, #d2c8b8 100%);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.16);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .card-photo-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(80, 110, 150, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(80, 110, 150, 0.08) 1px, transparent 1px);
+    background-size: 18px 18px;
+    z-index: 1;
+  }
+
+  .photo-sheen {
+    position: absolute;
+    top: 0;
+    left: -130%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 100%
+    );
+    z-index: 8;
+    pointer-events: none;
+  }
+
+  .polaroid-card.sheen-sweep .photo-sheen {
+    transition: left 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    left: 160%;
+  }
+
+  .style-dark .card-photo-frame {
+    background: radial-gradient(circle at 50% 35%, #3c3c48 0%, #18181f 100%);
+    border-radius: 11px;
+  }
+
+  .card-photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.32));
+  }
+
+  .card-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(30, 28, 25, 0.2);
+    z-index: 2;
+  }
+
+  /* Smooth Floating Score Pill (+XX) */
+  .score-pill {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 14px) scale(0.78);
+    z-index: 15;
+    background: linear-gradient(135deg, #ffffff, #f8f1df);
+    border: 2px solid #c9961a;
+    color: #1c1608;
+    padding: 4px 16px;
+    border-radius: 99px;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+    opacity: 0;
+    transition:
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.75s ease;
+    white-space: nowrap;
+  }
+
+  .score-pill.top-cat-pill {
+    background: linear-gradient(135deg, #fff6b7, #f5b73b);
+    border-color: #fff;
+    color: #1a1102;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.55), 0 0 20px rgba(255, 215, 0, 0.75);
+  }
+
+  .score-pill.visible {
+    opacity: 1;
+    transform: translate(-50%, 0px) scale(1);
+  }
+
+  .score-pill.merge {
+    opacity: 0;
+    transform: translate(-50%, 42px) scale(0.82);
+    transition:
+      transform 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.75s ease;
+  }
+
+  /* Polaroid Caption / Name & Score */
+  .card-caption {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+  }
+
+  .card-name {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 2.8px;
+    color: var(--ink);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .style-dark .card-name { color: #ffffff; }
+
+  .card-score-box {
+    width: 100%;
+    border-top: 1.5px dashed rgba(0,0,0,0.12);
+    padding-top: 5px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .style-dark .card-score-box {
+    border-top-color: rgba(255,255,255,0.12);
+  }
+
+  .score-lbl {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.2px;
+    color: var(--ink-muted);
+  }
+
+  .style-dark .score-lbl { color: #999; }
+
+  .score-val {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .style-dark .score-val { color: var(--gold-light); }
+
+  /* ================= NATIVE HD HERO SPOTLIGHT (PODIUM 1ST -> 10TH) ================= */
+  #hero-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 65;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  #hero-stage.active { opacity: 1; }
+
+  #hero-card {
+    margin-top: 280px;
+    width: 500px;
+    height: 805px;
+    background: var(--paper);
+    background-image: linear-gradient(160deg, #ffffff 0%, #f3ede0 100%);
+    border-radius: 22px;
+    padding: 26px 26px 22px 26px;
+    box-shadow:
+      0 35px 80px rgba(0,0,0,0.74),
+      0 0 45px rgba(255, 215, 100, 0.32),
+      inset 0 0 0 2px rgba(255,255,255,0.95);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transform: translateY(55px) scale(0.92) rotate(-1.2deg);
+    opacity: 0;
+    transition:
+      transform 1.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 1.1s ease;
+  }
+
+  .style-dark #hero-card {
+    background: rgba(22, 22, 28, 0.96);
+    background-image: linear-gradient(160deg, #2b2b36 0%, #15151b 100%);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.85), inset 0 0 0 2px rgba(255,255,255,0.18);
+  }
+
+  #hero-card.show {
+    transform: translateY(0px) scale(1) rotate(-0.8deg);
+    opacity: 1;
+  }
+
+  #hero-card.exit {
+    transform: translateX(-620px) scale(0.92) rotate(-6deg);
+    opacity: 0;
+  }
+
+  #hero-rank-pill {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ffe066, #d49b17);
+    color: #1c1504;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 5px;
+    padding: 9px 32px;
+    border-radius: 99px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+    z-index: 10;
+    white-space: nowrap;
+  }
+
+  #hero-photo-box {
+    width: 100%;
+    height: 525px;
+    border-radius: 14px;
+    background: radial-gradient(circle at 50% 35%, #ffffff 0%, #e5dec9 70%, #cfc5b0 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 4px 16px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .style-dark #hero-photo-box {
+    background: radial-gradient(circle at 50% 35%, #3d3d4a 0%, #17171d 100%);
+  }
+
+  #hero-photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.4));
+  }
+
+  #hero-name {
+    font-size: 50px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: var(--ink);
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 20px;
+    line-height: 1;
+  }
+
+  .style-dark #hero-name { color: #fff; }
+
+  .hero-score-row {
+    margin-top: auto;
+    border-top: 2px dashed rgba(0,0,0,0.14);
+    padding-top: 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .style-dark .hero-score-row { border-top-color: rgba(255,255,255,0.15); }
+
+  .hero-score-lbl {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    color: var(--ink-muted);
+  }
+
+  #hero-score-val {
+    font-size: 68px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .style-dark #hero-score-val { color: var(--gold-light); }
+
+  #hero-congrats-banner {
+    margin-top: 32px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.95s ease 0.25s;
+  }
+
+  #hero-congrats-banner.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #hero-rank-big {
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: #fff;
+    text-shadow: 0 8px 28px rgba(0,0,0,0.85), 0 0 24px rgba(255, 215, 0, 0.45);
+    line-height: 1;
+  }
+
+  #hero-congrats-sub {
+    font-size: 29px;
+    font-weight: 800;
+    letter-spacing: 11px;
+    color: var(--gold-light);
+    margin-top: 10px;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.85);
+  }
+
+  /* Bottom Dock Glass Bar during Podium */
+  #podium-dock-bg {
+    position: absolute;
+    bottom: 84px;
+    left: 92px;
+    right: 92px;
+    height: 196px;
+    background: rgba(18, 16, 14, 0.64);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 22px;
+    z-index: 20;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  #podium-dock-bg.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ================= SIDEBAR RECORDING CONTROLS (NEVER OVERLAPS 9:16 STAGE) ================= */
+  #playback-hud {
+    position: fixed;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%) translateX(-15px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 175px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    background: rgba(15, 15, 20, 0.94);
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+  }
+
+  #playback-hud.hud-active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0px);
+  }
+
+  #playback-hud button, #jump-select {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.76rem;
+    padding: 8px 10px;
+  }
+
+  #jump-select {
+    background: #252532;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 700;
+  }
+
+  #countdown-badge {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 14, 0.88);
+    backdrop-filter: blur(12px);
+    z-index: 95;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+
+  #countdown-num {
+    font-size: 190px;
+    font-weight: 900;
+    color: #ffd166;
+  }
+</style>
 </head>
 <body>
 
-<!-- ==========================================
-     CELESTIAL RISING GOLDEN SPARKS
-     ========================================== -->
-<canvas id="celestial-sparks"></canvas>
-
-<!-- ==========================================
-     LANDING MENU: THE 4 TAROT CARDS
-     ========================================== -->
-<div id="landing-menu">
-  <div class="menu-header">
-    <h1>Star KCA Academy</h1>
-    <p>KÆOS PROJECT • Choose your destiny</p>
+<!-- ================= STUDIO CONFIGURATION MENU ================= -->
+<div id="studio-panel">
+  <div class="studio-header">
+    <div>
+      <h1>✨ Star KCA Academy — Studio Vidéo Finale (V5 Clean Capture)</h1>
+      <p style="font-size: 0.82rem; color: #a8a8bc; margin-top: 4px;">
+        Zéro menu sur le cadre 9:16 • Vos scores de Finale (Aya, Neitsu & Chansons) sont pré-chargés automatiquement.
+      </p>
+    </div>
+    <div class="btn-group">
+      <select id="pre-start-select" class="header-select" title="Choisir à quel moment démarrer la vidéo">
+        <option value="0">🎬 Démarrer : Intro & Début</option>
+      </select>
+      <button class="btn-launch" onclick="launchFromStudio(true)">🔴 LANCER REC (Timer 3s)</button>
+      <button onclick="launchFromStudio(false)" style="background:#10b981; color:#06130e; border:none;">▶️ Aperçu Direct</button>
+      <button onclick="exportData()">💾 Exporter JSON</button>
+      <label class="file-btn">📂 Importer JSON <input type="file" accept=".json" onchange="importData(event)"></label>
+    </div>
   </div>
 
-  <div class="cards-layout">
-    <div class="card-container" onclick="handleCardTap(this, 'Soleil')">
-      <div class="tarot-flip-card theme-sun">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Sun</div>
-          </div>
+  <!-- 1. FULL-WIDTH SCORE TABLE -->
+  <div class="panel-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <h2 style="margin:0; border:none; padding:0;">📊 1. Grille Complète des Points & Scores (16 Catégories)</h2>
+      <div class="btn-group">
+        <button onclick="restoreUserV4Scores()" style="border-color:#ffd166; color:#ffd166;">⭐ Rétablir mes scores Finale V4 (Aya, Neitsu & Chansons)</button>
+        <button onclick="resetOfficialOverall(1)">🔄 Overall seuls (10 → 1 pt)</button>
+        <button onclick="clearFinaleOnly()">🧹 Vider colonnes Finale</button>
+      </div>
+    </div>
+    <p style="font-size:0.8rem; color:#a5a5b8; margin-bottom:14px;">
+      💡 <strong>Contrôles pendant l'enregistrement :</strong> Le cadre 9:16 est 100% vierge de tout bouton. Utilise <strong>Espace</strong> (Pause/Play), <strong>R</strong> (Relancer au début) ou <strong>Échap</strong> (Quitter vers le Studio), ou glisse ta souris tout au bord gauche de ton écran.
+    </p>
+
+    <div class="table-wrapper">
+      <table class="score-table" id="score-table">
+        <thead>
+          <tr id="score-table-head"></tr>
+        </thead>
+        <tbody id="score-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2. BOTTOM GRID: VISUAL SETTINGS & CONTESTANT PHOTOS -->
+  <div class="studio-bottom-grid">
+    <div class="panel-box">
+      <h2>🎨 2. Direction Artistique & Options Visuelles</h2>
+
+      <div class="setting-row">
+        <label>Style des Polaroïds :</label>
+        <select id="card-style-select" onchange="saveSettings()">
+          <option value="tape">Polaroïd Yearbook + Washi Tape (Scotch)</option>
+          <option value="pin">Polaroïd Yearbook + Épingle Rouge</option>
+          <option value="dark">Carte Glass Dark (Style Moderne Sombre)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Disposition des 10 cartes (calibrée dans le cadre liège) :</label>
+        <select id="grid-layout-select" onchange="saveSettings()">
+          <option value="3-4-3">Grille 3 - 4 - 3 (Équilibrée)</option>
+          <option value="2-4-4">Grille 2 - 4 - 4 (Top 2 en vedette)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Catégories à 0 point (non remplies) :</label>
+        <select id="zero-behavior-select" onchange="saveSettings()">
+          <option value="play-all">Afficher les 16 catégories (masquer la pastille si 0)</option>
+          <option value="skip-empty">Ignorer automatiquement les catégories où tout le monde a 0</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Focus Lumière sur les 3 Chansons de la Finale :</label>
+        <select id="song-spotlight-select" onchange="saveSettings()">
+          <option value="on">Illuminer les candidates de la chanson en cours + Badge Chanson</option>
+          <option value="off">Garder les 10 cartes éclairées normalement</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Rythme & Suspense des animations :</label>
+        <select id="speed-select" onchange="saveSettings()">
+          <option value="1">Suspense Cinématique (Recommandé — Lent & Fluide)</option>
+          <option value="1.25">Ultra Posé / Grand Suspense (+25% plus lent)</option>
+          <option value="0.8">Intermédiaire (Un peu plus rythmé)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Image de fond (Tableau Liège avec cadre) :</label>
+        <div style="display:flex; gap:8px;">
+          <label class="file-btn" style="flex:1; justify-content:center;">🖼️ Charger mon fond <input type="file" accept="image/*" onchange="uploadAsset('bg', event)"></label>
+          <button onclick="clearAsset('bg')" title="Supprimer le fond">✖</button>
         </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">NEITSU</div>
-            <div class="tarot-image-container"><img src="neitsu.png" alt="Neitsu" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ✹</div>
-            <div class="tarot-rank">THE SUN</div>
-          </div>
+      </div>
+
+      <div class="setting-row">
+        <label>Logo central en filigrane (PNG) :</label>
+        <div style="display:flex; gap:8px;">
+          <label class="file-btn" style="flex:1; justify-content:center;">⭐ Charger mon logo <input type="file" accept="image/*" onchange="uploadAsset('logo', event)"></label>
+          <button onclick="clearAsset('logo')" title="Supprimer le logo">✖</button>
         </div>
+      </div>
+
+      <div class="setting-row">
+        <label>Pseudo Instagram :</label>
+        <input type="text" id="ig-handle-input" value="@STAR_KCA_ACADEMY.SVS" oninput="saveSettings()">
       </div>
     </div>
 
-    <div class="card-container" onclick="handleCardTap(this, 'Lune')">
-      <div class="tarot-flip-card theme-moon">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Moon</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">KAINA</div>
-            <div class="tarot-image-container"><img src="kaina.png" alt="Kaina" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ☾</div>
-            <div class="tarot-rank">THE MOON</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-container" onclick="handleCardTap(this, 'Etoile')">
-      <div class="tarot-flip-card theme-star">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Star</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">AYA</div>
-            <div class="tarot-image-container"><img src="aya.png" alt="Aya" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ✦</div>
-            <div class="tarot-rank">THE STAR</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-container" onclick="handleCardTap(this, 'Global')">
-      <div class="tarot-flip-card theme-global">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The World</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">GLOBAL</div>
-            <div class="tarot-image-container"><img src="world.png" alt="Global World" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ☉</div>
-            <div class="tarot-rank">THE WORLD</div>
-          </div>
-        </div>
-      </div>
+    <div class="panel-box">
+      <h2>📸 3. Photos des 10 Finalistes (PNG détourés)</h2>
+      <div class="contestant-uploads" id="contestant-uploads-list"></div>
     </div>
   </div>
 </div>
 
-<!-- ==========================================
-     ACADEMY DASHBOARD
-     ========================================== -->
-<div id="app-dashboard">
-  <header>
-    <div class="container topbar">
-      <div class="brand" onclick="retourMenuPrincipale()" title="Return to Tarot Menu">
-        <h1>KÆOS PROJECT</h1>
-        <p>The Oracles' Academy</p>
-      </div>
+<!-- ================= 9:16 VIDEO STAGE (1080x1920) ================= -->
+<div id="stage-overlay">
+  <!-- Barre latérale cachée dans la marge gauche hors du 9:16 (uniquement si souris à gauche < 90px) -->
+  <div id="playback-hud">
+    <div style="font-size:0.7rem; color:#ffd166; font-weight:800; text-align:center; letter-spacing:1px; margin-bottom:2px;">CONTRÔLES STUDIO</div>
+    <button onclick="stopVideoShow()">⬅ Retour (Échap)</button>
+    <button onclick="togglePause()" id="pause-btn">⏸ Pause (Espace)</button>
+    <button onclick="startVideoShow(false, 0)">🔄 Début (Touche R)</button>
+    <select id="jump-select" onchange="jumpToSection(this.value)">
+      <option value="">⏩ Aller à...</option>
+    </select>
+  </div>
 
-      <div class="circle-switcher" id="circleSwitcher">
-        <button class="circle-btn" data-team="Global" onclick="switchTeam('Global')">☉ Global</button>
-        <button class="circle-btn" data-team="Soleil" onclick="switchTeam('Soleil')">✹ Sun</button>
-        <button class="circle-btn" data-team="Lune" onclick="switchTeam('Lune')">☾ Moon</button>
-        <button class="circle-btn" data-team="Etoile" onclick="switchTeam('Etoile')">✦ Star</button>
-      </div>
+  <div id="stage-container">
+    <img id="custom-bg" alt="">
+    <div id="stage-lighting"></div>
+    <canvas id="particles-canvas" width="1080" height="1920"></canvas>
 
-      <nav id="nav">
-        <a class="nav-link" href="#contestants">Initiates</a>
-        <a class="nav-link" href="#rankings">Alignment</a>
-        <a class="nav-link" href="#votes">The Scale</a>
-        <a class="nav-link" href="#grimoire">Grimoire</a>
-      </nav>
+    <!-- Countdown before recording -->
+    <div id="countdown-badge">
+      <div style="font-size:30px; font-weight:800; letter-spacing:5px; margin-bottom:16px; color:#ddd;">PRÉPARE TON ENREGISTREMENT</div>
+      <div id="countdown-num">3</div>
+      <div style="font-size:18px; color:#aaa; margin-top:20px; letter-spacing:2px;">Espace = Pause • Échap = Quitter</div>
     </div>
-  </header>
 
-  <main class="container">
-    <section id="contestants" class="page active"></section>
-    <section id="profile" class="page"></section>
-    <section id="rankings" class="page"></section>
-    <section id="votes" class="page"></section>
-    <section id="grimoire" class="page"></section>
-  </main>
+    <!-- Center Logo Watermark -->
+    <div id="center-logo-wrap">
+      <img id="center-logo-img" alt="">
+      <div id="center-logo-text">Star KCA<br>Academy</div>
+    </div>
+
+    <!-- Intro Fullscreen Title -->
+    <div id="intro-splash">
+      <div class="intro-card">
+        <div class="intro-eyebrow">GRAND FINALE</div>
+        <div class="intro-main">RANKING</div>
+        <div class="intro-sub">ANNOUNCEMENT</div>
+      </div>
+    </div>
+
+    <!-- Clean Top Bar (Strictly inside cork area) -->
+    <div id="top-bar">
+      <div class="hud-badge-left">
+        <div class="hud-dot"></div>
+        <div>
+          <div class="t1">RANKING</div>
+          <div class="t2">ANNOUNCEMENT</div>
+        </div>
+      </div>
+      <div class="hud-badge-right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span id="ig-handle-display">@STAR_KCA_ACADEMY.SVS</span>
+      </div>
+    </div>
+
+    <!-- Active Category Center Banner -->
+    <div id="active-cat-stage">
+      <div id="active-cat-box">
+        <div id="active-cat-main">OVERALL</div>
+        <div class="cat-sub-wrap">
+          <span id="active-cat-sub">AYA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Smooth Horizontal Timeline Ribbon -->
+    <div id="queue-viewport">
+      <div id="queue-track"></div>
+    </div>
+
+    <!-- Dock Glass Background for Final Podium -->
+    <div id="podium-dock-bg"></div>
+
+    <!-- 10 Polaroid Cards Layer -->
+    <div id="cards-layer"></div>
+
+    <!-- Native HD Hero Podium Stage (1st -> 10th) -->
+    <div id="hero-stage">
+      <div id="hero-card">
+        <div id="hero-rank-pill">WINNER</div>
+        <div id="hero-photo-box"></div>
+        <div id="hero-name">ANNE</div>
+        <div class="hero-score-row">
+          <span class="hero-score-lbl">FINAL SCORE</span>
+          <span id="hero-score-val">0</span>
+        </div>
+      </div>
+      <div id="hero-congrats-banner">
+        <div id="hero-rank-big">RANK 1ST</div>
+        <div id="hero-congrats-sub">CONGRATULATIONS !</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// ==========================================
-// 1. OFFICIAL CONFIGURATION & PROPHECY LINKS
-// ==========================================
-const CONFIG = {
-  SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
-  VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
-  ROUND_TABS: { PRERANK: "PRERANK", ROUND_1: "R1", ROUND_2: "R2", ROUND_3: "R3", ROUND_4: "R4", FINAL: "R5" },
-  VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
-  AUDITION_FORM_URL: "https://forms.gle/q3V1uG6XnYNNQKXf8",
-  INSTAGRAM_URL: "https://www.instagram.com/star_kca_academy.svs/",
-  REFRESH_MS: 45000
-};
-
-// Paste the direct Instagram Reel link inside `url: ""` once each video is posted!
-// If `url` is left empty (""), clicking the card automatically opens your main Instagram page.
-const PROPHECIES = [
-  { num: "PROPHECY 00", title: "The Eclipse",           symbol: "☉", unlockDate: "2026-10-01T00:00:00", dateLabel: "Available Now", url: "" },
-  { num: "PROPHECY I",  title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",       url: "" },
-  { num: "PROPHECY II", title: "The Three Survivors",   symbol: "☾", unlockDate: "2026-11-03T00:00:00", dateLabel: "Nov 3rd",       url: "" },
-  { num: "PROPHECY III",title: "The Celestial Circles", symbol: "✦", unlockDate: "2026-11-05T00:00:00", dateLabel: "Nov 5th",       url: "" },
-  { num: "PROPHECY IV", title: "The Golden Scale",      symbol: "✹", unlockDate: "2026-11-07T00:00:00", dateLabel: "Nov 7th",       url: "" },
-  { num: "PROPHECY V",  title: "The Eye of Judgment",   symbol: "☾", unlockDate: "2026-11-09T00:00:00", dateLabel: "Nov 9th",       url: "" },
-  { num: "PROPHECY VI", title: "The 48th Card",         symbol: "✦", unlockDate: "2026-11-11T00:00:00", dateLabel: "Nov 11th",      url: "" }
+/* ============================================================================
+   1. DONNÉES OFFICIELLES & VOS SCORES V4 PRÉ-CHARGÉS AUTOMATIQUEMENT
+   ============================================================================ */
+const FINALISTS = [
+  "Anne", "Annie", "Borah", "Hope", "Johi",
+  "Lea", "Mary", "Panida", "Stella", "Sun"
 ];
 
-const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "FINAL"];
-const ROUND_LABELS = {
-  PRERANK: "Pre-Rank (Awakening)",
-  ROUND_1: "Round 1",
-  ROUND_2: "Round 2",
-  ROUND_3: "Round 3",
-  ROUND_4: "Round 4",
-  FINAL:   "Finale (Apotheosis)"
-};
-const STATUS_LABELS = {
-  safe: "Upright Card (Safe)",
-  nominee: "Shadow Zone",
-  saved_judges: "Oracle's Grace",
-  saved_public: "Scale's Grace",
-  eliminated: "Consumed",
-  winner: "CHOSEN",
-  tbd: "Pending"
-};
-const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"];
-const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
+const CARD_TILTS = [-1.0, 0.9, -0.7, 1.1, -0.9, 0.8, -1.1, 0.9, -0.6, 0.8];
 
-const ROUND_RULES = {
-  PRERANK: { total: 48, safe: 48, shadow: 0, oracleSave: 0, publicSave: 0, elim: 0 },
-  ROUND_1: { total: 16, safe: 8,  shadow: 8, oracleSave: 3, publicSave: 2, elim: 3 },
-  ROUND_2: { total: 13, safe: 6,  shadow: 7, oracleSave: 3, publicSave: 1, elim: 3 },
-  ROUND_3: { total: 10, safe: 4,  shadow: 6, oracleSave: 2, publicSave: 1, elim: 3 },
-  ROUND_4: { total: 7,  safe: 1,  shadow: 6, oracleSave: 2, publicSave: 1, elim: 3 },
-  FINAL:   { total: 12, safe: 5,  shadow: 12, oracleSave: 0, publicSave: 5, elim: 7 }
-};
+const CATEGORIES = [
+  { id: "ov_aya",    main: "OVERALL", sub: "AYA",              short: "Overall<br>Aya",             grp: "grp-ov" },
+  { id: "ov_aqua",   main: "OVERALL", sub: "AQUA",             short: "Overall<br>Aqua",            grp: "grp-ov" },
+  { id: "ov_kaina",  main: "OVERALL", sub: "KAINA",            short: "Overall<br>Kaina",           grp: "grp-ov" },
+  { id: "ov_heaven", main: "OVERALL", sub: "HEAVEN",           short: "Overall<br>Heaven",          grp: "grp-ov" },
+  { id: "ov_hauras", main: "OVERALL", sub: "HAURAS",           short: "Overall<br>Hauras",          grp: "grp-ov" },
+  { id: "ov_neitsu", main: "OVERALL", sub: "NEITSU",           short: "Overall<br>Neitsu",          grp: "grp-ov" },
+  { id: "ov_score",  main: "OVERALL", sub: "SCORE /100",       short: "Overall<br>Score /100",      grp: "grp-sc" },
+  { id: "fn_aya",    main: "AYA",     sub: "FINAL RANK",       short: "Final Rank<br>Aya",          grp: "grp-fn" },
+  { id: "fn_aqua",   main: "AQUA",    sub: "FINAL RANK",       short: "Final Rank<br>Aqua",         grp: "grp-fn" },
+  { id: "fn_kaina",  main: "KAINA",   sub: "FINAL RANK",       short: "Final Rank<br>Kaina",        grp: "grp-fn" },
+  { id: "fn_heaven", main: "HEAVEN",  sub: "FINAL RANK",       short: "Final Rank<br>Heaven",       grp: "grp-fn" },
+  { id: "fn_hauras", main: "HAURAS",  sub: "FINAL RANK",       short: "Final Rank<br>Hauras",       grp: "grp-fn" },
+  { id: "fn_neitsu", main: "NEITSU",  sub: "FINAL RANK",       short: "Final Rank<br>Neitsu",       grp: "grp-fn" },
+  { id: "sg_nicole", main: "SCORE",   sub: "NICOLE KIDMAN",    short: "Score /100<br>Nicole Kidman",grp: "grp-sg", isSong: true },
+  { id: "sg_saucin", main: "SCORE",   sub: "SAUCIN'",          short: "Score /100<br>SAUCIN'",      grp: "grp-sg", isSong: true },
+  { id: "sg_popoff", main: "SCORE",   sub: "POP OFF POP OFF",  short: "Score /100<br>Pop Off",      grp: "grp-sg", isSong: true }
+];
 
-let rankingChartInstance = null;
-let profileChartInstance = null;
-let radarChartInstance = null;
-let countdownInterval = null;
-
-const state = {
-  data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
-  latestRound: "PRERANK",
-  selectedRankingsRound: null,
-  rankingView: "default",
-  votesRound: "ROUND_1",
-  votesTimer: null,
-  activeTeam: "Global"
+// Vos scores complets issus de star_kca_finale_config_v4 (1).json
+const USER_V4_SCORES = {
+  "Anne":   {"ov_aya":10,"ov_aqua":10,"ov_kaina":10,"ov_heaven":10,"ov_hauras":10,"ov_neitsu":10,"ov_score":96,"fn_aya":20,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":8,"sg_nicole":0,"sg_saucin":91,"sg_popoff":0},
+  "Annie":  {"ov_aya":7,"ov_aqua":8,"ov_kaina":7,"ov_heaven":9,"ov_hauras":6,"ov_neitsu":6,"ov_score":93.5,"fn_aya":14,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":12,"sg_nicole":95,"sg_saucin":0,"sg_popoff":0},
+  "Borah":  {"ov_aya":1,"ov_aqua":1,"ov_kaina":1,"ov_heaven":1,"ov_hauras":5,"ov_neitsu":1,"ov_score":75,"fn_aya":4,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":4,"sg_nicole":85,"sg_saucin":0,"sg_popoff":0},
+  "Hope":   {"ov_aya":8,"ov_aqua":9,"ov_kaina":9,"ov_heaven":8,"ov_hauras":8,"ov_neitsu":9,"ov_score":93,"fn_aya":18,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":14,"sg_nicole":96.5,"sg_saucin":0,"sg_popoff":0},
+  "Johi":   {"ov_aya":6,"ov_aqua":4,"ov_kaina":8,"ov_heaven":4,"ov_hauras":2,"ov_neitsu":7,"ov_score":91.5,"fn_aya":6,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":18,"sg_nicole":0,"sg_saucin":98,"sg_popoff":0},
+  "Lea":    {"ov_aya":5,"ov_aqua":6,"ov_kaina":3,"ov_heaven":6,"ov_hauras":4,"ov_neitsu":5,"ov_score":91,"fn_aya":16,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":16,"sg_nicole":0,"sg_saucin":0,"sg_popoff":97},
+  "Mary":   {"ov_aya":3,"ov_aqua":5,"ov_kaina":4,"ov_heaven":5,"ov_hauras":9,"ov_neitsu":4,"ov_score":90,"fn_aya":12,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":6,"sg_nicole":0,"sg_saucin":0,"sg_popoff":89.5},
+  "Panida": {"ov_aya":2,"ov_aqua":2,"ov_kaina":5,"ov_heaven":3,"ov_hauras":3,"ov_neitsu":8,"ov_score":93,"fn_aya":8,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":20,"sg_nicole":99,"sg_saucin":0,"sg_popoff":0},
+  "Stella": {"ov_aya":9,"ov_aqua":7,"ov_kaina":6,"ov_heaven":7,"ov_hauras":7,"ov_neitsu":3,"ov_score":87,"fn_aya":10,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":10,"sg_nicole":0,"sg_saucin":0,"sg_popoff":94},
+  "Sun":    {"ov_aya":4,"ov_aqua":3,"ov_kaina":2,"ov_heaven":2,"ov_hauras":1,"ov_neitsu":2,"ov_score":77,"fn_aya":4,"fn_aqua":0,"fn_kaina":0,"fn_heaven":0,"fn_hauras":0,"fn_neitsu":2,"sg_nicole":0,"sg_saucin":82,"sg_popoff":0}
 };
 
-// ==========================================
-// 2. CELESTIAL RISING GOLDEN SPARKS ENGINE
-// ==========================================
-function initCelestialSparks() {
-  const cvs = document.getElementById('celestial-sparks');
-  if (!cvs) return;
-  const ctx = cvs.getContext('2d');
-  let w = cvs.width = window.innerWidth;
-  let h = cvs.height = window.innerHeight;
+const OFFICIAL_OVERALL_POINTS = {
+  ov_neitsu: { Anne: 10, Annie: 6, Borah: 1, Hope: 9, Johi: 7, Lea: 5, Mary: 4, Panida: 8, Stella: 3, Sun: 2 },
+  ov_hauras: { Anne: 10, Annie: 6, Borah: 5, Hope: 8, Johi: 2, Lea: 4, Mary: 9, Panida: 3, Stella: 7, Sun: 1 },
+  ov_heaven: { Anne: 10, Annie: 9, Borah: 1, Hope: 8, Johi: 4, Lea: 6, Mary: 5, Panida: 3, Stella: 7, Sun: 2 },
+  ov_kaina:  { Anne: 10, Annie: 7, Borah: 1, Hope: 9, Johi: 8, Lea: 3, Mary: 4, Panida: 5, Stella: 6, Sun: 2 },
+  ov_aqua:   { Anne: 10, Annie: 8, Borah: 1, Hope: 9, Johi: 4, Lea: 6, Mary: 5, Panida: 2, Stella: 7, Sun: 3 },
+  ov_aya:    { Anne: 10, Annie: 7, Borah: 1, Hope: 8, Johi: 6, Lea: 5, Mary: 3, Panida: 2, Stella: 9, Sun: 4 }
+};
 
-  window.addEventListener('resize', () => {
-    w = cvs.width = window.innerWidth;
-    h = cvs.height = window.innerHeight;
-  });
+const OFFICIAL_OVERALL_SCORE_100 = {
+  Anne: 96, Annie: 93.5, Borah: 75, Hope: 93, Johi: 91.5,
+  Lea: 91, Mary: 90, Panida: 93, Stella: 87, Sun: 77
+};
 
-  const particles = Array.from({ length: 60 }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    r: 0.7 + Math.random() * 2.1,
-    vy: 0.2 + Math.random() * 0.55,
-    swayAmp: 0.15 + Math.random() * 0.35,
-    swaySpeed: 0.008 + Math.random() * 0.018,
-    phase: Math.random() * Math.PI * 2,
-    baseAlpha: 0.18 + Math.random() * 0.55
-  }));
+let appData = {
+  settings: {
+    cardStyle: "tape",
+    gridLayout: "3-4-3",
+    zeroBehavior: "play-all",
+    songSpotlight: "on",
+    speed: 1,
+    igHandle: "@STAR_KCA_ACADEMY.SVS"
+  },
+  scores: JSON.parse(JSON.stringify(USER_V4_SCORES))
+};
 
-  function animateSparks() {
-    ctx.clearRect(0, 0, w, h);
-    for (const p of particles) {
-      p.y -= p.vy;
-      p.phase += p.swaySpeed;
-      p.x += Math.sin(p.phase) * p.swayAmp;
+let uploadedImages = {};
 
-      if (p.y < -10) {
-        p.y = h + 10;
-        p.x = Math.random() * w;
-      }
-      const alpha = p.baseAlpha * (0.55 + 0.45 * Math.sin(p.phase * 2));
-      ctx.fillStyle = `rgba(226, 185, 97, ${alpha.toFixed(3)})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    requestAnimationFrame(animateSparks);
+// Affiche uniquement la barre latérale si la souris est tout à gauche de l'écran (< 90px)
+window.addEventListener("mousemove", (e) => {
+  const hud = document.getElementById("playback-hud");
+  const overlay = document.getElementById("stage-overlay");
+  if (!hud || !overlay || overlay.style.display !== "flex") return;
+  if (e.clientX <= 90 || (hud.classList.contains("hud-active") && e.clientX <= 200)) {
+    hud.classList.add("hud-active");
+  } else {
+    hud.classList.remove("hud-active");
   }
-  requestAnimationFrame(animateSparks);
-}
+});
 
-// ==========================================
-// 3. NAVIGATION & CIRCLE SWITCHER
-// ==========================================
-function handleCardTap(cardEl, teamFilter) {
-  const isTouch = window.matchMedia('(hover: none)').matches;
-  if (isTouch && !cardEl.classList.contains('flipped')) {
-    document.querySelectorAll('.card-container').forEach(c => c.classList.remove('flipped'));
-    cardEl.classList.add('flipped');
+/* ============================================================================
+   2. INITIALISATION & SAUVEGARDE DES SCORES
+   ============================================================================ */
+function ensureScoresIntegrity() {
+  if (!appData.scores || typeof appData.scores !== "object") {
+    appData.scores = JSON.parse(JSON.stringify(USER_V4_SCORES));
     return;
   }
-  entrerAcademie(teamFilter);
-}
-
-function updateCircleSwitcherUI() {
-  document.querySelectorAll('.circle-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.team === state.activeTeam);
-  });
-}
-
-function switchTeam(teamFilter) {
-  state.activeTeam = teamFilter;
-  state.rankingView = 'default';
-  updateCircleSwitcherUI();
-  renderAll();
-}
-
-function entrerAcademie(teamFilter) {
-  state.activeTeam = teamFilter;
-  state.rankingView = 'default';
-  updateCircleSwitcherUI();
-  const menu = document.getElementById('landing-menu');
-  const dashboard = document.getElementById('app-dashboard');
-  menu.style.opacity = '0';
-  menu.style.transform = 'scale(0.96)';
-  setTimeout(() => {
-    menu.style.display = 'none';
-    dashboard.style.display = 'block';
-    setTimeout(() => {
-      dashboard.style.opacity = '1';
-      renderAll();
-      if (!location.hash || location.hash === '#') location.hash = '#contestants';
-    }, 40);
-  }, 450);
-}
-
-function retourMenuPrincipale() {
-  const menu = document.getElementById('landing-menu');
-  const dashboard = document.getElementById('app-dashboard');
-  dashboard.style.opacity = '0';
-  setTimeout(() => {
-    dashboard.style.display = 'none';
-    menu.style.display = 'flex';
-    history.replaceState(null, null, ' ');
-    setTimeout(() => {
-      menu.style.opacity = '1';
-      menu.style.transform = 'scale(1)';
-    }, 40);
-  }, 400);
-}
-
-// ==========================================
-// 4. GOOGLE SHEETS PARSER & SCORING ENGINE
-// ==========================================
-function getRoundLabel(id) { return ROUND_LABELS[id] || id; }
-function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
-function canonicalRoundId(value) {
-  const raw = String(value || '').trim().toUpperCase().replace(/\s+/g, '_').replace(/-/g, '_');
-  if (!raw) return '';
-  if (['ROUND_5','R5','ROUND5','ROUND_6','R6','FINAL','FINALE'].includes(raw)) return 'FINAL';
-  if (ROUND_ORDER.includes(raw)) return raw;
-  if (/^R[1-4]$/.test(raw)) return `ROUND_${raw.slice(1)}`;
-  if (/^ROUND[1-4]$/.test(raw)) return `ROUND_${raw.slice(5)}`;
-  if (raw === 'PRE_RANK' || raw === 'PRERANKING') return 'PRERANK';
-  return raw;
-}
-function normalizeJudgeName(v) { return String(v || '').trim().toLowerCase(); }
-function getContestantName(id) { return String(state.data.contestants.find(c => c.id === id)?.name || '').trim() || id; }
-function colorForIndex(i) { return `hsl(${(i * 47) % 360} 65% 62%)`; }
-
-function handleImageFallback(img) {
-  const step = Number(img.dataset.fallbackStep || '0');
-  const contestantId = String(img.dataset.contestantId || '').trim();
-  if (step === 0 && contestantId) { img.dataset.fallbackStep = '1'; img.src = `${contestantId}_shadow_zone.png`; return; }
-  if (step === 1 && contestantId) { img.dataset.fallbackStep = '2'; img.src = `${contestantId}.png`; return; }
-  img.onerror = null;
-  img.src = "data:image/svg+xml;utf8," + encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
-      <circle cx="100" cy="78" r="32" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
-      <path d="M42 215 C42 155, 158 155, 158 215 Z" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
-    </svg>
-  `);
-}
-
-function parseCSV(text) {
-  const rows = []; let row = []; let inQuotes = false; let val = "";
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (inQuotes) {
-      if (char === '"') { if (text[i + 1] === '"') { val += '"'; i++; } else { inQuotes = false; } }
-      else { val += char; }
+  FINALISTS.forEach(name => {
+    if (!appData.scores[name] || typeof appData.scores[name] !== "object") {
+      appData.scores[name] = { ...USER_V4_SCORES[name] };
     } else {
-      if (char === '"') inQuotes = true;
-      else if (char === ',') { row.push(val); val = ""; }
-      else if (char === '\n' || char === '\r') {
-        row.push(val); rows.push(row); row = []; val = "";
-        if (char === '\r' && text[i + 1] === '\n') i++;
-      } else val += char;
+      CATEGORIES.forEach(cat => {
+        const val = Number(appData.scores[name][cat.id]);
+        if (isNaN(val)) {
+          appData.scores[name][cat.id] = USER_V4_SCORES[name][cat.id] || 0;
+        }
+      });
     }
-  }
-  if (val !== "" || row.length > 0) { row.push(val); rows.push(row); }
-  if (rows.length < 1) return [];
-  let headerIndex = 0;
-  for (let i = 0; i < Math.min(5, rows.length); i++) {
-    if (rows[i].some(c => typeof c === 'string' && ['contestant', 'name', 'candidat', 'eleve', 'username'].some(k => c.toLowerCase().includes(k)))) { headerIndex = i; break; }
-  }
-  const headers = rows[headerIndex].map(h => String(h).trim().toLowerCase());
-  return rows.slice(headerIndex + 1).map(r => {
-    const obj = {};
-    headers.forEach((h, i) => { if (h) obj[h] = r[i] !== undefined ? String(r[i]).trim() : ''; });
-    return obj;
   });
 }
 
-async function fetchSheetTab(sheetName, customSheetId = null) {
-  const targetId = customSheetId || CONFIG.SHEET_ID;
-  if (!targetId) return [];
-  const tryFetch = async (name) => {
-    const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;
+function loadSavedState() {
+  appData.scores = JSON.parse(JSON.stringify(USER_V4_SCORES));
+  try {
+    const savedV5 = localStorage.getItem("kca_finale_state_v5");
+    if (savedV5) {
+      const parsed = JSON.parse(savedV5);
+      if (parsed.settings) appData.settings = { ...appData.settings, ...parsed.settings };
+      if (parsed.scores) appData.scores = parsed.scores;
+    }
+  } catch (e) {}
+
+  ensureScoresIntegrity();
+  saveState();
+
+  document.getElementById("card-style-select").value = appData.settings.cardStyle || "tape";
+  document.getElementById("grid-layout-select").value = appData.settings.gridLayout || "3-4-3";
+  document.getElementById("zero-behavior-select").value = appData.settings.zeroBehavior || "play-all";
+  document.getElementById("song-spotlight-select").value = appData.settings.songSpotlight || "on";
+  document.getElementById("speed-select").value = appData.settings.speed || 1;
+  document.getElementById("ig-handle-input").value = appData.settings.igHandle || "@STAR_KCA_ACADEMY.SVS";
+  populateJumpSelects();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem("kca_finale_state_v5", JSON.stringify(appData));
+  } catch (e) {}
+}
+
+function saveSettings() {
+  appData.settings.cardStyle = document.getElementById("card-style-select").value;
+  appData.settings.gridLayout = document.getElementById("grid-layout-select").value;
+  appData.settings.zeroBehavior = document.getElementById("zero-behavior-select").value;
+  appData.settings.songSpotlight = document.getElementById("song-spotlight-select").value;
+  appData.settings.speed = parseFloat(document.getElementById("speed-select").value);
+  appData.settings.igHandle = document.getElementById("ig-handle-input").value;
+  saveState();
+  populateJumpSelects();
+  applyVisualSettings();
+}
+
+function restoreUserV4Scores() {
+  appData.scores = JSON.parse(JSON.stringify(USER_V4_SCORES));
+  saveState();
+  renderScoreTable();
+}
+
+function resetOfficialOverall(multiplier = 1) {
+  FINALISTS.forEach(name => {
+    Object.keys(OFFICIAL_OVERALL_POINTS).forEach(catId => {
+      appData.scores[name][catId] = OFFICIAL_OVERALL_POINTS[catId][name] * multiplier;
+    });
+    appData.scores[name]["ov_score"] = OFFICIAL_OVERALL_SCORE_100[name];
+  });
+  saveState();
+  renderScoreTable();
+}
+
+function clearFinaleOnly() {
+  FINALISTS.forEach(name => {
+    CATEGORIES.forEach(cat => {
+      if (!OFFICIAL_OVERALL_POINTS[cat.id] && cat.id !== "ov_score") {
+        appData.scores[name][cat.id] = 0;
+      }
+    });
+  });
+  saveState();
+  renderScoreTable();
+}
+
+/* IndexedDB (récupère automatiquement ton fond liège et tes photos déjà en cache) */
+let dbInstance = null;
+function initIndexedDB() {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => { if (!settled) { settled = true; resolve(); } };
+    setTimeout(finish, 1200);
+
     try {
-      const response = await fetch(url);
-      if (!response.ok) return null;
-      const txt = await response.text();
-      if (txt.toLowerCase().includes('<!doctype html>')) return null;
-      return parseCSV(txt);
-    } catch (e) { return null; }
-  };
-  let data = await tryFetch(sheetName);
-  if (!data && sheetName === 'R5') data = await tryFetch('FINAL') || await tryFetch('Finale') || await tryFetch('Round 5');
-  if (!data && sheetName.match(/^R\d$/)) {
-    const num = sheetName.replace('R', '');
-    data = await tryFetch(`Round ${num}`) || await tryFetch(`ROUND ${num}`);
-  }
-  return data || [];
-}
-
-function keyNorm(k) { return String(k || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
-function pickValue(row, aliases) {
-  const keys = Object.keys(row);
-  for (const a of aliases) {
-    const n = keyNorm(a);
-    const real = keys.find(k => keyNorm(k) === n);
-    if (real != null && row[real] !== null && row[real] !== undefined && String(row[real]).trim() !== '' && String(row[real]).toLowerCase() !== 'nan') return row[real];
-  }
-  return '';
-}
-function parseNum(val) {
-  if (val === '' || val === null || val === undefined) return NaN;
-  const num = Number(String(val).replace(/\s/g, '').replace(',', '.'));
-  return isNaN(num) ? NaN : num;
-}
-
-function getStatus(roundId, contestantId) { return state.data.round_status.find(r => r.round_id === roundId && r.contestant_id === contestantId)?.status || ''; }
-function statusClass(status) { return status === 'eliminated' ? 'eliminated-pill' : (status || 'tbd'); }
-function statusLabel(status) { return STATUS_LABELS[status] || STATUS_LABELS.tbd; }
-function getFirstEliminatedRoundIndex(contestantId) { return ROUND_ORDER.findIndex(round => getStatus(round, contestantId) === 'eliminated'); }
-
-function getActiveCountForRound(roundId, teamClass) {
-  const rIdx = ROUND_ORDER.indexOf(roundId);
-  const isGlobalPhase = (roundId === 'PRERANK' || roundId === 'FINAL');
-  let count = 0;
-  state.data.contestants.forEach(c => {
-    if (!isGlobalPhase && teamClass && c.teamClass !== teamClass) return;
-    const elimIdx = getFirstEliminatedRoundIndex(c.id);
-    if (elimIdx === -1 || elimIdx >= rIdx) count++;
+      const req = indexedDB.open("KCAFinaleAssetsDB", 1);
+      req.onupgradeneeded = (e) => {
+        e.target.result.createObjectStore("assets");
+      };
+      req.onsuccess = (e) => {
+        dbInstance = e.target.result;
+        const tx = dbInstance.transaction("assets", "readonly");
+        const store = tx.objectStore("assets");
+        const getAllKeys = store.getAllKeys();
+        getAllKeys.onsuccess = () => {
+          const keys = getAllKeys.result || [];
+          let remaining = keys.length;
+          if (remaining === 0) return finish();
+          keys.forEach(k => {
+            const g = store.get(k);
+            g.onsuccess = () => {
+              uploadedImages[k] = g.result;
+              remaining--;
+              if (remaining === 0) finish();
+            };
+            g.onerror = () => {
+              remaining--;
+              if (remaining === 0) finish();
+            };
+          });
+        };
+        getAllKeys.onerror = finish;
+      };
+      req.onerror = finish;
+      req.onblocked = finish;
+    } catch (err) {
+      finish();
+    }
   });
-  if (count > 0) return count;
-  if (roundId === 'FINAL') return 12;
-  return isGlobalPhase ? 48 : 16;
 }
 
-function getPerformanceScoreByRound() {
-  const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-  ROUND_ORDER.forEach(round => {
-    state.data.contestants.forEach(c => {
-      const activeCount = getActiveCountForRound(round, c.teamClass);
-      const pointsBase = activeCount + 1;
-      let totalPoints = 0; let hasData = false;
-      const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
-      if (rawScoreRec && Number.isFinite(rawScoreRec.total)) { totalPoints += rawScoreRec.total; hasData = true; }
-      JUDGE_NAMES.forEach(jn => {
-        const jRankRec = state.data.judge_rankings.find(r => r.round_id === round && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
-        if (jRankRec && Number.isFinite(jRankRec.rank) && jRankRec.rank >= 1) {
-          totalPoints += Math.max(0, pointsBase - jRankRec.rank);
-          hasData = true;
-        }
-      });
-      if (hasData) out[round][c.id] = totalPoints;
-    });
-  });
-  return out;
-}
+function saveAssetToDB(key, dataUrl) {
+  if (dataUrl === null) delete uploadedImages[key];
+  else uploadedImages[key] = dataUrl;
 
-function getOfficialRankingByRound(isGlobal = false) {
-  const targetJudge = isGlobal ? 'overall' : 'official';
-  const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-  state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === targetJudge).forEach(r => {
-    if (Number.isFinite(r.rank)) out[r.round_id][r.contestant_id] = r.rank;
-  });
-  const perfScoresByRound = getPerformanceScoreByRound();
-  ROUND_ORDER.forEach(round => {
-    const perfScores = perfScoresByRound[round];
-    const forceGlobal = isGlobal || round === 'PRERANK' || round === 'FINAL';
-    const groups = forceGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
-    groups.forEach(group => {
-      const groupIds = state.data.contestants.filter(c => (forceGlobal || c.teamClass === group)).map(c => c.id);
-      const scoredIds = groupIds.filter(id => !Number.isFinite(out[round][id]) && Number.isFinite(perfScores[id]));
-      scoredIds.sort((a, b) => perfScores[b] - perfScores[a]);
-      let usedRanks = new Set();
-      groupIds.forEach(id => { if (Number.isFinite(out[round][id])) usedRanks.add(out[round][id]); });
-      let autoRank = 1;
-      scoredIds.forEach((id) => {
-        while (usedRanks.has(autoRank)) autoRank++;
-        out[round][id] = autoRank;
-        usedRanks.add(autoRank);
-      });
-    });
-  });
-  return out;
-}
-
-async function loadDataFromRoundTabs() {
-  const entries = Object.entries(CONFIG.ROUND_TABS);
-  const results = await Promise.all(entries.map(([rid, tab]) => fetchSheetTab(tab).then(rows => [rid, rows])));
-  const rowsByRound = Object.fromEntries(results);
-  const contestantsMap = new Map();
-  const judge_rankings = []; const scores = []; const submissions = []; const round_status_clean = [];
-
-  Object.entries(rowsByRound).forEach(([round_id, rows]) => {
-    rows.forEach((row) => {
-      const name = String(pickValue(row, ['name', 'contestant', 'contestants', 'candidate', 'candidat']) || '').trim();
-      if (!name) return;
-      const id = normId(name);
-      if (EXCLUDED_NAMES.has(id)) return;
-      const instagram = String(pickValue(row, ['instagram', 'instagram_handle', 'username']) || '').trim();
-      const country = String(pickValue(row, ['country', 'pays', 'origine']) || '').trim();
-      const pronouns = String(pickValue(row, ['pronouns', 'pronoms']) || '').trim();
-      const teamRaw = String(pickValue(row, ['team', 'equipe', 'cercle', 'groupe', 'team_name']) || '').toLowerCase();
-      let teamClass = 'theme-global';
-      if (teamRaw.includes('sun') || teamRaw.includes('soleil') || teamRaw.includes('neitsu')) teamClass = 'theme-sun';
-      else if (teamRaw.includes('moon') || teamRaw.includes('lune') || teamRaw.includes('kaina')) teamClass = 'theme-moon';
-      else if (teamRaw.includes('star') || teamRaw.includes('etoile') || teamRaw.includes('étoile') || teamRaw.includes('aya')) teamClass = 'theme-star';
-
-      const performance = String(pickValue(row, ['performance', 'song', 'song_title', 'performance1', 'performance 1']) || '').trim();
-      const group_song = String(pickValue(row, ['performance2', 'performance 2']) || '').trim();
-      const link = String(pickValue(row, ['link', 'performance_link', 'youtube_url', 'url', 'linktotheperformance', 'linktotheperformance1']) || '').trim();
-      const link2 = String(pickValue(row, ['link2', 'linktotheperformance2']) || '').trim();
-      const officialRank = parseNum(pickValue(row, ['official_rank', 'rank', 'official ranking', 'classement']));
-      const overallRank = parseNum(pickValue(row, ['overall_rank', 'overall rank', 'global rank', 'classement global', 'overall']));
-      const perfScore = parseNum(pickValue(row, ['performance_score', 'score', 'creator_score', 'total', 'note']));
-      
-      const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
-      let statusValue = statusValueRaw;
-      if (statusValueRaw.includes('public') || statusValueRaw.includes('balance')) statusValue = 'saved_public';
-      else if (statusValueRaw.includes('judge') || statusValueRaw.includes('jury') || statusValueRaw.includes('oracle')) statusValue = 'saved_judges';
-      else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw.includes('elu')) statusValue = 'winner';
-      else if (statusValueRaw.includes('elim') || statusValueRaw.includes('élim') || statusValueRaw.includes('consum')) statusValue = 'eliminated';
-      else if (statusValueRaw.includes('nominee') || statusValueRaw.includes('rouge') || statusValueRaw.includes('ombre') || statusValueRaw.includes('shadow')) statusValue = 'nominee';
-      else if (statusValueRaw.includes('safe') || statusValueRaw.includes('droite') || statusValueRaw.includes('or')) statusValue = 'safe';
-
-      if (!contestantsMap.has(id)) {
-        contestantsMap.set(id, { id, name, photo_url: `${id}.png`, country, bio: '', instagram, pronouns, teamClass });
-      } else {
-        const c = contestantsMap.get(id);
-        if (country && !c.country) c.country = country;
-        if (pronouns && !c.pronouns) c.pronouns = pronouns;
-        if (instagram && !c.instagram) c.instagram = instagram;
-        if (teamClass !== 'theme-global' && c.teamClass === 'theme-global') c.teamClass = teamClass;
-      }
-      if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
-      if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
-      if (Number.isFinite(perfScore)) scores.push({ round_id, contestant_id: id, total: perfScore });
-      if (performance || link) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
-      if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
-
-      JUDGE_NAMES.forEach(jn => {
-        const val = parseNum(pickValue(row, [jn, `${jn}_rank`, `${jn} rank`]));
-        if (Number.isFinite(val)) judge_rankings.push({ round_id, judge_name: jn, contestant_id: id, rank: val });
-      });
-    });
-  });
-
-  const allIds = [...contestantsMap.keys()];
-  let lastStatusObj = {};
-  ROUND_ORDER.forEach(round => {
-    allIds.forEach(id => {
-      const existingIndex = round_status_clean.findIndex(r => r.round_id === round && r.contestant_id === id);
-      if (existingIndex >= 0) { lastStatusObj[id] = round_status_clean[existingIndex].status; }
-      else if (lastStatusObj[id] === 'eliminated') { round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' }); }
-    });
-  });
-
-  return { contestants: [...contestantsMap.values()], rounds: [], submissions, scores, judge_rankings, round_status: round_status_clean, votes_live: [] };
-}
-
-async function hydrate() {
-  state.data = await loadDataFromRoundTabs();
+  if (!dbInstance) return;
   try {
-    let votesRaw = await fetchSheetTab('votes_live', CONFIG.VOTE_SHEET_ID);
-    if (!votesRaw || votesRaw.length === 0) votesRaw = await fetchSheetTab('', CONFIG.VOTE_SHEET_ID);
-    state.data.votes_live = (votesRaw || []).map(r => {
-      const rid = pickValue(r, ['round_id', 'round', 'roundid', 'a']);
-      const cid = pickValue(r, ['contestant_id', 'contestant', 'name', 'candidat', 'b']);
-      let vcount = pickValue(r, ['votes_count', 'votes', 'count', 'total', 'c']);
-      if (vcount === '' && Object.values(r).length >= 3) vcount = Object.values(r)[2];
-      return { round_id: canonicalRoundId(rid), contestant_id: normId(cid), votes_count: parseNum(vcount) || 0 };
-    }).filter(v => v.contestant_id && v.round_id && !v.round_id.includes('ROUNDID'));
-  } catch (e) { console.warn("Votes not loaded:", e); }
-
-  state.data.contestants = state.data.contestants.filter(c => c.id && !EXCLUDED_NAMES.has(c.id));
-  state.latestRound = getLatestRound();
-  state.selectedRankingsRound = state.latestRound;
-  const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
-  state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound;
+    const tx = dbInstance.transaction("assets", "readwrite");
+    if (dataUrl === null) tx.objectStore("assets").delete(key);
+    else tx.objectStore("assets").put(dataUrl, key);
+  } catch (e) {}
 }
 
-function getJudgeRankingByRound(judgeName) {
-  const key = normalizeJudgeName(judgeName);
-  const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
-  state.data.judge_rankings.filter(r => normalizeJudgeName(r.judge_name) === key).forEach(r => { if (Number.isFinite(r.rank)) out[r.round_id][r.contestant_id] = r.rank; });
-  return out;
-}
-
-function getRankingViewOptions() {
-  return [
-    { value: 'default', label: state.activeTeam === 'Global' ? 'Global Arcana' : 'Circle Arcana' },
-    ...JUDGE_NAMES.map(j => ({ value: `judge:${j}`, label: j })),
-    { value: 'performance_score', label: 'Total Power' }
-  ];
-}
-
-function getRankingMapByView(view) {
-  if (view === 'default') return getOfficialRankingByRound(state.activeTeam === 'Global');
-  if (view === 'performance_score') return getPerformanceScoreByRound();
-  if (view.startsWith('judge:')) return getJudgeRankingByRound(view.split(':')[1]);
-  return getOfficialRankingByRound(state.activeTeam === 'Global');
-}
-
-function getLatestRound() {
-  for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
-    const round = ROUND_ORDER[i];
-    if (state.data.scores.some(r => r.round_id === round && Number.isFinite(r.total)) ||
-        state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
-        state.data.round_status.some(r => r.round_id === round && r.status !== '' && r.status !== 'eliminated')) {
-      return round;
-    }
-  }
-  return 'PRERANK';
-}
-
-function sortedContestants() {
-  const officialByRound = getOfficialRankingByRound(state.activeTeam === 'Global');
-  const current = officialByRound[state.latestRound] || {};
-  let filtered = state.data.contestants;
-  if (state.activeTeam === 'Soleil') filtered = filtered.filter(c => c.teamClass === 'theme-sun');
-  if (state.activeTeam === 'Lune') filtered = filtered.filter(c => c.teamClass === 'theme-moon');
-  if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => c.teamClass === 'theme-star');
-  
-  return [...filtered].sort((a, b) => {
-    const aElim = getStatus(state.latestRound, a.id) === 'eliminated' ? 1 : 0;
-    const bElim = getStatus(state.latestRound, b.id) === 'eliminated' ? 1 : 0;
-    if (aElim !== bElim) return aElim - bElim;
-    const ar = current[a.id]; const br = current[b.id];
-    if (Number.isFinite(ar) && Number.isFinite(br)) return ar - br;
-    if (Number.isFinite(ar)) return -1;
-    if (Number.isFinite(br)) return 1;
-    return String(a.name || '').localeCompare(String(b.name || ''));
-  });
-}
-
-// ==========================================
-// 5. TWO-PHASE COUNTDOWN & 7 PROPHECY CARDS
-// ==========================================
-function startGlobalCountdown() {
-  clearInterval(countdownInterval);
-  const updateClock = () => {
-    const now = new Date();
-    const openDate  = new Date(2026, 10, 1, 0, 0, 0);   // Nov 1, 2026 00:00:00
-    const closeDate = new Date(2026, 10, 13, 23, 59, 59); // Nov 13, 2026 23:59:59
-
-    let target = closeDate;
-    let phaseLabel = "✦ Auditions Close In ✦";
-    if (now < openDate) {
-      target = openDate;
-      phaseLabel = "✧ Auditions Open In ✧";
-    }
-
-    const diff = Math.max(0, target - now);
-    const d = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
-    const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-    const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
-    const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-
-    document.querySelectorAll('.cd-phase-lbl').forEach(el => el.textContent = phaseLabel);
-    document.querySelectorAll('.cd-days').forEach(el => el.textContent = d);
-    document.querySelectorAll('.cd-hours').forEach(el => el.textContent = h);
-    document.querySelectorAll('.cd-mins').forEach(el => el.textContent = m);
-    document.querySelectorAll('.cd-secs').forEach(el => el.textContent = s);
+function uploadAsset(key, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    saveAssetToDB(key, e.target.result);
+    renderContestantUploads();
+    applyVisualSettings();
   };
-  updateClock();
-  countdownInterval = setInterval(updateClock, 1000);
+  reader.readAsDataURL(file);
 }
 
-function buildPropheciesHTML() {
-  const now = new Date();
-  const cards = PROPHECIES.map(p => {
-    const unlocked = now >= new Date(p.unlockDate);
-    const tag = unlocked ? 'a' : 'div';
-    const targetUrl = (p.url && p.url.trim() !== "") ? p.url.trim() : CONFIG.INSTAGRAM_URL;
-    const hrefAttr = unlocked ? `href="${targetUrl}" target="_blank" rel="noopener noreferrer"` : '';
-    const statusText = unlocked ? `✦ Watch` : `✧ ${p.dateLabel}`;
+function clearAsset(key) {
+  saveAssetToDB(key, null);
+  renderContestantUploads();
+  applyVisualSettings();
+}
 
-    return `
-      <${tag} class="prophecy-card ${unlocked ? 'unlocked' : 'locked'}" ${hrefAttr}>
-        <span class="prophecy-num">${p.num}</span>
-        <div class="prophecy-glyph">${p.symbol}</div>
-        <h4 class="prophecy-title">${p.title}</h4>
-        <span class="prophecy-status">${statusText}</span>
-      </${tag}>
+/* ============================================================================
+   3. RENDU DU TABLEAU DES SCORES & UPLOAD PHOTOS
+   ============================================================================ */
+function renderScoreTable() {
+  ensureScoresIntegrity();
+  const thead = document.getElementById("score-table-head");
+  const tbody = document.getElementById("score-table-body");
+  if (!thead || !tbody) return;
+
+  let headHtml = `<th style="position:sticky;left:0;z-index:3;">Finaliste</th>`;
+  CATEGORIES.forEach((cat, idx) => {
+    headHtml += `<th class="${cat.grp}"><span style="opacity:0.6;font-size:0.64rem;">#${idx + 1}</span><br>${cat.short}</th>`;
+  });
+  headHtml += `<th>TOTAL</th>`;
+  thead.innerHTML = headHtml;
+
+  tbody.innerHTML = "";
+  FINALISTS.forEach(name => {
+    const tr = document.createElement("tr");
+    let rowHtml = `<td class="name-cell">${name}</td>`;
+    let sum = 0;
+
+    CATEGORIES.forEach(cat => {
+      const val = Number(appData.scores[name][cat.id] || 0);
+      sum += val;
+      const zeroClass = val === 0 ? "zero-val" : "";
+      rowHtml += `
+        <td>
+          <input type="number" step="0.1" class="${zeroClass}"
+            value="${val}"
+            oninput="updateScoreCell('${name}', '${cat.id}', this)">
+        </td>
+      `;
+    });
+
+    rowHtml += `<td class="total-cell" id="total-${name}">${formatScore(sum)}</td>`;
+    tr.innerHTML = rowHtml;
+    tbody.appendChild(tr);
+  });
+  populateJumpSelects();
+}
+
+function updateScoreCell(name, catId, inputEl) {
+  const val = parseFloat(inputEl.value);
+  appData.scores[name][catId] = isNaN(val) ? 0 : val;
+  inputEl.classList.toggle("zero-val", appData.scores[name][catId] === 0);
+
+  let sum = 0;
+  CATEGORIES.forEach(cat => {
+    sum += Number(appData.scores[name][cat.id] || 0);
+  });
+  const totalEl = document.getElementById("total-" + name);
+  if (totalEl) totalEl.textContent = formatScore(sum);
+  saveState();
+  populateJumpSelects();
+}
+
+function renderContestantUploads() {
+  const container = document.getElementById("contestant-uploads-list");
+  if (!container) return;
+  container.innerHTML = "";
+  FINALISTS.forEach(name => {
+    const imgSrc = uploadedImages["char_" + name] || "";
+    const card = document.createElement("div");
+    card.className = "upload-card";
+    card.innerHTML = `
+      <img class="upload-thumb" src="${imgSrc || 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22><rect width=%2248%22 height=%2248%22 fill=%22%231e1e28%22/></svg>'}" alt="">
+      <div class="upload-info">
+        <strong>${name}</strong>
+        <label>Choisir PNG <input type="file" accept="image/*" onchange="uploadAsset('char_${name}', event)"></label>
+      </div>
     `;
-  }).join('');
-
-  return `
-    <div style="margin-top: 2.6rem; text-align: left;">
-      <h3>The Seven Prophecies</h3>
-      <p class="small" style="margin-top:0;">A new card is unsealed every two days on Instagram.</p>
-      <div class="prophecies-grid">${cards}</div>
-    </div>
-  `;
-}
-
-function renderAuditionPortal(root) {
-  root.innerHTML = `
-    <div class="card-paper audition-hero">
-      <div style="font-size:2.2rem; color:var(--tarot-gold); letter-spacing:14px; margin-bottom:0.6rem;">✹ ☾ ✦</div>
-      <h2>The Audition Portal</h2>
-      <p class="small" style="max-width:650px; margin:0 auto; font-size:0.95rem; line-height:1.65;">
-        November 1st to November 13th • 48 singers will be selected through auditions to enter the 3 Circles and compete for the 5 spots alongside the 3 founders in the final 8-member group: <strong>KÆOS</strong>.
-      </p>
-      <span class="countdown-phase-lbl cd-phase-lbl">✧ Auditions Open In ✧</span>
-      <div class="countdown-grid">
-        <div class="countdown-box"><div class="countdown-num cd-days">00</div><div class="countdown-lbl">Days</div></div>
-        <div class="countdown-box"><div class="countdown-num cd-hours">00</div><div class="countdown-lbl">Hours</div></div>
-        <div class="countdown-box"><div class="countdown-num cd-mins">00</div><div class="countdown-lbl">Minutes</div></div>
-        <div class="countdown-box"><div class="countdown-num cd-secs">00</div><div class="countdown-lbl">Seconds</div></div>
-      </div>
-      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.8rem;">
-        <a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.AUDITION_FORM_URL}">✦ Submit my Audition</a>
-        <button class="btn" onclick="location.hash='#grimoire'">✦ Read the Grimoire</button>
-      </div>
-      ${buildPropheciesHTML()}
-    </div>
-  `;
-  startGlobalCountdown();
-}
-
-// ==========================================
-// 6. PAGE RENDERERS (INITIATES, ALIGNMENT, PROFILE, SCALE, GRIMOIRE)
-// ==========================================
-function renderContestants() {
-  const root = document.getElementById('contestants');
-  if (state.data.contestants.length === 0) {
-    renderAuditionPortal(root);
-    return;
-  }
-  const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
-  let teamTitle = "";
-  if (state.activeTeam === 'Soleil') teamTitle = ` — ✹ Sun (Neitsu)`;
-  if (state.activeTeam === 'Lune') teamTitle = ` — ☾ Moon (Kaina)`;
-  if (state.activeTeam === 'Etoile') teamTitle = ` — ✦ Star (Aya)`;
-
-  root.innerHTML = `
-    <div class="card-paper">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <h2 style="margin-bottom:0.3rem;">The Grand Reading${teamTitle}</h2>
-          <p class="small" style="color:var(--tarot-gold); margin:0;">
-            The stars are aligned for cycle: <span class="chip" style="font-weight:bold; color:var(--bg); background:var(--tarot-gold)">${getRoundLabel(state.latestRound)}</span>
-          </p>
-        </div>
-      </div>
-      <div class="filters" style="margin-top:1.5rem;">
-        <input id="searchContestant" placeholder="Search an initiate..." />
-        <select id="statusFilter">
-          <option value="all">All destinies</option>
-          <option value="safe">Upright Card (Safe)</option>
-          <option value="nominee">Shadow Zone</option>
-          <option value="saved_judges">Oracle's Grace</option>
-          <option value="saved_public">Scale's Grace</option>
-          <option value="eliminated">Consumed</option>
-        </select>
-      </div>
-    </div>
-    <div id="contestantsGrid" class="contestants-grid"></div>
-  `;
-
-  const draw = () => {
-    const q = document.getElementById('searchContestant').value.toLowerCase().trim();
-    const f = document.getElementById('statusFilter').value;
-    const list = sortedContestants().filter(c => c.name.toLowerCase().includes(q)).filter(c => {
-      let status = getStatus(state.latestRound, c.id);
-      if (!status && getFirstEliminatedRoundIndex(c.id) !== -1 && getFirstEliminatedRoundIndex(c.id) <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
-      if (f === 'all') return true;
-      return status === f || (f === 'safe' && ['winner', 'second', 'third', 'fourth', 'fifth'].includes(status));
-    });
-
-    if (list.length === 0) {
-      document.getElementById('contestantsGrid').innerHTML = '<p class="small">No card found for this filter.</p>';
-    } else {
-      document.getElementById('contestantsGrid').innerHTML = list.map((c) => {
-        let status = getStatus(state.latestRound, c.id);
-        const elimRound = getFirstEliminatedRoundIndex(c.id);
-        if (!status && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
-        const rank = currentRanks[c.id];
-        const rankDisplay = Number.isFinite(rank) ? 'ARCANA ' + (rank < 10 ? '0' + rank : rank) : 'TBD';
-        let extraClass = '';
-        if (status === 'eliminated') extraClass = 'eliminated';
-        else if (status === 'nominee') extraClass = 'danger-zone';
-        const teamClass = c.teamClass || 'theme-global';
-        const imgSrc = (status === 'nominee') ? `${c.id}_shadow.png` : c.photo_url;
-        let badgeHtml = '';
-        if (status === 'nominee') badgeHtml = `<div class="tarot-badge nominee">Shadow Zone</div>`;
-        else if (status === 'saved_judges') badgeHtml = `<div class="tarot-badge saved_judges">Oracle's Grace</div>`;
-        else if (status === 'saved_public') badgeHtml = `<div class="tarot-badge saved_public">Scale's Grace</div>`;
-        else if (status === 'winner') badgeHtml = `<div class="tarot-badge winner">✦ CHOSEN</div>`;
-
-        return `
-        <div class="tarot-card ${teamClass} ${extraClass}" onclick="location.hash='#profile/${c.id}'">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">${getContestantName(c.id)}</div>
-            <div class="tarot-image-container">
-              <img src="${imgSrc}" data-contestant-id="${c.id}" alt="${c.name}" onerror="handleImageFallback(this)" />
-            </div>
-            ${badgeHtml}
-            <div class="tarot-rank">${rankDisplay}</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  };
-  document.getElementById('searchContestant').addEventListener('input', draw);
-  document.getElementById('statusFilter').addEventListener('change', draw);
-  draw();
-}
-
-function renderRankings() {
-  const root = document.getElementById('rankings');
-  if (state.data.contestants.length === 0) { renderAuditionPortal(root); return; }
-  const viewOptions = getRankingViewOptions();
-  const rankingMap = getRankingMapByView(state.rankingView);
-  const isPerformance = state.rankingView === 'performance_score';
-  const activeRound = state.selectedRankingsRound || state.latestRound;
-
-  const list = sortedContestants().sort((a, b) => {
-    const aElim = getStatus(activeRound, a.id) === 'eliminated' ? 1 : 0;
-    const bElim = getStatus(activeRound, b.id) === 'eliminated' ? 1 : 0;
-    if (aElim !== bElim) return aElim - bElim;
-    const va = rankingMap[activeRound]?.[a.id]; const vb = rankingMap[activeRound]?.[b.id];
-    if (Number.isFinite(va) && Number.isFinite(vb)) return isPerformance ? vb - va : va - vb;
-    if (Number.isFinite(va)) return -1; if (Number.isFinite(vb)) return 1;
-    return String(a.name || '').localeCompare(String(b.name || ''));
+    container.appendChild(card);
   });
-  
-  const teamIds = list.map(c => c.id);
-  const nominations = {
-    nominee: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'nominee' && teamIds.includes(r.contestant_id)),
-    saved_judges: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_judges' && teamIds.includes(r.contestant_id)),
-    saved_public: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_public' && teamIds.includes(r.contestant_id)),
-    eliminated: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'eliminated' && teamIds.includes(r.contestant_id))
-  };
+}
 
-  let optionsHtml = viewOptions.map(o => `<option value="${o.value}" ${o.value === state.rankingView ? 'selected' : ''}>${o.label}</option>`).join('');
-  let roundsHtml = ROUND_ORDER.map(r => `<option value="${r}" ${r === activeRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
-  let thRoundsHtml = ROUND_ORDER.map(r => `<th>${getRoundLabel(r)}</th>`).join('');
+function formatScore(num) {
+  const rounded = Math.round(num * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
 
-  let rowsHtml = list.map((c, idx) => {
-    let cellsHtml = ROUND_ORDER.map(r => {
-      const v = rankingMap[r]?.[c.id];
-      const elimIndex = getFirstEliminatedRoundIndex(c.id);
-      const isDeadInTable = elimIndex !== -1 && elimIndex < ROUND_ORDER.indexOf(r);
-      if (Number.isFinite(v)) {
-        const displayV = (isPerformance && v % 1 !== 0) ? v.toFixed(1) : v;
-        if (!isPerformance && isDeadInTable) return `<td><span style="color:var(--tarot-ash); font-weight:600;">${displayV}</span> <span class="pill eliminated-pill" style="font-size:0.55rem; padding:0.15rem 0.4rem; margin-left:6px;">Consumed</span></td>`;
-        return `<td>${displayV}</td>`;
+function getContestantSongLabel(name) {
+  const s = appData.scores[name] || {};
+  if (Number(s.sg_nicole || 0) > 0) return "♪ NICOLE";
+  if (Number(s.sg_saucin || 0) > 0) return "♪ SAUCIN'";
+  if (Number(s.sg_popoff || 0) > 0) return "♪ POP OFF";
+  return "";
+}
+
+function exportData() {
+  const payload = JSON.stringify({ appData, uploadedImages });
+  const blob = new Blob([payload], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "star_kca_finale_config_v5.json";
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (parsed.appData) {
+        appData = parsed.appData;
+        saveState();
       }
-      let st = getStatus(r, c.id);
-      if (st && st !== 'eliminated' && !isDeadInTable) return `<td><span class="pill ${statusClass(st)}" style="font-size:0.68rem; padding:0.15rem 0.5rem;">${statusLabel(st)}</span></td>`;
-      if (st === 'eliminated' || isDeadInTable) return `<td><span class="pill eliminated-pill" style="font-size:0.68rem; padding:0.15rem 0.5rem;">Consumed</span></td>`;
-      return '<td>—</td>';
-    }).join('');
-    return `<tr><td>${idx + 1}</td><td><a href="#profile/${c.id}">${getContestantName(c.id)}</a></td>${cellsHtml}</tr>`;
-  }).join('');
+      if (parsed.uploadedImages) {
+        Object.keys(parsed.uploadedImages).forEach(k => {
+          saveAssetToDB(k, parsed.uploadedImages[k]);
+        });
+      }
+      loadSavedState();
+      renderScoreTable();
+      renderContestantUploads();
+      applyVisualSettings();
+    } catch (err) {
+      alert("Fichier JSON invalide.");
+    }
+  };
+  reader.readAsText(file);
+}
 
-  root.innerHTML = `
-    <div class="card-paper">
-      <h2>Alignment</h2>
-      <div class="filters">
-        <select id="rankingViewSelect">${optionsHtml}</select>
-        <select id="rankingsRoundSelect">${roundsHtml}</select>
-      </div>
-      <p class="small" style="color:var(--tarot-gold)">Aura evolution across the cycles.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>${isPerformance ? 'Pos' : 'Arcana'}</th><th>Initiate</th>${thRoundsHtml}</tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
-      <h3 style="margin-top:2.5rem;">The Oracles' Judgment (${getRoundLabel(activeRound)})</h3>
-      <p class="small"><span style="color:var(--tarot-danger); font-weight:bold;">Shadow Zone :</span> ${nominations.nominee.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">Oracle's Grace :</span> ${nominations.saved_judges.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">Scale's Grace :</span> ${nominations.saved_public.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">Consumed Cards :</span> ${nominations.eliminated.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-    </div>
-    <div class="card-paper">
-      <h3>Web of Destiny</h3>
-      <div class="table-wrap"><div style="min-width: 600px; height: 360px;"><canvas id="rankingChart"></canvas></div></div>
-    </div>
-  `;
+/* ============================================================================
+   4. MOTEUR DE PARTICULES & CONFETTIS DORÉS (PODIUM)
+   ============================================================================ */
+let particles = [];
+let confettiMode = false;
+let particleAnimId = null;
 
-  document.getElementById('rankingViewSelect').addEventListener('change', (e) => { state.rankingView = e.target.value; renderRankings(); });
-  document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => { state.selectedRankingsRound = e.target.value; renderRankings(); });
+function initParticles() {
+  const canvas = document.getElementById("particles-canvas");
+  const ctx = canvas.getContext("2d");
+  particles = [];
+  confettiMode = false;
 
-  try {
-    if (rankingChartInstance) rankingChartInstance.destroy();
-    const ctx = document.getElementById('rankingChart');
-    if (!ctx || typeof Chart === 'undefined') return;
-    Chart.defaults.color = '#888888'; Chart.defaults.borderColor = '#2E2E2E';
-    rankingChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ROUND_ORDER.map(r => getRoundLabel(r)),
-        datasets: list.map((c, idx) => {
-          const elimIndex = getFirstEliminatedRoundIndex(c.id);
-          const isEliminated = getStatus(activeRound, c.id) === 'eliminated';
-          const baseColor = colorForIndex(idx);
-          const color = isEliminated ? baseColor.replace('hsl', 'hsla').replace(')', ', 0.25)') : baseColor;
-          return {
-            label: getContestantName(c.id),
-            data: ROUND_ORDER.map((r, rIdx) => {
-              if (elimIndex !== -1 && rIdx > elimIndex) return null;
-              const v = rankingMap[r]?.[c.id];
-              return Number.isFinite(v) ? v : null;
-            }),
-            borderColor: color, backgroundColor: color, borderWidth: isEliminated ? 1 : 3,
-            borderDash: isEliminated ? [5, 5] : [], pointRadius: isEliminated ? 0 : 4, tension: 0.25, spanGaps: true
-          };
-        })
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: true, position: 'bottom', labels: { color: '#F0EDE5', boxWidth: 10, usePointStyle: true } } },
-        scales: {
-          x: { ticks: { color: '#888' } },
-          y: { reverse: !isPerformance, min: isPerformance ? undefined : 1, max: isPerformance ? undefined : Math.max(16, list.length), ticks: { color: '#888', stepSize: isPerformance ? undefined : 1 } }
+  for (let i = 0; i < 38; i++) {
+    particles.push({
+      x: 90 + Math.random() * 900,
+      y: 85 + Math.random() * 1750,
+      r: Math.random() * 2.8 + 1,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -Math.random() * 0.4 - 0.12,
+      alpha: Math.random() * 0.42 + 0.12,
+      rot: Math.random() * Math.PI,
+      vRot: (Math.random() - 0.5) * 0.04
+    });
+  }
+
+  function renderLoop() {
+    ctx.clearRect(0, 0, 1080, 1920);
+    particles.forEach(p => {
+      if (confettiMode) {
+        p.x += Math.sin(p.y * 0.015) * 0.8 + p.vx * 2;
+        p.y += Math.abs(p.vy) * 4.2 + 1.2;
+        p.rot += p.vRot;
+        if (p.y > 1835) {
+          p.y = 85;
+          p.x = 95 + Math.random() * 890;
         }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = `rgba(255, 218, 110, ${p.alpha + 0.3})`;
+        ctx.fillRect(-p.r * 1.6, -p.r * 0.8, p.r * 3.2, p.r * 1.6);
+        ctx.restore();
+      } else {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < 80) p.y = 1835;
+        if (p.x < 85) p.x = 995;
+        if (p.x > 995) p.x = 85;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 238, 195, ${p.alpha})`;
+        ctx.fill();
       }
     });
-  } catch (err) { console.error(err); }
+    particleAnimId = requestAnimationFrame(renderLoop);
+  }
+  if (particleAnimId) cancelAnimationFrame(particleAnimId);
+  renderLoop();
 }
 
-function renderProfile(contestantId) {
-  const c = state.data.contestants.find(x => x.id === contestantId);
-  const root = document.getElementById('profile');
-  if (!c) { root.innerHTML = `<div class="card-paper"><p>Card lost in limbo.</p></div>`; return; }
+/* ============================================================================
+   5. PLACEMENT CALIBRÉ DANS LE CADRE EN BOIS & ANIMATIONS
+   ============================================================================ */
+let cardElements = {};
+let currentTotals = {};
+let isPaused = false;
+let abortRunId = 0;
 
-  const official = getOfficialRankingByRound(state.activeTeam === 'Global');
-  const judgesByName = Object.fromEntries(JUDGE_NAMES.map(j => [j, getJudgeRankingByRound(j)]));
-  const perfScore = getPerformanceScoreByRound();
-  const profileOrder = sortedContestants();
-  const profileIndex = profileOrder.findIndex(x => x.id === c.id);
-  const prevContestant = profileIndex > 0 ? profileOrder[profileIndex - 1] : null;
-  const nextContestant = profileIndex >= 0 && profileIndex < profileOrder.length - 1 ? profileOrder[profileIndex + 1] : null;
-  const submissions = state.data.submissions.filter(s => s.contestant_id === c.id).sort((a,b) => ROUND_ORDER.indexOf(a.round_id) - ROUND_ORDER.indexOf(b.round_id));
+function applyVisualSettings() {
+  const stage = document.getElementById("stage-container");
+  stage.classList.remove("style-pin", "style-tape", "style-dark");
+  stage.classList.add("style-" + appData.settings.cardStyle);
 
-  let circleBadgeHtml = `<div class="circle-badge-pill">☉ Unassigned Circle</div>`;
-  if (c.teamClass === 'theme-sun') circleBadgeHtml = `<div class="circle-badge-pill">✹ Circle of the Sun — Neitsu</div>`;
-  else if (c.teamClass === 'theme-moon') circleBadgeHtml = `<div class="circle-badge-pill">☾ Circle of the Moon — Kaina</div>`;
-  else if (c.teamClass === 'theme-star') circleBadgeHtml = `<div class="circle-badge-pill">✦ Circle of the Star — Aya</div>`;
+  const bgImg = document.getElementById("custom-bg");
+  if (uploadedImages["bg"]) {
+    bgImg.src = uploadedImages["bg"];
+    bgImg.style.display = "block";
+  } else {
+    bgImg.style.display = "none";
+  }
 
-  const meta = [
-    c.country ? `Land : ${c.country}` : '',
-    c.pronouns ? `Identity : ${c.pronouns}` : '',
-    c.instagram ? `Grimoire (Insta) : <a href="${c.instagram.startsWith('http') ? c.instagram : 'https://instagram.com/' + c.instagram.replace('@', '')}" target="_blank" style="color:var(--tarot-gold)">${c.instagram}</a>` : ''
-  ].filter(Boolean).join(' · ');
+  const logoImg = document.getElementById("center-logo-img");
+  const logoTxt = document.getElementById("center-logo-text");
+  if (uploadedImages["logo"]) {
+    logoImg.src = uploadedImages["logo"];
+    logoImg.style.display = "block";
+    logoTxt.style.display = "none";
+  } else {
+    logoImg.style.display = "none";
+    logoTxt.style.display = "block";
+  }
 
-  let roundsRowsHtml = ROUND_ORDER.map(r => {
-    let st = getStatus(r, c.id);
-    const elimRound = getFirstEliminatedRoundIndex(c.id);
-    if (!st && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(r)) st = 'eliminated';
-    const pScore = perfScore[r]?.[c.id];
-    const rawVocal = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id)?.total;
-    let pScoreStr = Number.isFinite(pScore) ? (pScore % 1 === 0 ? pScore.toString() : pScore.toFixed(1)) : '—';
-    let vocalStr = Number.isFinite(rawVocal) ? `${rawVocal}/100` : '—';
-    const jCellsHtml = JUDGE_NAMES.map(j => `<td>${judgesByName[j]?.[r]?.[c.id] ?? '—'}</td>`).join('');
-    return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${official[r]?.[c.id] ?? '—'}</td>${jCellsHtml}<td>${vocalStr}</td><td><strong style="color:var(--tarot-gold)">${pScoreStr}</strong></td><td><span class="pill ${statusClass(st)}">${statusLabel(st)}</span></td></tr>`;
-  }).join('');
+  document.getElementById("ig-handle-display").textContent = appData.settings.igHandle;
+}
 
-  let perfsRowsHtml = submissions.length > 0 ? submissions.map(s => `
-    <tr>
-      <td><strong>${getRoundLabel(s.round_id) || s.round_id}</strong></td>
-      <td>${s.song_title || 'Pending'}${s.group_song ? `<br><span style="color:var(--muted); font-size:0.85em">${s.group_song}</span>` : ''}</td>
-      <td>
-        ${s.youtube_url ? `<a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" href="${s.youtube_url}">Observe Ritual</a>` : '—'}
-        ${s.bandlab_url ? ` <a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" href="${s.bandlab_url}">BandLab</a>` : ''}
-      </td>
-    </tr>`).join('') : `<tr><td colspan="3">No visions recorded.</td></tr>`;
+function resizeStageToFitWindow() {
+  const stage = document.getElementById("stage-container");
+  const scaleX = window.innerWidth / 1080;
+  const scaleY = window.innerHeight / 1920;
+  const scale = Math.min(scaleX, scaleY);
+  stage.style.transform = `scale(${scale})`;
+}
+window.addEventListener("resize", resizeStageToFitWindow);
 
-  const dynamicRankLabel = state.activeTeam === 'Global' ? 'Global Arcana' : 'Circle Arcana';
-  const latestSt = getStatus(state.latestRound, c.id);
-  const profileImgSrc = (latestSt === 'nominee') ? `${c.id}_shadow.png` : c.photo_url;
+function getGridCoordinates(rankIndex) {
+  const layout = appData.settings.gridLayout;
+  const cardW = 204;
+  let rows;
+  if (layout === "2-4-4") {
+    rows = [
+      { count: 2, y: 348, gapX: 68 },
+      { count: 4, y: 742, gapX: 26 },
+      { count: 4, y: 1136, gapX: 26 }
+    ];
+  } else {
+    rows = [
+      { count: 3, y: 348, gapX: 48 },
+      { count: 4, y: 742, gapX: 26 },
+      { count: 3, y: 1136, gapX: 48 }
+    ];
+  }
 
-  root.innerHTML = `
-    <div class="card-paper">
-      <div class="profile-nav">
-        <button class="btn" onclick="location.hash='#contestants'">← Back to cards</button>
-        ${prevContestant ? `<button class="btn" onclick="location.hash='#profile/${prevContestant.id}'">← ${getContestantName(prevContestant.id)}</button>` : ''}
-        ${nextContestant ? `<button class="btn" onclick="location.hash='#profile/${nextContestant.id}'">${getContestantName(nextContestant.id)} →</button>` : ''}
-      </div>
-      <div class="row two">
-        <div style="display:flex; justify-content:center;">
-          <div class="profile-img-wrap ${latestSt === 'nominee' ? 'danger-zone' : ''}">
-            <img class="profile-img" src="${profileImgSrc}" data-contestant-id="${c.id}" alt="${c.name}" onerror="handleImageFallback(this)" />
-          </div>
-        </div>
-        <div class="profile-content">
-          <h2 style="font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.35rem;">${getContestantName(c.id)}</h2>
-          ${circleBadgeHtml}
-          ${meta ? `<p class="small" style="font-size:0.95rem; color:var(--tarot-gold); margin-top:0.2rem;">${meta}</p>` : ''}
-          <h3 style="margin-top:1.8rem;">Book of Cycles</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Cycle</th><th>${dynamicRankLabel}</th>${JUDGE_NAMES.map(j => `<th>${j}</th>`).join('')}<th>Vocal (/100)</th><th>Total Power</th><th>Destiny</th></tr></thead>
-              <tbody>${roundsRowsHtml}</tbody>
-            </table>
-          </div>
-          <h3 style="margin-top:2rem;">Rituals (Performances)</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Cycle</th><th>Work</th><th>Visions</th></tr></thead>
-              <tbody>${perfsRowsHtml}</tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row charts-split">
-      <div class="card-paper" style="margin-bottom:0;">
-        <h3>Aura Pentagram (${getRoundLabel(state.latestRound)})</h3>
-        <div style="height: 300px; display:flex; justify-content:center; align-items:center;"><canvas id="radarChart"></canvas></div>
-      </div>
-      <div class="card-paper" style="margin-bottom:0;">
-        <h3>Aura Fluctuation</h3>
-        <div style="height: 300px;"><canvas id="profileChart"></canvas></div>
-      </div>
-    </div>
-  `;
-
-  const r = state.latestRound;
-  const maxActive = getActiveCountForRound(r, c.teamClass);
-  const rankToPct = (rk) => Number.isFinite(rk) && rk >= 1 ? Math.round(Math.max(15, ((maxActive - rk + 1) / maxActive) * 100)) : 50;
-
-  try {
-    if (radarChartInstance) radarChartInstance.destroy();
-    const ctxRadar = document.getElementById('radarChart');
-    if (ctxRadar && typeof Chart !== 'undefined') {
-      radarChartInstance = new Chart(ctxRadar, {
-        type: 'radar',
-        data: {
-          labels: ['✹ Sun (Neitsu)', '☾ Moon (Kaina)', '✦ Star (Aya)', 'Hauras', 'Vocal (/100)'],
-          datasets: [{
-            label: getContestantName(c.id),
-            data: [rankToPct(judgesByName['Neitsu']?.[r]?.[c.id]), rankToPct(judgesByName['Kaina']?.[r]?.[c.id]), rankToPct(judgesByName['Aya']?.[r]?.[c.id]), rankToPct(judgesByName['Hauras']?.[r]?.[c.id]), state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id)?.total || 75],
-            backgroundColor: 'rgba(226, 185, 97, 0.2)', borderColor: '#E2B961', pointBackgroundColor: '#E2B961', borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-          scales: { r: { min: 0, max: 100, angleLines: { color: '#2E2E2E' }, grid: { color: '#252525' }, pointLabels: { color: '#E2B961', font: { family: 'Poppins', size: 11 } }, ticks: { display: false } } }
-        }
-      });
+  let r = 0;
+  let idxInRow = rankIndex;
+  for (let i = 0; i < rows.length; i++) {
+    if (idxInRow < rows[i].count) {
+      r = i;
+      break;
     }
-    if (profileChartInstance) profileChartInstance.destroy();
-    const ctx2 = document.getElementById('profileChart');
-    const elimIndex = getFirstEliminatedRoundIndex(c.id);
-    if (ctx2 && typeof Chart !== 'undefined') {
-      profileChartInstance = new Chart(ctx2, {
-        type: 'line',
-        data: {
-          labels: ROUND_ORDER.map(rd => getRoundLabel(rd)),
-          datasets: [{
-            label: getContestantName(c.id),
-            data: ROUND_ORDER.map((rd, rIdx) => (elimIndex !== -1 && rIdx > elimIndex) ? null : (Number.isFinite(official[rd]?.[c.id]) ? official[rd][c.id] : null)),
-            borderColor: '#E2B961', backgroundColor: 'rgba(226, 185, 97, 0.12)', borderWidth: 3, tension: 0.25, spanGaps: true
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#F0EDE5' } } },
-          scales: { x: { ticks: { color: '#888' } }, y: { reverse: true, min: 1, max: Math.max(16, state.data.contestants.length), ticks: { color: '#888', stepSize: 1 } } }
-        }
-      });
-    }
-  } catch (err) { console.error(err); }
+    idxInRow -= rows[i].count;
+  }
+
+  const rowObj = rows[r];
+  const totalRowW = rowObj.count * cardW + (rowObj.count - 1) * rowObj.gapX;
+  const startX = (1080 - totalRowW) / 2;
+  const x = startX + idxInRow * (cardW + rowObj.gapX);
+  const y = rowObj.y;
+  return { x, y };
 }
 
-function renderVotes() {
-  const root = document.getElementById('votes');
-  if (state.data.contestants.length === 0) { renderAuditionPortal(root); return; }
-  const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
-  const selected = canonicalRoundId(state.votesRound);
-  state.votesRound = ROUND_ORDER.includes(selected) ? selected : (roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound);
+function buildCardsDOM() {
+  const layer = document.getElementById("cards-layer");
+  layer.innerHTML = "";
+  cardElements = {};
+  currentTotals = {};
 
-  const rule = ROUND_RULES[state.votesRound] || ROUND_RULES.ROUND_1;
-  const nominees = state.data.round_status.filter(r => r.round_id === state.votesRound && r.status === 'nominee').map(r => r.contestant_id);
-  const votedCandidates = state.data.votes_live.filter(v => v.round_id === state.votesRound).map(v => v.contestant_id);
-  const activeTeamIds = sortedContestants().map(c => c.id);
-  const targets = [...new Set([...nominees, ...votedCandidates])].filter(id => activeTeamIds.includes(id));
+  FINALISTS.forEach((name, idx) => {
+    currentTotals[name] = 0;
+    const el = document.createElement("div");
+    el.className = "polaroid-card";
+    const tilt = CARD_TILTS[idx % CARD_TILTS.length];
+    const imgSrc = uploadedImages["char_" + name];
+    const photoContent = imgSrc
+      ? `<img src="${imgSrc}" alt="${name}">`
+      : `<div class="card-avatar-fallback">${name.charAt(0)}</div>`;
 
-  const rows = targets.map(id => {
-    const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
-    return { id, name: getContestantName(id), votes: Number(record?.votes_count || 0) };
-  }).sort((a, b) => b.votes - a.votes);
+    const songLbl = getContestantSongLabel(name);
+    const songBadgeHtml = (songLbl && appData.settings.songSpotlight !== "off")
+      ? `<div class="song-unit-tag">${songLbl}</div>`
+      : "";
 
-  const totalVotes = rows.reduce((sum, r) => sum + r.votes, 0);
-  const maxVotes = rows.length > 0 ? rows[0].votes : 0;
-
-  let votesListHtml = rows.length ? rows.map((r, idx) => {
-    const pct = totalVotes > 0 ? (r.votes / totalVotes) * 100 : 0;
-    const barPct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
-    const inPublicSaveZone = idx < rule.publicSave;
-    return `
-      <div class="vote-row" style="${inPublicSaveZone ? 'border-color:var(--tarot-gold);' : ''}">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <strong style="font-family:'Cinzel', serif; font-size:1.15rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
-            ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.6rem;">Scale's Grace</span>` : ''}
+    el.innerHTML = `
+      <div class="polaroid-inner" id="card-inner-${name}" style="transform: rotate(${tilt}deg);">
+        <div class="card-fastener"></div>
+        <div class="rank-cluster">
+          <div class="rank-badge" id="card-rk-${name}">-</div>
+          <div class="delta-badge" id="card-delta-${name}"></div>
+        </div>
+        ${songBadgeHtml}
+        <div class="card-photo-frame">
+          <div class="photo-sheen"></div>
+          ${photoContent}
+          <div class="score-pill" id="card-pill-${name}">+0</div>
+        </div>
+        <div class="card-caption">
+          <div class="card-name">${name}</div>
+          <div class="card-score-box">
+            <span class="score-lbl">SCORE</span>
+            <span class="score-val" id="card-score-${name}">0</span>
           </div>
-          <div style="font-weight:600;">${r.votes} votes (${pct.toFixed(1)}%)</div>
-        </div>
-        <div class="bar"><span style="width:${barPct}%"></span></div>
-      </div>`;
-  }).join('') : `<p class="small" style="text-align:center; margin:1.5rem 0;">Silence reigns on the Scale this cycle.</p>`;
-
-  const scaleHtml = `
-    <div class="scale-showcase">
-      <svg class="scale-svg" viewBox="0 0 220 130">
-        <line x1="110" y1="20" x2="110" y2="115" stroke="#E2B961" stroke-width="3"/>
-        <polygon points="85,115 135,115 125,105 95,105" fill="#E2B961"/>
-        <circle cx="110" cy="20" r="6" fill="#E2B961"/>
-        <g class="scale-beam-group">
-          <line x1="35" y1="35" x2="185" y2="35" stroke="#E2B961" stroke-width="3"/>
-          <line x1="35" y1="35" x2="20" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-          <line x1="35" y1="35" x2="50" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-          <path d="M12 75 Q35 90 58 75 Z" fill="rgba(226,185,97,0.3)" stroke="#E2B961" stroke-width="1.5"/>
-          <line x1="185" y1="35" x2="170" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-          <line x1="185" y1="35" x2="200" y2="75" stroke="#E2B961" stroke-width="1.5"/>
-          <path d="M162 75 Q185 90 208 75 Z" fill="rgba(226,185,97,0.3)" stroke="#E2B961" stroke-width="1.5"/>
-        </g>
-      </svg>
-      <div class="scale-quotas">
-        <div class="quota-card shadow-quota"><strong>${rule.shadow}</strong><span class="small">In Shadow Zone</span></div>
-        <div class="quota-card"><strong>${rule.oracleSave}</strong><span class="small">Saved by Oracle</span></div>
-        <div class="quota-card"><strong>${rule.publicSave}</strong><span class="small">Saved by Public</span></div>
-        <div class="quota-card"><strong>${rule.elim}</strong><span class="small">Consumed Cards</span></div>
-      </div>
-    </div>
-  `;
-
-  let roundsOptionsHtml = ROUND_ORDER.filter(r => r !== 'PRERANK').map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
-  const mainVoteContent = rows.length > 0 ? `<div style="margin-top:2rem;">${votesListHtml}</div>${scaleHtml}` : `${scaleHtml}<div style="margin-top:1.5rem;">${votesListHtml}</div>`;
-
-  root.innerHTML = `
-    <div class="card-paper">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <h2>The Scale — ${getRoundLabel(state.votesRound)}</h2>
-        <div class="filters" style="margin:0;">
-          <select id="votesRoundSelect">${roundsOptionsHtml}</select>
-          ${CONFIG.VOTE_FORM_URL ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.VOTE_FORM_URL}">✦ Tip the Scale</a>` : ''}
         </div>
       </div>
-      ${mainVoteContent}
-      <p class="small" style="margin-top:2rem; color:var(--tarot-gold)">
-        Total votes: ${totalVotes} · Last vision: ${new Date().toLocaleTimeString('en-US')}
-      </p>
-    </div>
-  `;
-  document.getElementById('votesRoundSelect').addEventListener('change', (e) => { state.votesRound = e.target.value; renderVotes(); });
+    `;
+
+    const pos = getGridCoordinates(idx);
+    el.style.transform = `translate3d(${pos.x}px, ${pos.y + 55}px, 0px) scale(0.88)`;
+    el.style.opacity = "0";
+    layer.appendChild(el);
+    cardElements[name] = el;
+  });
 }
 
-function renderGrimoire() {
-  const root = document.getElementById('grimoire');
-  const mysticEyeSvg = `
-    <svg class="oracle-eye-svg" viewBox="0 0 64 40" fill="none">
-      <path d="M4 20 C16 4, 48 4, 60 20 C48 36, 16 36, 4 20 Z" stroke="#E2B961" stroke-width="2"/>
-      <circle cx="32" cy="20" r="8" stroke="#E2B961" stroke-width="2"/>
-      <circle cx="32" cy="20" r="3" fill="#E2B961"/>
-    </svg>
-  `;
+function updateRankBadges(orderedNames, prevRankMap, showDelta) {
+  orderedNames.forEach((name, idx) => {
+    const rk = idx + 1;
+    const badge = document.getElementById("card-rk-" + name);
+    const deltaEl = document.getElementById("card-delta-" + name);
+    const cardEl = cardElements[name];
+    if (!badge) return;
 
-  root.innerHTML = `
-    <div class="card-paper">
-      <div class="grimoire-intro">
-        <span class="grimoire-motto">KÆOS • KEEP AN EYE ON US</span>
-        <h2 style="margin-bottom:0.8rem;">The Grimoire — KÆOS PROJECT</h2>
-        <p class="small" style="font-size:0.95rem; line-height:1.7; color:var(--text); margin:0;">
-          Created two years ago by <strong>Neitsu</strong>, joined by <strong>Kaina</strong> in the very first season and by <strong>Aya</strong> in the second chapter, <strong>KÆOS</strong> ("Keep An Eye On Us") rises again. Through Season 3, 5 new members will be recruited alongside the 3 surviving founders to form the final 8-artist group: <strong>KÆOS</strong>.
-        </p>
-      </div>
+    badge.textContent = rk === 1 ? "👑 #1" : "#" + rk;
+    badge.className = "rank-badge";
+    if (rk === 1) {
+      badge.classList.add("rk-1");
+      cardEl.classList.add("is-leader");
+    } else {
+      cardEl.classList.remove("is-leader");
+      if (rk === 2) badge.classList.add("rk-2");
+      else if (rk === 3) badge.classList.add("rk-3");
+    }
 
-      <h3>The 3 Circles &amp; The Jury</h3>
-      <div class="oracles-grid">
-        <div class="oracle-box">
-          <div class="oracle-symbol">✹</div>
-          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">NEITSU — Circle of the Sun</h4>
-          <p class="small" style="margin:0; line-height:1.55;">Creator of the Star KCA Academy and founder of KÆOS 2 years ago. Alongside Kaina and Aya, he leads the Circle of the Sun to find the 5 new members.</p>
-        </div>
-        <div class="oracle-box">
-          <div class="oracle-symbol">☾</div>
-          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">KAINA — Circle of the Moon</h4>
-          <p class="small" style="margin:0; line-height:1.55;">Selected in the very first season of KÆOS, she remained loyal to the project and now leads the Circle of the Moon.</p>
-        </div>
-        <div class="oracle-box">
-          <div class="oracle-symbol">✦</div>
-          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">AYA — Circle of the Star</h4>
-          <p class="small" style="margin:0; line-height:1.55;">Joined the group during the second chapter of KÆOS and now leads the Circle of the Star alongside Neitsu and Kaina.</p>
-        </div>
-        <div class="oracle-box">
-          <div class="oracle-symbol">${mysticEyeSvg}</div>
-          <h4 style="margin:0 0 8px 0; font-size:1.05rem;">HAURAS — Fourth Judge</h4>
-          <p class="small" style="margin:0; line-height:1.55;">Fourth member of the jury from outside the KCA universe, bringing an independent musical perspective with equal weight in every round's ranking.</p>
-        </div>
-      </div>
-
-      <h3>The Book of Cycles</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Cycle</th><th>Works / Songs</th><th>Progression &amp; Quotas per Circle</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong style="color:var(--tarot-gold)">Pre-Rank (Awakening)</strong></td><td>Open Audition (Nov 1st – Nov 13th)</td><td>Selection of the 48 Initiates split into 3 Circles of 16 (Sun, Moon, Star)</td></tr>
-            <tr><td><strong>Round 1 (16 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>8 Safe • 8 in Shadow Zone (3 saved by Leader, 2 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 2 (13 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>6 Safe • 7 in Shadow Zone (3 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 3 (10 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>4 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 4 (7 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>1 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong style="color:var(--tarot-gold)">Finale (Apotheosis)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>The 12 survivors (4 per Circle) merge: 5 Winners join KÆOS</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top:2.8rem;">100-Point Vocal Rubric</h3>
-      <p class="small">The 100-point vocal score is evaluated across these 11 criteria:</p>
-      <div class="rubric-grid">
-        <div class="rubric-item"><span>Pitch</span><span class="rubric-pts">/20</span></div>
-        <div class="rubric-item"><span>Vocal Quality</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Technique</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Vocal Identity</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Interpretation / Musicality</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Audio &amp; Mixing</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Attitude</span><span class="rubric-pts">/10</span></div>
-        <div class="rubric-item"><span>Rhythm</span><span class="rubric-pts">/5</span></div>
-        <div class="rubric-item"><span>Pronunciation</span><span class="rubric-pts">/5</span></div>
-        <div class="rubric-item"><span>Vocal Presence</span><span class="rubric-pts">/5</span></div>
-        <div class="rubric-item"><span>Harmonies &amp; Ad-libs</span><span class="rubric-pts">/5</span></div>
-      </div>
-
-      ${buildPropheciesHTML()}
-    </div>
-  `;
+    if (deltaEl) {
+      deltaEl.className = "delta-badge";
+      if (showDelta && prevRankMap && prevRankMap[name] !== undefined) {
+        const diff = prevRankMap[name] - idx;
+        if (diff > 0) {
+          deltaEl.textContent = "▲" + diff;
+          deltaEl.classList.add("up", "show");
+        } else if (diff < 0) {
+          deltaEl.textContent = "▼" + Math.abs(diff);
+          deltaEl.classList.add("down", "show");
+        }
+      }
+    }
+  });
 }
 
-function renderAll() {
-  renderContestants();
-  renderRankings();
-  renderVotes();
-  renderGrimoire();
-  if (location.hash && location.hash.startsWith('#profile/')) {
-    renderProfile(location.hash.split('/')[1]);
+function getActiveCategoriesList() {
+  if (appData.settings.zeroBehavior === "skip-empty") {
+    return CATEGORIES.filter(cat =>
+      FINALISTS.some(name => Number(appData.scores[name][cat.id] || 0) !== 0)
+    );
+  }
+  return CATEGORIES;
+}
+
+function populateJumpSelects() {
+  const activeCats = getActiveCategoriesList();
+  const selHud = document.getElementById("jump-select");
+  const selPre = document.getElementById("pre-start-select");
+
+  let optionsHtml = `<option value="0">🎬 Intro & Placement</option>`;
+  activeCats.forEach((cat, idx) => {
+    optionsHtml += `<option value="${idx + 1}">#${idx + 1} — ${cat.main} (${cat.sub})</option>`;
+  });
+  optionsHtml += `<option value="999">🏆 Podium Final (1st → 10th)</option>`;
+
+  if (selHud) selHud.innerHTML = `<option value="">⏩ Aller à...</option>` + optionsHtml;
+  if (selPre) {
+    const prevVal = selPre.value || "0";
+    selPre.innerHTML = optionsHtml;
+    if ([...selPre.options].some(o => o.value === prevVal)) selPre.value = prevVal;
   }
 }
 
-function setupNav() {
-  const onHash = () => {
-    const hash = location.hash || '';
-    if (hash === '' || hash === '#') {
-      document.getElementById('app-dashboard').style.display = 'none';
-      document.getElementById('app-dashboard').style.opacity = '0';
-      document.getElementById('landing-menu').style.display = 'flex';
-      document.getElementById('landing-menu').style.opacity = '1';
-      document.getElementById('landing-menu').style.transform = 'scale(1)';
-      return;
-    } else {
-      document.getElementById('landing-menu').style.display = 'none';
-      document.getElementById('app-dashboard').style.display = 'block';
-      document.getElementById('app-dashboard').style.opacity = '1';
-    }
-    const [page, param] = hash.slice(1).split('/');
-    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-    if (page === 'profile' && param) {
-      document.getElementById('profile').classList.add('active');
-      renderProfile(param);
-    } else {
-      const target = document.getElementById(page) ? page : 'contestants';
-      document.getElementById(target).classList.add('active');
-    }
-    document.querySelectorAll('.nav-link').forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === '#' + page);
-    });
-  };
-  window.removeEventListener('hashchange', onHash);
-  window.addEventListener('hashchange', onHash);
-  onHash();
+function launchFromStudio(withCountdown) {
+  const startVal = parseInt(document.getElementById("pre-start-select").value || "0", 10);
+  startVideoShow(withCountdown, startVal);
 }
 
-async function boot() {
-  try {
-    initCelestialSparks();
-    updateCircleSwitcherUI();
-    setupNav();
-    await hydrate();
-    renderAll();
+function jumpToSection(val) {
+  if (val === "") return;
+  const stepNum = parseInt(val, 10);
+  startVideoShow(false, stepNum);
+}
 
-    clearTimeout(state.votesTimer);
-    state.votesTimer = setInterval(async () => {
-      await hydrate();
-      renderAll();
-    }, CONFIG.REFRESH_MS);
-  } catch (error) {
-    console.error("Critical startup error:", error);
+function buildQueueRibbon(activeCats) {
+  const track = document.getElementById("queue-track");
+  track.innerHTML = "";
+  activeCats.forEach((cat, idx) => {
+    const pill = document.createElement("div");
+    pill.className = "q-pill";
+    pill.id = "q-pill-" + idx;
+    pill.innerHTML = `<span>${cat.main}</span><span class="q-sub-txt">${cat.sub}</span>`;
+    track.appendChild(pill);
+  });
+  track.style.transform = "translateX(0px)";
+}
+
+function slideQueueTo(index, total) {
+  const track = document.getElementById("queue-track");
+  for (let i = 0; i < total; i++) {
+    const p = document.getElementById("q-pill-" + i);
+    if (!p) continue;
+    p.classList.remove("next-up", "done");
+    if (i <= index) p.classList.add("done");
+    else if (i === index + 1) p.classList.add("next-up");
+  }
+
+  const nextEl = document.getElementById("q-pill-" + (index + 1));
+  if (nextEl) {
+    const offset = Math.max(0, nextEl.offsetLeft - 70);
+    track.style.transform = `translateX(-${offset}px)`;
   }
 }
 
-boot();
+function wait(ms, runId) {
+  const scaledMs = ms * appData.settings.speed;
+  return new Promise((resolve, reject) => {
+    let elapsed = 0;
+    const step = 40;
+    const timer = setInterval(() => {
+      if (runId !== abortRunId) {
+        clearInterval(timer);
+        return reject("ABORTED");
+      }
+      if (!isPaused) {
+        elapsed += step;
+        if (elapsed >= scaledMs) {
+          clearInterval(timer);
+          resolve();
+        }
+      }
+    }, step);
+  });
+}
+
+function animateScoreCounter(name, fromVal, toVal, durationMs, runId) {
+  const el = document.getElementById("card-score-" + name);
+  const scaledDuration = durationMs * appData.settings.speed;
+  const startTime = performance.now();
+
+  function tick(now) {
+    if (runId !== abortRunId) return;
+    const progress = Math.min((now - startTime) / scaledDuration, 1);
+    const eased = progress < 0.5
+      ? 4 * progress * progress * progress
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+    const current = fromVal + (toVal - fromVal) * eased;
+    const displayNum = Math.round(current * 10) / 10;
+    el.textContent = formatScore(displayNum);
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = formatScore(toVal);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ============================================================================
+   6. SÉQUENCE VIDÉO COMPLÈTE (SANS LIGNE DE PROGRESSION NI ÉCRAN DE FIN)
+   ============================================================================ */
+async function startVideoShow(withCountdown, startStep = 0) {
+  abortRunId++;
+  const runId = abortRunId;
+  isPaused = false;
+  document.getElementById("pause-btn").textContent = "⏸ Pause (Espace)";
+  document.getElementById("playback-hud").classList.remove("hud-active");
+
+  applyVisualSettings();
+  initParticles();
+
+  const overlay = document.getElementById("stage-overlay");
+  overlay.style.display = "flex";
+  resizeStageToFitWindow();
+
+  const introSplash = document.getElementById("intro-splash");
+  const topBar = document.getElementById("top-bar");
+  const activeCatBox = document.getElementById("active-cat-box");
+  const queueViewport = document.getElementById("queue-viewport");
+  const podiumDockBg = document.getElementById("podium-dock-bg");
+  const heroStage = document.getElementById("hero-stage");
+  const heroCard = document.getElementById("hero-card");
+  const heroCongrats = document.getElementById("hero-congrats-banner");
+  const centerLogoWrap = document.getElementById("center-logo-wrap");
+
+  introSplash.className = "";
+  topBar.className = "";
+  activeCatBox.className = "";
+  queueViewport.className = "";
+  podiumDockBg.className = "";
+  heroStage.className = "";
+  heroCard.className = "";
+  heroCongrats.className = "";
+  centerLogoWrap.style.opacity = "0.22";
+
+  buildCardsDOM();
+  const activeCats = getActiveCategoriesList();
+  populateJumpSelects();
+  buildQueueRibbon(activeCats);
+
+  let currentOrder = [...FINALISTS].sort((a, b) => a.localeCompare(b));
+
+  const catStartIdx = startStep === 999 ? activeCats.length : Math.max(0, startStep - 1);
+  if (startStep > 0) {
+    for (let i = 0; i < catStartIdx; i++) {
+      const c = activeCats[i];
+      FINALISTS.forEach(name => {
+        currentTotals[name] = Math.round((currentTotals[name] + Number(appData.scores[name][c.id] || 0)) * 100) / 100;
+      });
+      const prevMap = {};
+      currentOrder.forEach((n, idx) => prevMap[n] = idx);
+      currentOrder.sort((a, b) => currentTotals[b] !== currentTotals[a] ? currentTotals[b] - currentTotals[a] : prevMap[a] - prevMap[b]);
+    }
+    FINALISTS.forEach(name => {
+      document.getElementById("card-score-" + name).textContent = formatScore(currentTotals[name]);
+    });
+    updateRankBadges(currentOrder, null, false);
+  }
+
+  try {
+    if (withCountdown) {
+      const cdBadge = document.getElementById("countdown-badge");
+      const cdNum = document.getElementById("countdown-num");
+      cdBadge.style.display = "flex";
+      for (let c = 3; c >= 1; c--) {
+        cdNum.textContent = String(c);
+        await new Promise(r => setTimeout(r, 1000));
+        if (runId !== abortRunId) return;
+      }
+      cdBadge.style.display = "none";
+    }
+
+    if (startStep === 0) {
+      // --- 1. INTRO SPLASH CINÉMATIQUE ---
+      await wait(400, runId);
+      introSplash.classList.add("active");
+      await wait(3000, runId);
+      introSplash.classList.remove("active");
+      introSplash.classList.add("exit");
+      await wait(1100, runId);
+
+      // --- 2. ENTRÉE DE LA BARRE DU HAUT + DISTRIBUTION DOUCE DES 10 POLAROÏDS ---
+      topBar.classList.add("visible");
+      for (let i = 0; i < currentOrder.length; i++) {
+        const name = currentOrder[i];
+        const pos = getGridCoordinates(i);
+        const el = cardElements[name];
+        el.style.zIndex = String(30 - i);
+        el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0px) scale(1)`;
+        el.style.opacity = "1";
+        await wait(110, runId);
+      }
+
+      await wait(1500, runId);
+      queueViewport.classList.add("visible");
+      await wait(1400, runId);
+    } else {
+      topBar.classList.add("visible");
+      queueViewport.classList.add("visible");
+      currentOrder.forEach((name, i) => {
+        const pos = getGridCoordinates(i);
+        const el = cardElements[name];
+        el.style.zIndex = String(30 - i);
+        el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0px) scale(1)`;
+        el.style.opacity = "1";
+      });
+      await wait(600, runId);
+    }
+
+    // --- 3. BOUCLE DES CATÉGORIES ---
+    for (let i = catStartIdx; i < activeCats.length; i++) {
+      const cat = activeCats[i];
+
+      if (i > catStartIdx) {
+        activeCatBox.classList.remove("show");
+        activeCatBox.classList.add("exit");
+        await wait(700, runId);
+      }
+
+      document.getElementById("active-cat-main").textContent = cat.main;
+      document.getElementById("active-cat-sub").textContent = cat.sub;
+      activeCatBox.classList.remove("exit");
+      activeCatBox.classList.add("show");
+      slideQueueTo(i, activeCats.length);
+
+      const useSpotlight = cat.isSong && appData.settings.songSpotlight !== "off";
+      if (useSpotlight) {
+        FINALISTS.forEach(name => {
+          const pts = Number(appData.scores[name][cat.id] || 0);
+          const el = cardElements[name];
+          if (pts > 0) {
+            el.classList.add("song-spotlight");
+            el.classList.remove("song-dimmed");
+          } else {
+            el.classList.add("song-dimmed");
+            el.classList.remove("song-spotlight");
+          }
+        });
+      }
+
+      await wait(1650, runId);
+
+      let maxCatPts = 0;
+      FINALISTS.forEach(name => {
+        const p = Number(appData.scores[name][cat.id] || 0);
+        if (p > maxCatPts) maxCatPts = p;
+      });
+
+      let anyPointsAdded = false;
+      for (let cIdx = 0; cIdx < currentOrder.length; cIdx++) {
+        const name = currentOrder[cIdx];
+        const pts = Number(appData.scores[name][cat.id] || 0);
+        const pill = document.getElementById("card-pill-" + name);
+        const cardEl = cardElements[name];
+        pill.className = "score-pill";
+        cardEl.classList.remove("sheen-sweep");
+
+        if (pts !== 0) {
+          anyPointsAdded = true;
+          const isTop = pts === maxCatPts && maxCatPts > 0;
+          const sign = pts > 0 ? "+" : "";
+          pill.textContent = (isTop ? "★ " : "") + sign + formatScore(pts);
+          if (isTop) {
+            pill.classList.add("top-cat-pill");
+            void cardEl.offsetWidth;
+            cardEl.classList.add("sheen-sweep");
+          }
+          pill.classList.add("visible");
+          await wait(65, runId);
+        }
+      }
+
+      if (anyPointsAdded) {
+        await wait(2800, runId);
+
+        FINALISTS.forEach(name => {
+          const pts = Number(appData.scores[name][cat.id] || 0);
+          if (pts !== 0) {
+            const pill = document.getElementById("card-pill-" + name);
+            pill.classList.remove("visible");
+            pill.classList.add("merge");
+
+            const cardEl = cardElements[name];
+            cardEl.classList.add("score-bump");
+            setTimeout(() => cardEl.classList.remove("score-bump"), 1100);
+
+            const oldTotal = currentTotals[name];
+            const newTotal = Math.round((oldTotal + pts) * 100) / 100;
+            currentTotals[name] = newTotal;
+            animateScoreCounter(name, oldTotal, newTotal, 1400, runId);
+          }
+        });
+
+        await wait(2100, runId);
+
+        if (useSpotlight) {
+          FINALISTS.forEach(name => {
+            cardElements[name].classList.remove("song-dimmed", "song-spotlight");
+          });
+          await wait(350, runId);
+        }
+
+        const prevRankMap = {};
+        currentOrder.forEach((n, idx) => prevRankMap[n] = idx);
+
+        currentOrder.sort((a, b) => {
+          if (currentTotals[b] !== currentTotals[a]) {
+            return currentTotals[b] - currentTotals[a];
+          }
+          return prevRankMap[a] - prevRankMap[b];
+        });
+
+        updateRankBadges(currentOrder, prevRankMap, i > 0);
+
+        currentOrder.forEach((name, newIdx) => {
+          const oldIdx = prevRankMap[name];
+          const el = cardElements[name];
+          const pos = getGridCoordinates(newIdx);
+
+          if (newIdx < oldIdx) {
+            el.classList.add("moving-up");
+            el.style.zIndex = String(50 - newIdx);
+            setTimeout(() => {
+              el.classList.remove("moving-up");
+              el.style.zIndex = String(30 - newIdx);
+            }, 2250 * appData.settings.speed);
+          } else {
+            el.style.zIndex = String(30 - newIdx);
+          }
+
+          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0px) scale(1)`;
+        });
+
+        await wait(3200, runId);
+      } else {
+        if (useSpotlight) {
+          FINALISTS.forEach(name => cardElements[name].classList.remove("song-dimmed", "song-spotlight"));
+        }
+        await wait(1500, runId);
+      }
+    }
+
+    // --- 4. DÉFILÉ FINAL HD (RANK 1ST -> 10TH) AVEC PLUIE DE PAILLETTES OR ---
+    await wait(800, runId);
+    confettiMode = true;
+    queueViewport.classList.remove("visible");
+    activeCatBox.classList.remove("show");
+    activeCatBox.classList.add("exit");
+    await wait(800, runId);
+
+    document.getElementById("active-cat-main").textContent = "FINAL RESULTS";
+    document.getElementById("active-cat-sub").textContent = "OFFICIAL RANKING";
+    activeCatBox.classList.remove("exit");
+    activeCatBox.classList.add("show");
+
+    podiumDockBg.classList.add("visible");
+    heroStage.classList.add("active");
+
+    const ordinals = ["1ST", "2ND", "3RD", "4TH", "5TH", "6TH", "7TH", "8TH", "9TH", "10TH"];
+
+    for (let rankIdx = 0; rankIdx < currentOrder.length; rankIdx++) {
+      const winnerName = currentOrder[rankIdx];
+
+      cardElements[winnerName].style.opacity = "0";
+      const remaining = currentOrder.slice(rankIdx + 1);
+      const miniScale = 0.42;
+      const miniW = 204 * miniScale;
+      const miniGap = 8;
+      const totalMiniW = remaining.length * miniW + Math.max(0, remaining.length - 1) * miniGap;
+      const startMiniX = (1080 - totalMiniW) / 2;
+
+      remaining.forEach((remName, mIdx) => {
+        const remEl = cardElements[remName];
+        const targetCenterX = startMiniX + mIdx * (miniW + miniGap) + miniW / 2;
+        const targetCenterY = 1738;
+        const tx = targetCenterX - 204 / 2;
+        const ty = targetCenterY - 348 / 2;
+        remEl.style.zIndex = String(25 + mIdx);
+        remEl.style.transform = `translate3d(${tx}px, ${ty}px, 0px) scale(${miniScale})`;
+        remEl.style.opacity = "0.95";
+      });
+
+      const imgSrc = uploadedImages["char_" + winnerName];
+      document.getElementById("hero-photo-box").innerHTML = imgSrc
+        ? `<img src="${imgSrc}" alt="${winnerName}">`
+        : `<div class="card-avatar-fallback" style="font-size:140px;">${winnerName.charAt(0)}</div>`;
+
+      const pillEl = document.getElementById("hero-rank-pill");
+      if (rankIdx === 0) {
+        pillEl.textContent = "👑 WINNER • 1ST PLACE";
+        pillEl.style.background = "linear-gradient(135deg, #ffe066, #d49b17)";
+      } else if (rankIdx === 1) {
+        pillEl.textContent = "🥈 RUNNER-UP • #2";
+        pillEl.style.background = "linear-gradient(135deg, #f0f4f8, #9fb3c8)";
+      } else if (rankIdx === 2) {
+        pillEl.textContent = "🥉 PODIUM • #3";
+        pillEl.style.background = "linear-gradient(135deg, #f3c69f, #b86b35)";
+      } else {
+        pillEl.textContent = `RANK #${rankIdx + 1}`;
+        pillEl.style.background = "linear-gradient(135deg, #ffe066, #d49b17)";
+      }
+
+      document.getElementById("hero-name").textContent = winnerName;
+      document.getElementById("hero-score-val").textContent = formatScore(currentTotals[winnerName]);
+      document.getElementById("hero-rank-big").textContent = `RANK ${ordinals[rankIdx]}`;
+
+      heroCard.className = "show";
+      heroCongrats.className = "show";
+
+      await wait(4500, runId);
+
+      if (rankIdx < currentOrder.length - 1) {
+        heroCard.className = "exit";
+        heroCongrats.className = "";
+        await wait(950, runId);
+      }
+    }
+
+  } catch (e) {
+    if (e !== "ABORTED") console.error(e);
+  }
+}
+
+function stopVideoShow() {
+  abortRunId++;
+  if (particleAnimId) cancelAnimationFrame(particleAnimId);
+  document.getElementById("stage-overlay").style.display = "none";
+  document.getElementById("countdown-badge").style.display = "none";
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById("pause-btn").textContent = isPaused ? "▶️ Reprendre (Espace)" : "⏸ Pause (Espace)";
+}
+
+window.addEventListener("keydown", (e) => {
+  const overlayVisible = document.getElementById("stage-overlay").style.display === "flex";
+  if (!overlayVisible) return;
+  if (e.code === "Escape") stopVideoShow();
+  else if (e.code === "Space") {
+    e.preventDefault();
+    togglePause();
+  } else if (e.code === "KeyR") {
+    startVideoShow(false, 0);
+  }
+});
+
+// Rendu immédiat et garanti du tableau des scores dès l'ouverture
+window.addEventListener("DOMContentLoaded", async () => {
+  loadSavedState();
+  renderScoreTable();
+  renderContestantUploads();
+  applyVisualSettings();
+
+  await initIndexedDB();
+  renderContestantUploads();
+  applyVisualSettings();
+});
 </script>
 </body>
 </html>
