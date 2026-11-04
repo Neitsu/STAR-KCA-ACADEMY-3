@@ -57,13 +57,20 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 2rem 0; transition: opacity 0.6s ease, transform 0.6s ease;
     }
-    .menu-header { text-align: center; margin-bottom: 2.5rem; color: var(--tarot-gold); padding: 0 1rem; }
+    .menu-header { text-align: center; margin-bottom: 2.2rem; color: var(--tarot-gold); padding: 0 1rem; }
     .menu-header h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: 6px; text-transform: uppercase; margin: 0 0 10px 0; text-shadow: 0 0 25px rgba(226, 185, 97, 0.35); }
     .menu-header p { font-size: clamp(0.75rem, 2vw, 1rem); letter-spacing: 6px; text-transform: uppercase; margin: 0; color: #999; }
+    .menu-sub-hint {
+      display: inline-block; margin-top: 14px; padding: 5px 18px;
+      border: 1px solid var(--tarot-gold-dim); border-radius: 99px;
+      background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold);
+      font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 3px;
+      text-transform: uppercase;
+    }
     
     .cards-layout { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; max-width: 1400px; padding: 20px; }
-    .card-container { width: 270px; height: 430px; perspective: 1500px; cursor: pointer; position: relative; }
-    .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+    .card-container { width: 270px; height: 430px; perspective: 1500px; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
+    .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
     
     @media (hover: hover) {
       .card-container:hover .tarot-flip-card { transform: rotateY(180deg) translateY(-16px); }
@@ -82,7 +89,14 @@
     }
     .card-front::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.55) 0%, rgba(10,10,10,0.94) 100%); }
     .card-front-inner { position: relative; z-index: 2; width: 88%; height: 92%; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; }
-    .card-front-label { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.85rem; text-transform: uppercase; opacity: 0.85; }
+    .card-front-label { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; opacity: 0.92; }
+    .front-tap-badge {
+      position: absolute; bottom: 20px; font-family: 'Cinzel', serif;
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 2px;
+      color: var(--tarot-gold); border: 1px solid var(--tarot-gold-dim);
+      background: rgba(10, 10, 10, 0.85); padding: 4px 12px; border-radius: 99px;
+      text-transform: uppercase;
+    }
 
     .front-symbol {
       width: 84px; height: 84px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg);
@@ -90,10 +104,16 @@
       box-shadow: 0 0 25px rgba(226, 185, 97, 0.25), inset 0 0 15px rgba(226, 185, 97, 0.3); text-shadow: 0 0 15px rgba(226, 185, 97, 0.8);
     }
     .card-back { transform: rotateY(180deg); }
+
+    @keyframes pulseEnterBtn {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(226, 185, 97, 0.5); }
+      50% { transform: scale(1.06); box-shadow: 0 0 24px rgba(226, 185, 97, 0.85); }
+    }
     .enter-hint {
-      position: absolute; bottom: 52px; background: rgba(226, 185, 97, 0.95); color: #0A0A0A;
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; padding: 4px 14px; border-radius: 99px;
-      text-transform: uppercase; z-index: 5; box-shadow: 0 0 15px rgba(226, 185, 97, 0.5);
+      position: absolute; bottom: 50px; background: var(--tarot-gold); color: #0A0A0A;
+      font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+      padding: 6px 16px; border-radius: 99px; text-transform: uppercase; z-index: 5;
+      animation: pulseEnterBtn 2.4s infinite ease-in-out;
     }
 
     /* ==========================================
@@ -376,15 +396,17 @@
   <div class="menu-header">
     <h1>Star KCA Academy</h1>
     <p>KÆOS PROJECT • Choose your destiny</p>
+    <div class="menu-sub-hint">✦ Tap a card to enter the Academy ✦</div>
   </div>
 
   <div class="cards-layout">
-    <div class="card-container" onclick="handleCardTap(this, 'Soleil')">
+    <div class="card-container" data-team="Soleil" onclick="handleCardTap(this, 'Soleil')">
       <div class="tarot-flip-card theme-sun">
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
             <div class="card-front-label">The Sun</div>
+            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -392,20 +414,21 @@
             <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">NEITSU</div>
-            <div class="tarot-image-container"><img src="neitsu.png" alt="Neitsu" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ✹</div>
+            <div class="tarot-image-container"><img src="neitsu.png" data-leader="neitsu" alt="Neitsu" onerror="handleImageFallback(this)"></div>
+            <div class="enter-hint">✦ Click to Enter ✹</div>
             <div class="tarot-rank">THE SUN</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card-container" onclick="handleCardTap(this, 'Lune')">
+    <div class="card-container" data-team="Lune" onclick="handleCardTap(this, 'Lune')">
       <div class="tarot-flip-card theme-moon">
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
             <div class="card-front-label">The Moon</div>
+            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -413,20 +436,21 @@
             <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">KAINA</div>
-            <div class="tarot-image-container"><img src="kaina.png" alt="Kaina" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ☾</div>
+            <div class="tarot-image-container"><img src="kaina.png" data-leader="kaina" alt="Kaina" onerror="handleImageFallback(this)"></div>
+            <div class="enter-hint">✦ Click to Enter ☾</div>
             <div class="tarot-rank">THE MOON</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card-container" onclick="handleCardTap(this, 'Etoile')">
+    <div class="card-container" data-team="Etoile" onclick="handleCardTap(this, 'Etoile')">
       <div class="tarot-flip-card theme-star">
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
             <div class="card-front-label">The Star</div>
+            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -434,20 +458,21 @@
             <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">AYA</div>
-            <div class="tarot-image-container"><img src="aya.png" alt="Aya" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ✦</div>
+            <div class="tarot-image-container"><img src="aya.png" data-leader="aya" alt="Aya" onerror="handleImageFallback(this)"></div>
+            <div class="enter-hint">✦ Click to Enter ✦</div>
             <div class="tarot-rank">THE STAR</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card-container" onclick="handleCardTap(this, 'Global')">
+    <div class="card-container" data-team="Global" onclick="handleCardTap(this, 'Global')">
       <div class="tarot-flip-card theme-global">
         <div class="card-face card-front">
           <div class="card-front-inner">
             <div class="front-symbol"></div>
             <div class="card-front-label">The World</div>
+            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
           </div>
         </div>
         <div class="card-face card-back">
@@ -455,8 +480,8 @@
             <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">GLOBAL</div>
-            <div class="tarot-image-container"><img src="world.png" alt="Global World" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">Enter ☉</div>
+            <div class="tarot-image-container"><img src="world.png" data-leader="world" alt="Global World" onerror="handleImageFallback(this)"></div>
+            <div class="enter-hint">✦ Click to Enter ☉</div>
             <div class="tarot-rank">THE WORLD</div>
           </div>
         </div>
@@ -512,11 +537,12 @@ const CONFIG = {
   VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
   AUDITION_FORM_URL: "https://forms.gle/q3V1uG6XnYNNQKXf8",
   INSTAGRAM_URL: "https://www.instagram.com/star_kca_academy.svs/",
+  CANDIDATE_FOLDER: "candidat",
+  NOMINATION_FOLDER: "nomination",
   REFRESH_MS: 45000
 };
 
 // Paste the direct Instagram Reel link inside `url: ""` once each video is posted!
-// If `url` is left empty (""), clicking the card automatically opens your main Instagram page.
 const PROPHECIES = [
   { num: "PROPHECY 00", title: "The Eclipse",           symbol: "☉", unlockDate: "2026-10-01T00:00:00", dateLabel: "Available Now", url: "" },
   { num: "PROPHECY I",  title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",       url: "" },
@@ -561,6 +587,7 @@ let rankingChartInstance = null;
 let profileChartInstance = null;
 let radarChartInstance = null;
 let countdownInterval = null;
+let cardEnterTimeout = null;
 
 const state = {
   data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
@@ -621,15 +648,43 @@ function initCelestialSparks() {
 }
 
 // ==========================================
-// 3. NAVIGATION & CIRCLE SWITCHER
+// 3. NAVIGATION, MOBILE AUTO-FLIP & 1-TAP ENTRY
 // ==========================================
-function handleCardTap(cardEl, teamFilter) {
+function initMobileScrollCardFlip() {
+  // On touch screens, automatically flip cards as they scroll into view
   const isTouch = window.matchMedia('(hover: none)').matches;
+  if (!isTouch || !('IntersectionObserver' in window)) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('flipped');
+      } else {
+        entry.target.classList.remove('flipped');
+      }
+    });
+  }, { threshold: 0.62 });
+
+  document.querySelectorAll('#landing-menu .card-container').forEach(card => {
+    observer.observe(card);
+  });
+}
+
+function handleCardTap(cardEl, teamFilter) {
+  clearTimeout(cardEnterTimeout);
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  // If the user taps a card on mobile that hasn't flipped yet:
+  // Flip it immediately AND open the Academy right after the 3D flip (no second tap needed!)
   if (isTouch && !cardEl.classList.contains('flipped')) {
-    document.querySelectorAll('.card-container').forEach(c => c.classList.remove('flipped'));
+    document.querySelectorAll('#landing-menu .card-container').forEach(c => c.classList.remove('flipped'));
     cardEl.classList.add('flipped');
+    cardEnterTimeout = setTimeout(() => {
+      entrerAcademie(teamFilter);
+    }, 620);
     return;
   }
+
   entrerAcademie(teamFilter);
 }
 
@@ -681,7 +736,68 @@ function retourMenuPrincipale() {
 }
 
 // ==========================================
-// 4. GOOGLE SHEETS PARSER & SCORING ENGINE
+// 4. IMAGE FOLDER PATHS (`candidat/` & `nomination/`) + SMART FALLBACK
+// ==========================================
+function getContestantImagePath(c, isNominee = false) {
+  const id = c.id;
+  if (isNominee) {
+    return `${CONFIG.NOMINATION_FOLDER}/${id}-nominee.png`;
+  }
+  return `${CONFIG.CANDIDATE_FOLDER}/${id}.png`;
+}
+
+function handleImageFallback(img) {
+  const step = Number(img.dataset.fallbackStep || '0');
+  const contestantId = String(img.dataset.contestantId || '').trim();
+  const rawName = String(img.dataset.rawName || '').trim();
+  const isNominee = img.dataset.isNominee === '1';
+  const leaderId = String(img.dataset.leader || '').trim();
+
+  // Fallback for the 4 landing menu leader cards if moved into candidat/
+  if (leaderId) {
+    if (step === 0) {
+      img.dataset.fallbackStep = '1';
+      img.src = `${CONFIG.CANDIDATE_FOLDER}/${leaderId}.png`;
+      return;
+    }
+  }
+
+  // Smart multi-step fallback for Contestant & Nomination folders (handles lowercase & exact case)
+  if (contestantId) {
+    const candidatesToTry = isNominee
+      ? [
+          `${CONFIG.NOMINATION_FOLDER}/${rawName}-nominee.png`,
+          `${CONFIG.NOMINATION_FOLDER}/${contestantId}_nominee.png`,
+          `${CONFIG.CANDIDATE_FOLDER}/${contestantId}.png`,
+          `${CONFIG.CANDIDATE_FOLDER}/${rawName}.png`,
+          `${contestantId}-nominee.png`,
+          `${contestantId}.png`
+        ]
+      : [
+          `${CONFIG.CANDIDATE_FOLDER}/${rawName}.png`,
+          `${contestantId}.png`,
+          `${CONFIG.NOMINATION_FOLDER}/${contestantId}-nominee.png`,
+          `${CONFIG.NOMINATION_FOLDER}/${rawName}-nominee.png`
+        ];
+
+    if (step < candidatesToTry.length) {
+      img.dataset.fallbackStep = String(step + 1);
+      img.src = candidatesToTry[step];
+      return;
+    }
+  }
+
+  img.onerror = null;
+  img.src = "data:image/svg+xml;utf8," + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+      <circle cx="100" cy="78" r="32" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
+      <path d="M42 215 C42 155, 158 155, 158 215 Z" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
+    </svg>
+  `);
+}
+
+// ==========================================
+// 5. GOOGLE SHEETS PARSER & SCORING ENGINE
 // ==========================================
 function getRoundLabel(id) { return ROUND_LABELS[id] || id; }
 function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
@@ -698,20 +814,6 @@ function canonicalRoundId(value) {
 function normalizeJudgeName(v) { return String(v || '').trim().toLowerCase(); }
 function getContestantName(id) { return String(state.data.contestants.find(c => c.id === id)?.name || '').trim() || id; }
 function colorForIndex(i) { return `hsl(${(i * 47) % 360} 65% 62%)`; }
-
-function handleImageFallback(img) {
-  const step = Number(img.dataset.fallbackStep || '0');
-  const contestantId = String(img.dataset.contestantId || '').trim();
-  if (step === 0 && contestantId) { img.dataset.fallbackStep = '1'; img.src = `${contestantId}_shadow_zone.png`; return; }
-  if (step === 1 && contestantId) { img.dataset.fallbackStep = '2'; img.src = `${contestantId}.png`; return; }
-  img.onerror = null;
-  img.src = "data:image/svg+xml;utf8," + encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
-      <circle cx="100" cy="78" r="32" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
-      <path d="M42 215 C42 155, 158 155, 158 215 Z" fill="#202020" stroke="#E2B961" stroke-width="1.5"/>
-    </svg>
-  `);
-}
 
 function parseCSV(text) {
   const rows = []; let row = []; let inQuotes = false; let val = "";
@@ -890,7 +992,16 @@ async function loadDataFromRoundTabs() {
       else if (statusValueRaw.includes('safe') || statusValueRaw.includes('droite') || statusValueRaw.includes('or')) statusValue = 'safe';
 
       if (!contestantsMap.has(id)) {
-        contestantsMap.set(id, { id, name, photo_url: `${id}.png`, country, bio: '', instagram, pronouns, teamClass });
+        contestantsMap.set(id, {
+          id,
+          name,
+          photo_url: `${CONFIG.CANDIDATE_FOLDER}/${id}.png`,
+          country,
+          bio: '',
+          instagram,
+          pronouns,
+          teamClass
+        });
       } else {
         const c = contestantsMap.get(id);
         if (country && !c.country) c.country = country;
@@ -1000,7 +1111,7 @@ function sortedContestants() {
 }
 
 // ==========================================
-// 5. TWO-PHASE COUNTDOWN & 7 PROPHECY CARDS
+// 6. TWO-PHASE COUNTDOWN & 7 PROPHECY CARDS
 // ==========================================
 function startGlobalCountdown() {
   clearInterval(countdownInterval);
@@ -1086,7 +1197,7 @@ function renderAuditionPortal(root) {
 }
 
 // ==========================================
-// 6. PAGE RENDERERS (INITIATES, ALIGNMENT, PROFILE, SCALE, GRIMOIRE)
+// 7. PAGE RENDERERS (INITIATES, ALIGNMENT, PROFILE, SCALE, GRIMOIRE)
 // ==========================================
 function renderContestants() {
   const root = document.getElementById('contestants');
@@ -1148,7 +1259,8 @@ function renderContestants() {
         if (status === 'eliminated') extraClass = 'eliminated';
         else if (status === 'nominee') extraClass = 'danger-zone';
         const teamClass = c.teamClass || 'theme-global';
-        const imgSrc = (status === 'nominee') ? `${c.id}_shadow.png` : c.photo_url;
+        const isNom = status === 'nominee';
+        const imgSrc = getContestantImagePath(c, isNom);
         let badgeHtml = '';
         if (status === 'nominee') badgeHtml = `<div class="tarot-badge nominee">Shadow Zone</div>`;
         else if (status === 'saved_judges') badgeHtml = `<div class="tarot-badge saved_judges">Oracle's Grace</div>`;
@@ -1163,7 +1275,7 @@ function renderContestants() {
             <div class="tarot-top-icon"></div>
             <div class="tarot-name">${getContestantName(c.id)}</div>
             <div class="tarot-image-container">
-              <img src="${imgSrc}" data-contestant-id="${c.id}" alt="${c.name}" onerror="handleImageFallback(this)" />
+              <img src="${imgSrc}" data-contestant-id="${c.id}" data-raw-name="${c.name}" data-is-nominee="${isNom ? '1' : '0'}" alt="${c.name}" onerror="handleImageFallback(this)" />
             </div>
             ${badgeHtml}
             <div class="tarot-rank">${rankDisplay}</div>
@@ -1341,7 +1453,8 @@ function renderProfile(contestantId) {
 
   const dynamicRankLabel = state.activeTeam === 'Global' ? 'Global Arcana' : 'Circle Arcana';
   const latestSt = getStatus(state.latestRound, c.id);
-  const profileImgSrc = (latestSt === 'nominee') ? `${c.id}_shadow.png` : c.photo_url;
+  const isNom = latestSt === 'nominee';
+  const profileImgSrc = getContestantImagePath(c, isNom);
 
   root.innerHTML = `
     <div class="card-paper">
@@ -1352,8 +1465,8 @@ function renderProfile(contestantId) {
       </div>
       <div class="row two">
         <div style="display:flex; justify-content:center;">
-          <div class="profile-img-wrap ${latestSt === 'nominee' ? 'danger-zone' : ''}">
-            <img class="profile-img" src="${profileImgSrc}" data-contestant-id="${c.id}" alt="${c.name}" onerror="handleImageFallback(this)" />
+          <div class="profile-img-wrap ${isNom ? 'danger-zone' : ''}">
+            <img class="profile-img" src="${profileImgSrc}" data-contestant-id="${c.id}" data-raw-name="${c.name}" data-is-nominee="${isNom ? '1' : '0'}" alt="${c.name}" onerror="handleImageFallback(this)" />
           </div>
         </div>
         <div class="profile-content">
@@ -1648,6 +1761,7 @@ function setupNav() {
 async function boot() {
   try {
     initCelestialSparks();
+    initMobileScrollCardFlip();
     updateCircleSwitcherUI();
     setupNav();
     await hydrate();
