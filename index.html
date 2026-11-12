@@ -547,11 +547,11 @@ const PROPHECIES = [
   { num: "PROPHECY 00", title: "The Eclipse",           symbol: "☉", unlockDate: "2026-10-01T00:00:00", dateLabel: "Available Now", url: "https://www.instagram.com/reel/DfKNzl7sDlG/?utm_source=ig_web_copy_link&psln=NTc4MTIwNjQ2YQ==" },
   { num: "PROPHECY I",  title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",       url: "https://www.instagram.com/reel/DfMfxGDx4IC/?utm_source=ig_web_copy_link&obrf=NTc4MTIwNjQ2YQ==" },
   { num: "PROPHECY II", title: "The Three Survivors",   symbol: "☾", unlockDate: "2026-11-03T00:00:00", dateLabel: "Nov 3rd",       url: "https://www.instagram.com/reel/DfRuYh2sZMm/?utm_source=ig_web_copy_link&vrfl=NTc4MTIwNjQ2YQ==" },
-  { num: "PROPHECY III",title: "The Celestial Circles", symbol: "✦", unlockDate: "2026-11-05T00:00:00", dateLabel: "Nov 5th",       url: "" },
-  { num: "PROPHECY IV", title: "The Golden Scale",      symbol: "✹", unlockDate: "2026-11-07T00:00:00", dateLabel: "Nov 7th",       url: "" },
-  { num: "PROPHECY V",  title: "The Eye of Judgment",   symbol: "☾", unlockDate: "2026-11-09T00:00:00", dateLabel: "Nov 9th",       url: "" },
-  { num: "PROPHECY VI", title: "The 48th Card",         symbol: "✦", unlockDate: "2026-11-11T00:00:00", dateLabel: "Nov 11th",      url: "" },
-  { num: "PROPHECY VII",title: "We are destiny",        symbol: "☉", unlockDate: "2026-11-12T00:00:00", dateLabel: "Nov 12th",      url: "" }
+  { num: "PROPHECY III",title: "The Celestial Circles", symbol: "✦", unlockDate: "2026-11-05T00:00:00", dateLabel: "Nov 5th",       url: "https://www.instagram.com/reel/DfWtj9jxs2V/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY IV", title: "The Golden Scale",      symbol: "✹", unlockDate: "2026-11-07T00:00:00", dateLabel: "Nov 7th",       url: "https://www.instagram.com/reel/DfcIbbRM9Cy/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY V",  title: "The Eye of Judgment",   symbol: "☾", unlockDate: "2026-11-09T00:00:00", dateLabel: "Nov 9th",       url: "https://www.instagram.com/reel/DfhSDy5s2ZQ/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY VI", title: "The 48th Card",         symbol: "✦", unlockDate: "2026-11-11T00:00:00", dateLabel: "Nov 11th",      url: "https://www.instagram.com/reel/DfmdzlhxsFP/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY VII",title: "We are destiny",        symbol: "☉", unlockDate: "2026-11-12T00:00:00", dateLabel: "Nov 12th",      url: "https://www.instagram.com/reel/Dfo5_oBxxeC/?utm_source=ig_web_copy_link&exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" }
 ];
 
 const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "FINAL"];
@@ -1119,7 +1119,7 @@ function startGlobalCountdown() {
   const updateClock = () => {
     const now = new Date();
     const openDate  = new Date(2026, 10, 1, 0, 0, 0);   // Nov 1, 2026 00:00:00
-    const closeDate = new Date(2026, 10, 13, 23, 59, 59); // Nov 13, 2026 23:59:59
+    const closeDate = new Date(2026, 10, 13, 23, 59, 59); // Nov 12, 2026 23:59:59
 
     let target = closeDate;
     let phaseLabel = "✦ Auditions Close In ✦";
