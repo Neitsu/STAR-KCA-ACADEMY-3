@@ -237,7 +237,7 @@
     .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
     .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(45%); opacity: 0.75; }
 
-    .pill { display: inline-block; padding: 0.26rem 0.72rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
+    .pill { display: inline-block; padding: 0.24rem 0.62rem; border-radius: 4px; font-size: 0.68rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
     .safe { background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold); border-color: var(--tarot-gold); }
     .nominee { background: var(--tarot-danger); color: #ffffff; border-color: var(--tarot-danger); }
     .saved_judges, .saved_public { background: #141414; color: var(--tarot-gold); border-color: var(--tarot-gold-dim); }
@@ -247,11 +247,11 @@
     
     .row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
     @media (min-width: 880px) {
-      .row.two { grid-template-columns: 330px 1fr; gap: 2.5rem; align-items: start; }
-      .row.charts-split { grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: center; }
+      .row.two { grid-template-columns: 310px 1fr; gap: 2rem; align-items: start; }
+      .row.charts-split { grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: stretch; }
     }
     
-    .profile-img-wrap { width: 100%; max-width: 330px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; padding: 12px; display: flex; justify-content: center; position: relative; }
+    .profile-img-wrap { width: 100%; max-width: 310px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; padding: 12px; display: flex; justify-content: center; position: relative; }
     .profile-img-wrap::before { content:''; position: absolute; inset: 6px; border: 1px solid var(--tarot-gold); pointer-events: none; }
     .profile-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2; }
     .profile-content { min-width: 0; width: 100%; }
@@ -270,15 +270,16 @@
     
     .profile-nav { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
     .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.9rem 0.5rem; text-align: left; white-space: nowrap; letter-spacing: 1.5px; }
-    td { border-bottom: 1px dotted var(--line); padding: 0.85rem 0.5rem; text-align: left; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.75rem 0.45rem; text-align: left; white-space: nowrap; letter-spacing: 1.2px; }
+    td { border-bottom: 1px dotted var(--line); padding: 0.72rem 0.45rem; text-align: left; white-space: nowrap; }
     .table-wrap a { color: var(--tarot-gold); text-decoration: none; font-weight: 600; transition: color 0.2s; }
     .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
     .chip { display: inline-block; border: 1px solid var(--tarot-gold); border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.74rem; background: rgba(226,185,97,0.1); font-weight: 600; }
+    .bonus-pill { display: inline-block; background: rgba(226, 185, 97, 0.18); border: 1px solid var(--tarot-gold); color: #FFF5CC; font-family: 'Cinzel', serif; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-left: 5px; }
 
     /* ==========================================
-       AUDITION PORTAL & 7 PROPHECY CARDS
+       AUDITION PORTAL & 7 PROPHECY CARDS (ALIGNED)
        ========================================== */
     .audition-hero {
       text-align: center; padding: 2.8rem 1.5rem;
@@ -297,14 +298,18 @@
     .countdown-lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 6px; }
 
     .prophecies-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-      gap: 1rem; margin-top: 1.4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 0.9rem; margin-top: 1.4rem;
+    }
+    @media (min-width: 1080px) {
+      .prophecies-grid { grid-template-columns: repeat(7, 1fr); }
     }
     .prophecy-card {
       background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      padding: 1.2rem 0.8rem; text-align: center; text-decoration: none;
+      padding: 1.15rem 0.65rem; text-align: center; text-decoration: none;
       display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-      min-height: 190px; position: relative; transition: all 0.3s ease;
+      min-height: 185px; position: relative; transition: all 0.3s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.8);
     }
     .prophecy-card::before {
@@ -320,23 +325,37 @@
       border-color: #262626; background: #090909; opacity: 0.6; cursor: default;
     }
     .prophecy-card.locked::before { border-color: #1c1c1c; }
-    .prophecy-num { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 2.5px; color: var(--tarot-gold); text-transform: uppercase; }
+    .prophecy-num { font-family: 'Cinzel', serif; font-size: 0.63rem; letter-spacing: 2px; color: var(--tarot-gold); text-transform: uppercase; }
     .prophecy-card.locked .prophecy-num { color: #666; }
     .prophecy-glyph {
-      width: 44px; height: 44px; border: 1px solid var(--tarot-gold); border-radius: 50%;
+      width: 42px; height: 42px; border: 1px solid var(--tarot-gold); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.35rem; color: var(--tarot-gold); margin: 0.6rem 0;
+      font-size: 1.3rem; color: var(--tarot-gold); margin: 0.55rem 0;
       background: #141414; box-shadow: 0 0 15px rgba(226, 185, 97, 0.2);
     }
     .prophecy-card.locked .prophecy-glyph { border-color: #333; color: #555; box-shadow: none; }
-    .prophecy-title { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--text); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 0.6rem 0; line-height: 1.25; }
+    .prophecy-title { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--text); font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 0.6rem 0; line-height: 1.25; }
     .prophecy-card.locked .prophecy-title { color: #666; }
     .prophecy-status {
-      font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
       padding: 3px 9px; border-radius: 3px; background: var(--tarot-gold); color: var(--bg);
     }
     .prophecy-card.locked .prophecy-status {
       background: #151515; color: #666; border: 1px solid #2a2a2a;
+    }
+
+    /* ==========================================
+       SEALED PENTAGRAM STATE (PRE-RANK)
+       ========================================== */
+    .sealed-pentagram-box {
+      height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 1.5rem; background: radial-gradient(circle, rgba(226,185,97,0.06) 0%, transparent 70%);
+      border: 1px dashed rgba(226, 185, 97, 0.25); border-radius: 6px;
+    }
+    .sealed-pentagram-glyph {
+      width: 68px; height: 68px; border: 1.5px solid var(--tarot-gold-dim); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--tarot-gold);
+      margin-bottom: 1rem; box-shadow: 0 0 25px rgba(226, 185, 97, 0.15);
     }
 
     /* ==========================================
@@ -528,7 +547,7 @@
 
 <script>
 // ==========================================
-// 1. OFFICIAL CONFIGURATION & PROPHECY LINKS
+// 1. OFFICIAL CONFIGURATION & 7 PROPHECY LINKS (ALIGNED)
 // ==========================================
 const CONFIG = {
   SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
@@ -542,26 +561,26 @@ const CONFIG = {
   REFRESH_MS: 45000
 };
 
-// Paste the direct Instagram Reel link inside `url: ""` once each video is posted!
+// Prophecy 00 removed so all 7 Prophecies align cleanly on a single row!
 const PROPHECIES = [
-  { num: "PROPHECY 00", title: "The Eclipse",           symbol: "☉", unlockDate: "2026-10-01T00:00:00", dateLabel: "Available Now", url: "https://www.instagram.com/reel/DfKNzl7sDlG/?utm_source=ig_web_copy_link&psln=NTc4MTIwNjQ2YQ==" },
-  { num: "PROPHECY I",  title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",       url: "https://www.instagram.com/reel/DfMfxGDx4IC/?utm_source=ig_web_copy_link&obrf=NTc4MTIwNjQ2YQ==" },
-  { num: "PROPHECY II", title: "The Three Survivors",   symbol: "☾", unlockDate: "2026-11-03T00:00:00", dateLabel: "Nov 3rd",       url: "https://www.instagram.com/reel/DfRuYh2sZMm/?utm_source=ig_web_copy_link&vrfl=NTc4MTIwNjQ2YQ==" },
-  { num: "PROPHECY III",title: "The Celestial Circles", symbol: "✦", unlockDate: "2026-11-05T00:00:00", dateLabel: "Nov 5th",       url: "https://www.instagram.com/reel/DfWtj9jxs2V/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
-  { num: "PROPHECY IV", title: "The Golden Scale",      symbol: "✹", unlockDate: "2026-11-07T00:00:00", dateLabel: "Nov 7th",       url: "https://www.instagram.com/reel/DfcIbbRM9Cy/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
-  { num: "PROPHECY V",  title: "The Eye of Judgment",   symbol: "☾", unlockDate: "2026-11-09T00:00:00", dateLabel: "Nov 9th",       url: "https://www.instagram.com/reel/DfhSDy5s2ZQ/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
-  { num: "PROPHECY VI", title: "The 48th Card",         symbol: "✦", unlockDate: "2026-11-11T00:00:00", dateLabel: "Nov 11th",      url: "https://www.instagram.com/reel/DfmdzlhxsFP/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
-  { num: "PROPHECY VII",title: "We are destiny",        symbol: "☉", unlockDate: "2026-11-12T00:00:00", dateLabel: "Nov 12th",      url: "https://www.instagram.com/reel/Dfo5_oBxxeC/?utm_source=ig_web_copy_link&exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" }
+  { num: "PROPHECY I",   title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",  url: "https://www.instagram.com/reel/DfMfxGDx4IC/?utm_source=ig_web_copy_link&obrf=NTc4MTIwNjQ2YQ==" },
+  { num: "PROPHECY II",  title: "The Three Survivors",   symbol: "☾", unlockDate: "2026-11-03T00:00:00", dateLabel: "Nov 3rd",  url: "https://www.instagram.com/reel/DfRuYh2sZMm/?utm_source=ig_web_copy_link&vrfl=NTc4MTIwNjQ2YQ==" },
+  { num: "PROPHECY III", title: "The Celestial Circles", symbol: "✦", unlockDate: "2026-11-05T00:00:00", dateLabel: "Nov 5th",  url: "https://www.instagram.com/reel/DfWtj9jxs2V/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY IV",  title: "The Golden Scale",      symbol: "✹", unlockDate: "2026-11-07T00:00:00", dateLabel: "Nov 7th",  url: "https://www.instagram.com/reel/DfcIbbRM9Cy/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY V",   title: "The Eye of Judgment",   symbol: "☾", unlockDate: "2026-11-09T00:00:00", dateLabel: "Nov 9th",  url: "https://www.instagram.com/reel/DfhSDy5s2ZQ/?utm_source=ig_web_copy_link&dlrf=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY VI",  title: "The 48th Card",         symbol: "✦", unlockDate: "2026-11-11T00:00:00", dateLabel: "Nov 11th", url: "https://www.instagram.com/reel/DfmdzlhxsFP/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" },
+  { num: "PROPHECY VII", title: "We Are Destiny",        symbol: "☉", unlockDate: "2026-11-12T00:00:00", dateLabel: "Nov 12th", url: "https://www.instagram.com/reel/Dfo5_oBxxeC/?utm_source=ig_web_copy_link&exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==" }
 ];
 
 const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "FINAL"];
+// Shortened labels ("Pre-Rank" & "Finale") so table columns stay compact and close together
 const ROUND_LABELS = {
-  PRERANK: "Pre-Rank (Awakening)",
+  PRERANK: "Pre-Rank",
   ROUND_1: "Round 1",
   ROUND_2: "Round 2",
   ROUND_3: "Round 3",
   ROUND_4: "Round 4",
-  FINAL:   "Finale (Apotheosis)"
+  FINAL:   "Finale"
 };
 const STATUS_LABELS = {
   safe: "Upright Card (Safe)",
@@ -573,7 +592,7 @@ const STATUS_LABELS = {
   tbd: "Pending"
 };
 const JUDGE_NAMES = ["Neitsu", "Hauras", "Kaina", "Aya"];
-const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
+const EXCLUDED_NAMES = new Set(['official_rank', 'overall_rank', 'score', 'bonus', 'neitsu', 'hauras', 'kaina', 'aya', 'statut', 'performance_1', 'link_to_the_performance_1', 'performance_2', 'link_to_the_performance_2', 'contestants', 'contestant', 'username', 'country', 'pronouns', 'instagram', 'team', 'cercle']);
 
 const ROUND_RULES = {
   PRERANK: { total: 48, safe: 48, shadow: 0, oracleSave: 0, publicSave: 0, elim: 0 },
@@ -595,6 +614,7 @@ const state = {
   latestRound: "PRERANK",
   selectedRankingsRound: null,
   rankingView: "default",
+  webFocusContestant: "all",
   votesRound: "ROUND_1",
   votesTimer: null,
   activeTeam: "Global"
@@ -652,7 +672,6 @@ function initCelestialSparks() {
 // 3. NAVIGATION, MOBILE AUTO-FLIP & 1-TAP ENTRY
 // ==========================================
 function initMobileScrollCardFlip() {
-  // On touch screens, automatically flip cards as they scroll into view
   const isTouch = window.matchMedia('(hover: none)').matches;
   if (!isTouch || !('IntersectionObserver' in window)) return;
 
@@ -675,8 +694,6 @@ function handleCardTap(cardEl, teamFilter) {
   clearTimeout(cardEnterTimeout);
   const isTouch = window.matchMedia('(hover: none)').matches;
 
-  // If the user taps a card on mobile that hasn't flipped yet:
-  // Flip it immediately AND open the Academy right after the 3D flip (no second tap needed!)
   if (isTouch && !cardEl.classList.contains('flipped')) {
     document.querySelectorAll('#landing-menu .card-container').forEach(c => c.classList.remove('flipped'));
     cardEl.classList.add('flipped');
@@ -698,6 +715,7 @@ function updateCircleSwitcherUI() {
 function switchTeam(teamFilter) {
   state.activeTeam = teamFilter;
   state.rankingView = 'default';
+  state.webFocusContestant = 'all';
   updateCircleSwitcherUI();
   renderAll();
 }
@@ -705,6 +723,7 @@ function switchTeam(teamFilter) {
 function entrerAcademie(teamFilter) {
   state.activeTeam = teamFilter;
   state.rankingView = 'default';
+  state.webFocusContestant = 'all';
   updateCircleSwitcherUI();
   const menu = document.getElementById('landing-menu');
   const dashboard = document.getElementById('app-dashboard');
@@ -754,7 +773,6 @@ function handleImageFallback(img) {
   const isNominee = img.dataset.isNominee === '1';
   const leaderId = String(img.dataset.leader || '').trim();
 
-  // Fallback for the 4 landing menu leader cards if moved into candidat/
   if (leaderId) {
     if (step === 0) {
       img.dataset.fallbackStep = '1';
@@ -763,7 +781,6 @@ function handleImageFallback(img) {
     }
   }
 
-  // Smart multi-step fallback for Contestant & Nomination folders (handles lowercase & exact case)
   if (contestantId) {
     const candidatesToTry = isNominee
       ? [
@@ -798,7 +815,7 @@ function handleImageFallback(img) {
 }
 
 // ==========================================
-// 5. GOOGLE SHEETS PARSER & SCORING ENGINE
+// 5. GOOGLE SHEETS PARSER & SCORING ENGINE (PRE-RANK /40 + ROUND 1 BONUS)
 // ==========================================
 function getRoundLabel(id) { return ROUND_LABELS[id] || id; }
 function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
@@ -880,7 +897,8 @@ function pickValue(row, aliases) {
 }
 function parseNum(val) {
   if (val === '' || val === null || val === undefined) return NaN;
-  const num = Number(String(val).replace(/\s/g, '').replace(',', '.'));
+  const cleaned = String(val).replace(/\/40|\/100|\/10|pts|pt/gi, '').replace(/\s/g, '').replace(',', '.');
+  const num = Number(cleaned);
   return isNaN(num) ? NaN : num;
 }
 
@@ -907,11 +925,41 @@ function getPerformanceScoreByRound() {
   const out = Object.fromEntries(ROUND_ORDER.map(r => [r, {}]));
   ROUND_ORDER.forEach(round => {
     state.data.contestants.forEach(c => {
+      const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
+
+      // SPECIAL RULE FOR PRE-RANK: Each of the 4 judges scores out of 10 (/10) -> Total out of 40 (/40)
+      if (round === 'PRERANK') {
+        let sumJudges10 = 0;
+        let hasJudge10 = false;
+        JUDGE_NAMES.forEach(jn => {
+          const jRec = state.data.judge_rankings.find(r => r.round_id === 'PRERANK' && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
+          if (jRec && Number.isFinite(jRec.rank)) {
+            sumJudges10 += jRec.rank;
+            hasJudge10 = true;
+          }
+        });
+        if (rawScoreRec && Number.isFinite(rawScoreRec.total) && rawScoreRec.total > 0) {
+          out[round][c.id] = rawScoreRec.total;
+        } else if (hasJudge10) {
+          out[round][c.id] = Math.round(sumJudges10 * 10) / 10;
+        }
+        return;
+      }
+
+      // ROUNDS 1 TO FINALE: Vocal Score (/100) + Theme Song Bonus (up to +15 pts in R1) + 4 Judges Rank Points
       const activeCount = getActiveCountForRound(round, c.teamClass);
       const pointsBase = activeCount + 1;
-      let totalPoints = 0; let hasData = false;
-      const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
-      if (rawScoreRec && Number.isFinite(rawScoreRec.total)) { totalPoints += rawScoreRec.total; hasData = true; }
+      let totalPoints = 0;
+      let hasData = false;
+
+      if (rawScoreRec && Number.isFinite(rawScoreRec.total)) {
+        totalPoints += rawScoreRec.total;
+        hasData = true;
+      }
+      if (rawScoreRec && Number.isFinite(rawScoreRec.bonus) && rawScoreRec.bonus > 0) {
+        totalPoints += rawScoreRec.bonus;
+        hasData = true;
+      }
       JUDGE_NAMES.forEach(jn => {
         const jRankRec = state.data.judge_rankings.find(r => r.round_id === round && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
         if (jRankRec && Number.isFinite(jRankRec.rank) && jRankRec.rank >= 1) {
@@ -919,7 +967,7 @@ function getPerformanceScoreByRound() {
           hasData = true;
         }
       });
-      if (hasData) out[round][c.id] = totalPoints;
+      if (hasData) out[round][c.id] = Math.round(totalPoints * 10) / 10;
     });
   });
   return out;
@@ -934,7 +982,7 @@ function getOfficialRankingByRound(isGlobal = false) {
   const perfScoresByRound = getPerformanceScoreByRound();
   ROUND_ORDER.forEach(round => {
     const perfScores = perfScoresByRound[round];
-    const forceGlobal = isGlobal || round === 'PRERANK' || round === 'FINAL';
+    const forceGlobal = isGlobal || round === 'FINAL';
     const groups = forceGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
     groups.forEach(group => {
       const groupIds = state.data.contestants.filter(c => (forceGlobal || c.teamClass === group)).map(c => c.id);
@@ -979,18 +1027,19 @@ async function loadDataFromRoundTabs() {
       const group_song = String(pickValue(row, ['performance2', 'performance 2']) || '').trim();
       const link = String(pickValue(row, ['link', 'performance_link', 'youtube_url', 'url', 'linktotheperformance', 'linktotheperformance1']) || '').trim();
       const link2 = String(pickValue(row, ['link2', 'linktotheperformance2']) || '').trim();
-      const officialRank = parseNum(pickValue(row, ['official_rank', 'rank', 'official ranking', 'classement']));
+      const officialRank = parseNum(pickValue(row, ['official_rank', 'rank', 'official ranking', 'classement', 'circle_rank', 'circle rank']));
       const overallRank = parseNum(pickValue(row, ['overall_rank', 'overall rank', 'global rank', 'classement global', 'overall']));
-      const perfScore = parseNum(pickValue(row, ['performance_score', 'score', 'creator_score', 'total', 'note']));
+      const perfScore = parseNum(pickValue(row, ['performance_score', 'score', 'creator_score', 'total', 'note', 'vocal', 'vocal_100', 'audition', 'total_40', 'prerank_score', 'points']));
+      const bonusScore = parseNum(pickValue(row, ['bonus', 'bonus_pts', 'bonus pts', 'theme_song', 'themesong', 'theme song', 'we_are_destiny', 'bonus_15']));
       
       const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
       let statusValue = statusValueRaw;
-      if (statusValueRaw.includes('public') || statusValueRaw.includes('balance')) statusValue = 'saved_public';
+      if (statusValueRaw.includes('public') || statusValueRaw.includes('balance') || statusValueRaw.includes('scale')) statusValue = 'saved_public';
       else if (statusValueRaw.includes('judge') || statusValueRaw.includes('jury') || statusValueRaw.includes('oracle')) statusValue = 'saved_judges';
-      else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw.includes('elu')) statusValue = 'winner';
+      else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw.includes('elu') || statusValueRaw.includes('chosen')) statusValue = 'winner';
       else if (statusValueRaw.includes('elim') || statusValueRaw.includes('élim') || statusValueRaw.includes('consum')) statusValue = 'eliminated';
       else if (statusValueRaw.includes('nominee') || statusValueRaw.includes('rouge') || statusValueRaw.includes('ombre') || statusValueRaw.includes('shadow')) statusValue = 'nominee';
-      else if (statusValueRaw.includes('safe') || statusValueRaw.includes('droite') || statusValueRaw.includes('or')) statusValue = 'safe';
+      else if (statusValueRaw.includes('safe') || statusValueRaw.includes('droite') || statusValueRaw.includes('or') || statusValueRaw.includes('upright')) statusValue = 'safe';
 
       if (!contestantsMap.has(id)) {
         contestantsMap.set(id, {
@@ -1012,12 +1061,19 @@ async function loadDataFromRoundTabs() {
       }
       if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
       if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
-      if (Number.isFinite(perfScore)) scores.push({ round_id, contestant_id: id, total: perfScore });
+      if (Number.isFinite(perfScore) || Number.isFinite(bonusScore)) {
+        scores.push({
+          round_id,
+          contestant_id: id,
+          total: Number.isFinite(perfScore) ? perfScore : NaN,
+          bonus: Number.isFinite(bonusScore) ? bonusScore : 0
+        });
+      }
       if (performance || link) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
       if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
 
       JUDGE_NAMES.forEach(jn => {
-        const val = parseNum(pickValue(row, [jn, `${jn}_rank`, `${jn} rank`]));
+        const val = parseNum(pickValue(row, [jn, `${jn}_rank`, `${jn} rank`, `${jn}_score`, `${jn} score`, `${jn}_10`]));
         if (Number.isFinite(val)) judge_rankings.push({ round_id, judge_name: jn, contestant_id: id, rank: val });
       });
     });
@@ -1053,8 +1109,9 @@ async function hydrate() {
   state.data.contestants = state.data.contestants.filter(c => c.id && !EXCLUDED_NAMES.has(c.id));
   state.latestRound = getLatestRound();
   state.selectedRankingsRound = state.latestRound;
-  const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
-  state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound;
+  const roundsWithVotes = ROUND_ORDER.filter(r => r !== 'PRERANK' && state.data.votes_live.some(v => v.round_id === r));
+  const fallbackVoteRound = state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound;
+  state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || fallbackVoteRound;
 }
 
 function getJudgeRankingByRound(judgeName) {
@@ -1082,7 +1139,7 @@ function getRankingMapByView(view) {
 function getLatestRound() {
   for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
     const round = ROUND_ORDER[i];
-    if (state.data.scores.some(r => r.round_id === round && Number.isFinite(r.total)) ||
+    if (state.data.scores.some(r => r.round_id === round && (Number.isFinite(r.total) || r.bonus > 0)) ||
         state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
         state.data.round_status.some(r => r.round_id === round && r.status !== '' && r.status !== 'eliminated')) {
       return round;
@@ -1118,8 +1175,8 @@ function startGlobalCountdown() {
   clearInterval(countdownInterval);
   const updateClock = () => {
     const now = new Date();
-    const openDate  = new Date(2026, 10, 1, 0, 0, 0);   // Nov 1, 2026 00:00:00
-    const closeDate = new Date(2026, 10, 12, 23, 59, 59); // Nov 12, 2026 23:59:59
+    const openDate  = new Date(2026, 10, 1, 0, 0, 0);
+    const closeDate = new Date(2026, 10, 12, 23, 59, 59);
 
     let target = closeDate;
     let phaseLabel = "✦ Auditions Close In ✦";
@@ -1166,7 +1223,7 @@ function buildPropheciesHTML() {
   return `
     <div style="margin-top: 2.6rem; text-align: left;">
       <h3>The Seven Prophecies</h3>
-      <p class="small" style="margin-top:0;">A new card is unsealed every two days on Instagram.</p>
+      <p class="small" style="margin-top:0;">All seven prophecies of the KÆOS awakening on Instagram.</p>
       <div class="prophecies-grid">${cards}</div>
     </div>
   `;
@@ -1297,6 +1354,7 @@ function renderRankings() {
   const rankingMap = getRankingMapByView(state.rankingView);
   const isPerformance = state.rankingView === 'performance_score';
   const activeRound = state.selectedRankingsRound || state.latestRound;
+  const isGlobal = state.activeTeam === 'Global';
 
   const list = sortedContestants().sort((a, b) => {
     const aElim = getStatus(activeRound, a.id) === 'eliminated' ? 1 : 0;
@@ -1319,6 +1377,8 @@ function renderRankings() {
   let optionsHtml = viewOptions.map(o => `<option value="${o.value}" ${o.value === state.rankingView ? 'selected' : ''}>${o.label}</option>`).join('');
   let roundsHtml = ROUND_ORDER.map(r => `<option value="${r}" ${r === activeRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
   let thRoundsHtml = ROUND_ORDER.map(r => `<th>${getRoundLabel(r)}</th>`).join('');
+  let focusCandidateOptions = `<option value="all">✦ Show all initiates (${list.length})</option>` +
+    list.map(c => `<option value="${c.id}" ${state.webFocusContestant === c.id ? 'selected' : ''}>Focus: ${getContestantName(c.id)}</option>`).join('');
 
   let rowsHtml = list.map((c, idx) => {
     let cellsHtml = ROUND_ORDER.map(r => {
@@ -1326,7 +1386,8 @@ function renderRankings() {
       const elimIndex = getFirstEliminatedRoundIndex(c.id);
       const isDeadInTable = elimIndex !== -1 && elimIndex < ROUND_ORDER.indexOf(r);
       if (Number.isFinite(v)) {
-        const displayV = (isPerformance && v % 1 !== 0) ? v.toFixed(1) : v;
+        let displayV = (isPerformance && v % 1 !== 0) ? v.toFixed(1) : v;
+        if (isPerformance && r === 'PRERANK') displayV = `${displayV} / 40`;
         if (!isPerformance && isDeadInTable) return `<td><span style="color:var(--tarot-ash); font-weight:600;">${displayV}</span> <span class="pill eliminated-pill" style="font-size:0.55rem; padding:0.15rem 0.4rem; margin-left:6px;">Consumed</span></td>`;
         return `<td>${displayV}</td>`;
       }
@@ -1338,6 +1399,10 @@ function renderRankings() {
     return `<tr><td>${idx + 1}</td><td><a href="#profile/${c.id}">${getContestantName(c.id)}</a></td>${cellsHtml}</tr>`;
   }).join('');
 
+  // Dynamic vertical height for Web of Destiny: 640px for 16-member Circle, 960px for 48-member Global!
+  const chartHeightPx = isGlobal ? 960 : 640;
+  const maxRankScale = isGlobal ? 48 : 16;
+
   root.innerHTML = `
     <div class="card-paper">
       <h2>Alignment</h2>
@@ -1347,8 +1412,8 @@ function renderRankings() {
       </div>
       <p class="small" style="color:var(--tarot-gold)">Aura evolution across the cycles.</p>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>${isPerformance ? 'Pos' : 'Arcana'}</th><th>Initiate</th>${thRoundsHtml}</tr></thead>
+        <table style="max-width: 980px;">
+          <thead><tr><th style="width:70px;">${isPerformance ? 'Pos' : 'Arcana'}</th><th style="width:170px;">Initiate</th>${thRoundsHtml}</tr></thead>
           <tbody>${rowsHtml}</tbody>
         </table>
       </div>
@@ -1359,19 +1424,29 @@ function renderRankings() {
       <p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">Consumed Cards :</span> ${nominations.eliminated.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
     </div>
     <div class="card-paper">
-      <h3>Web of Destiny</h3>
-      <div class="table-wrap"><div style="min-width: 600px; height: 360px;"><canvas id="rankingChart"></canvas></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:1rem;">
+        <div>
+          <h3 style="border:none; padding:0; margin:0;">Web of Destiny</h3>
+          <p class="small" style="margin:4px 0 0 0;">Click a name below the chart or use the selector to highlight a single initiate's trajectory.</p>
+        </div>
+        <select id="webFocusSelect">${focusCandidateOptions}</select>
+      </div>
+      <div class="table-wrap"><div style="min-width: 650px; height: ${chartHeightPx}px;"><canvas id="rankingChart"></canvas></div></div>
     </div>
   `;
 
   document.getElementById('rankingViewSelect').addEventListener('change', (e) => { state.rankingView = e.target.value; renderRankings(); });
   document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => { state.selectedRankingsRound = e.target.value; renderRankings(); });
+  document.getElementById('webFocusSelect').addEventListener('change', (e) => { state.webFocusContestant = e.target.value; renderRankings(); });
 
   try {
     if (rankingChartInstance) rankingChartInstance.destroy();
     const ctx = document.getElementById('rankingChart');
     if (!ctx || typeof Chart === 'undefined') return;
     Chart.defaults.color = '#888888'; Chart.defaults.borderColor = '#2E2E2E';
+
+    const hasFocus = state.webFocusContestant && state.webFocusContestant !== 'all';
+
     rankingChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
@@ -1379,26 +1454,53 @@ function renderRankings() {
         datasets: list.map((c, idx) => {
           const elimIndex = getFirstEliminatedRoundIndex(c.id);
           const isEliminated = getStatus(activeRound, c.id) === 'eliminated';
+          const isFocused = !hasFocus || state.webFocusContestant === c.id;
           const baseColor = colorForIndex(idx);
-          const color = isEliminated ? baseColor.replace('hsl', 'hsla').replace(')', ', 0.25)') : baseColor;
+          const dimAlpha = hasFocus && !isFocused ? 0.12 : (isEliminated ? 0.25 : 1);
+          const color = dimAlpha < 1 ? baseColor.replace('hsl', 'hsla').replace(')', `, ${dimAlpha})`) : baseColor;
           return {
+            contestantId: c.id,
             label: getContestantName(c.id),
             data: ROUND_ORDER.map((r, rIdx) => {
               if (elimIndex !== -1 && rIdx > elimIndex) return null;
               const v = rankingMap[r]?.[c.id];
               return Number.isFinite(v) ? v : null;
             }),
-            borderColor: color, backgroundColor: color, borderWidth: isEliminated ? 1 : 3,
-            borderDash: isEliminated ? [5, 5] : [], pointRadius: isEliminated ? 0 : 4, tension: 0.25, spanGaps: true
+            borderColor: color,
+            backgroundColor: color,
+            borderWidth: (hasFocus && isFocused) ? 4.5 : (isEliminated || !isFocused ? 1.2 : 3),
+            borderDash: isEliminated ? [5, 5] : [],
+            pointRadius: (hasFocus && isFocused) ? 6 : (!isFocused || isEliminated ? 2 : 4.5),
+            tension: 0.25,
+            spanGaps: true
           };
         })
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: true, position: 'bottom', labels: { color: '#F0EDE5', boxWidth: 10, usePointStyle: true } } },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { color: '#F0EDE5', boxWidth: 12, padding: 14, usePointStyle: true },
+            onClick: (e, legendItem, legend) => {
+              const clickedDataset = legend.chart.data.datasets[legendItem.datasetIndex];
+              if (clickedDataset && clickedDataset.contestantId) {
+                state.webFocusContestant = (state.webFocusContestant === clickedDataset.contestantId) ? 'all' : clickedDataset.contestantId;
+                renderRankings();
+              }
+            }
+          }
+        },
         scales: {
-          x: { ticks: { color: '#888' } },
-          y: { reverse: !isPerformance, min: isPerformance ? undefined : 1, max: isPerformance ? undefined : Math.max(16, list.length), ticks: { color: '#888', stepSize: isPerformance ? undefined : 1 } }
+          x: { ticks: { color: '#E2B961', font: { family: 'Cinzel', weight: '700' } } },
+          y: {
+            reverse: !isPerformance,
+            min: isPerformance ? undefined : 1,
+            max: isPerformance ? undefined : maxRankScale,
+            ticks: { color: '#AAA', stepSize: isPerformance ? undefined : 1, autoSkip: false }
+          }
         }
       }
     });
@@ -1410,7 +1512,8 @@ function renderProfile(contestantId) {
   const root = document.getElementById('profile');
   if (!c) { root.innerHTML = `<div class="card-paper"><p>Card lost in limbo.</p></div>`; return; }
 
-  const official = getOfficialRankingByRound(state.activeTeam === 'Global');
+  const isGlobalView = state.activeTeam === 'Global';
+  const official = getOfficialRankingByRound(isGlobalView);
   const judgesByName = Object.fromEntries(JUDGE_NAMES.map(j => [j, getJudgeRankingByRound(j)]));
   const perfScore = getPerformanceScoreByRound();
   const profileOrder = sortedContestants();
@@ -1435,9 +1538,26 @@ function renderProfile(contestantId) {
     const elimRound = getFirstEliminatedRoundIndex(c.id);
     if (!st && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(r)) st = 'eliminated';
     const pScore = perfScore[r]?.[c.id];
-    const rawVocal = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id)?.total;
+    const scoreRec = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id);
+    const rawVocal = scoreRec?.total;
+    const rawBonus = scoreRec?.bonus || 0;
+
+    if (r === 'PRERANK') {
+      // PRE-RANK ROW: Each Judge is out of 10 (/10) and Total Power is out of 40 (/40)
+      const jCellsPre = JUDGE_NAMES.map(j => {
+        const jVal = judgesByName[j]?.['PRERANK']?.[c.id];
+        return `<td>${Number.isFinite(jVal) ? `${jVal}<span style="color:var(--muted);font-size:0.75em;">/10</span>` : '—'}</td>`;
+      }).join('');
+      const preTotStr = Number.isFinite(pScore) ? `${pScore % 1 === 0 ? pScore : pScore.toFixed(1)} <span style="font-size:0.78em;color:var(--muted);">/ 40</span>` : '—';
+      const preSt = st || (Number.isFinite(official['PRERANK']?.[c.id]) ? 'safe' : '');
+      return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${official[r]?.[c.id] ?? '—'}</td>${jCellsPre}<td><span style="color:var(--muted);font-size:0.8em;">Audition (/40)</span></td><td><strong style="color:var(--tarot-gold)">${preTotStr}</strong></td><td><span class="pill ${statusClass(preSt)}">${statusLabel(preSt)}</span></td></tr>`;
+    }
+
     let pScoreStr = Number.isFinite(pScore) ? (pScore % 1 === 0 ? pScore.toString() : pScore.toFixed(1)) : '—';
     let vocalStr = Number.isFinite(rawVocal) ? `${rawVocal}/100` : '—';
+    if (rawBonus > 0) {
+      vocalStr += ` <span class="bonus-pill" title="Theme Song Bonus (Max +15 pts)">+${rawBonus} Bonus</span>`;
+    }
     const jCellsHtml = JUDGE_NAMES.map(j => `<td>${judgesByName[j]?.[r]?.[c.id] ?? '—'}</td>`).join('');
     return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${official[r]?.[c.id] ?? '—'}</td>${jCellsHtml}<td>${vocalStr}</td><td><strong style="color:var(--tarot-gold)">${pScoreStr}</strong></td><td><span class="pill ${statusClass(st)}">${statusLabel(st)}</span></td></tr>`;
   }).join('');
@@ -1452,10 +1572,32 @@ function renderProfile(contestantId) {
       </td>
     </tr>`).join('') : `<tr><td colspan="3">No visions recorded.</td></tr>`;
 
-  const dynamicRankLabel = state.activeTeam === 'Global' ? 'Global Arcana' : 'Circle Arcana';
+  const dynamicRankLabel = isGlobalView ? 'Global Arcana (/48)' : 'Circle Arcana (/16)';
   const latestSt = getStatus(state.latestRound, c.id);
   const isNom = latestSt === 'nominee';
   const profileImgSrc = getContestantImagePath(c, isNom);
+
+  // Check if Round 1+ data exists for the Pentagram (never invent fake 75/100 or 50% in Pre-Rank!)
+  const r = state.latestRound;
+  const activeVocalRec = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id);
+  const hasRealPentagramData = (r !== 'PRERANK') && (
+    (activeVocalRec && Number.isFinite(activeVocalRec.total)) ||
+    JUDGE_NAMES.some(jn => Number.isFinite(judgesByName[jn]?.[r]?.[c.id]))
+  );
+
+  const pentagramContentHtml = hasRealPentagramData
+    ? `<div style="height: 300px; display:flex; justify-content:center; align-items:center;"><canvas id="radarChart"></canvas></div>`
+    : `<div class="sealed-pentagram-box">
+         <div class="sealed-pentagram-glyph">✦</div>
+         <h4 style="margin:0 0 6px 0; font-size:0.95rem;">Pentagram Sealed during Pre-Rank</h4>
+         <p class="small" style="max-width:340px; margin:0; line-height:1.55;">
+           Pre-Rank auditions were evaluated on a <strong>/40 scale</strong> (10 pts per Oracle). The 5-Point Aura Pentagram (Vocal /100 + 4 Oracles) awakens in <strong>Round 1</strong>.
+         </p>
+       </div>`;
+
+  // Aura Fluctuation scale: /16 inside Sun, Moon, Star circles, /48 in Global!
+  const fluctuationMaxRank = isGlobalView ? 48 : 16;
+  const fluctuationScopeLabel = isGlobalView ? "Global (/48)" : "Circle (/16)";
 
   root.innerHTML = `
     <div class="card-paper">
@@ -1474,14 +1616,15 @@ function renderProfile(contestantId) {
           <h2 style="font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.35rem;">${getContestantName(c.id)}</h2>
           ${circleBadgeHtml}
           ${meta ? `<p class="small" style="font-size:0.95rem; color:var(--tarot-gold); margin-top:0.2rem;">${meta}</p>` : ''}
-          <h3 style="margin-top:1.8rem;">Book of Cycles</h3>
+          <h3 style="margin-top:1.5rem;">Book of Cycles</h3>
+          <p class="small" style="margin-top:0; margin-bottom:0.8rem;">Pre-Rank: 4 Oracles (/10 each = /40) · Round 1: Vocal (/100) + Theme Song Bonus (max +15 pts) + 4 Oracles Ranking</p>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Cycle</th><th>${dynamicRankLabel}</th>${JUDGE_NAMES.map(j => `<th>${j}</th>`).join('')}<th>Vocal (/100)</th><th>Total Power</th><th>Destiny</th></tr></thead>
+              <thead><tr><th>Cycle</th><th>${dynamicRankLabel}</th>${JUDGE_NAMES.map(j => `<th>${j}</th>`).join('')}<th>Vocal &amp; Bonus</th><th>Total Power</th><th>Destiny</th></tr></thead>
               <tbody>${roundsRowsHtml}</tbody>
             </table>
           </div>
-          <h3 style="margin-top:2rem;">Rituals (Performances)</h3>
+          <h3 style="margin-top:1.8rem;">Rituals (Performances)</h3>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Cycle</th><th>Work</th><th>Visions</th></tr></thead>
@@ -1493,31 +1636,36 @@ function renderProfile(contestantId) {
     </div>
     <div class="row charts-split">
       <div class="card-paper" style="margin-bottom:0;">
-        <h3>Aura Pentagram (${getRoundLabel(state.latestRound)})</h3>
-        <div style="height: 300px; display:flex; justify-content:center; align-items:center;"><canvas id="radarChart"></canvas></div>
+        <h3>Aura Pentagram (${getRoundLabel(r)})</h3>
+        ${pentagramContentHtml}
       </div>
       <div class="card-paper" style="margin-bottom:0;">
-        <h3>Aura Fluctuation</h3>
+        <h3>Aura Fluctuation — ${fluctuationScopeLabel}</h3>
         <div style="height: 300px;"><canvas id="profileChart"></canvas></div>
       </div>
     </div>
   `;
 
-  const r = state.latestRound;
   const maxActive = getActiveCountForRound(r, c.teamClass);
-  const rankToPct = (rk) => Number.isFinite(rk) && rk >= 1 ? Math.round(Math.max(15, ((maxActive - rk + 1) / maxActive) * 100)) : 50;
+  const rankToPct = (rk) => Number.isFinite(rk) && rk >= 1 ? Math.round(Math.max(15, ((maxActive - rk + 1) / maxActive) * 100)) : 0;
 
   try {
     if (radarChartInstance) radarChartInstance.destroy();
     const ctxRadar = document.getElementById('radarChart');
-    if (ctxRadar && typeof Chart !== 'undefined') {
+    if (hasRealPentagramData && ctxRadar && typeof Chart !== 'undefined') {
       radarChartInstance = new Chart(ctxRadar, {
         type: 'radar',
         data: {
           labels: ['✹ Sun (Neitsu)', '☾ Moon (Kaina)', '✦ Star (Aya)', 'Hauras', 'Vocal (/100)'],
           datasets: [{
             label: getContestantName(c.id),
-            data: [rankToPct(judgesByName['Neitsu']?.[r]?.[c.id]), rankToPct(judgesByName['Kaina']?.[r]?.[c.id]), rankToPct(judgesByName['Aya']?.[r]?.[c.id]), rankToPct(judgesByName['Hauras']?.[r]?.[c.id]), state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id)?.total || 75],
+            data: [
+              rankToPct(judgesByName['Neitsu']?.[r]?.[c.id]),
+              rankToPct(judgesByName['Kaina']?.[r]?.[c.id]),
+              rankToPct(judgesByName['Aya']?.[r]?.[c.id]),
+              rankToPct(judgesByName['Hauras']?.[r]?.[c.id]),
+              activeVocalRec?.total || 0
+            ],
             backgroundColor: 'rgba(226, 185, 97, 0.2)', borderColor: '#E2B961', pointBackgroundColor: '#E2B961', borderWidth: 2
           }]
         },
@@ -1527,6 +1675,7 @@ function renderProfile(contestantId) {
         }
       });
     }
+
     if (profileChartInstance) profileChartInstance.destroy();
     const ctx2 = document.getElementById('profileChart');
     const elimIndex = getFirstEliminatedRoundIndex(c.id);
@@ -1536,14 +1685,24 @@ function renderProfile(contestantId) {
         data: {
           labels: ROUND_ORDER.map(rd => getRoundLabel(rd)),
           datasets: [{
-            label: getContestantName(c.id),
+            label: `${getContestantName(c.id)} — ${fluctuationScopeLabel}`,
             data: ROUND_ORDER.map((rd, rIdx) => (elimIndex !== -1 && rIdx > elimIndex) ? null : (Number.isFinite(official[rd]?.[c.id]) ? official[rd][c.id] : null)),
-            borderColor: '#E2B961', backgroundColor: 'rgba(226, 185, 97, 0.12)', borderWidth: 3, tension: 0.25, spanGaps: true
+            borderColor: '#E2B961', backgroundColor: 'rgba(226, 185, 97, 0.14)', borderWidth: 3, pointRadius: 5, tension: 0.25, spanGaps: true
           }]
         },
         options: {
-          responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#F0EDE5' } } },
-          scales: { x: { ticks: { color: '#888' } }, y: { reverse: true, min: 1, max: Math.max(16, state.data.contestants.length), ticks: { color: '#888', stepSize: 1 } } }
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#F0EDE5' } } },
+          scales: {
+            x: { ticks: { color: '#888' } },
+            y: {
+              reverse: true,
+              min: 1,
+              max: fluctuationMaxRank,
+              ticks: { color: '#AAA', stepSize: isGlobalView ? 4 : 1 }
+            }
+          }
         }
       });
     }
@@ -1553,20 +1712,57 @@ function renderProfile(contestantId) {
 function renderVotes() {
   const root = document.getElementById('votes');
   if (state.data.contestants.length === 0) { renderAuditionPortal(root); return; }
-  const roundsWithVotes = ROUND_ORDER.filter(r => state.data.votes_live.some(v => v.round_id === r));
-  const selected = canonicalRoundId(state.votesRound);
-  state.votesRound = ROUND_ORDER.includes(selected) ? selected : (roundsWithVotes[roundsWithVotes.length - 1] || state.latestRound);
 
-  const rule = ROUND_RULES[state.votesRound] || ROUND_RULES.ROUND_1;
+  const validVoteRounds = ROUND_ORDER.filter(r => r !== 'PRERANK');
+  const roundsWithVotes = validVoteRounds.filter(r => state.data.votes_live.some(v => v.round_id === r));
+  let selected = canonicalRoundId(state.votesRound);
+  if (!validVoteRounds.includes(selected)) {
+    selected = roundsWithVotes[roundsWithVotes.length - 1] || (state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound);
+  }
+  state.votesRound = selected;
+
+  const isGlobal = state.activeTeam === 'Global';
+  const baseRule = ROUND_RULES[state.votesRound] || ROUND_RULES.ROUND_1;
+  // In Global view (for Rounds 1-4), multiply the per-circle quotas by 3 (e.g., 24 in Shadow Zone, 9 Oracle, 6 Public, 9 Consumed in Round 1!)
+  const multiplier = (isGlobal && state.votesRound !== 'FINAL') ? 3 : 1;
+  const displayQuotas = {
+    shadow: baseRule.shadow * multiplier,
+    oracleSave: baseRule.oracleSave * multiplier,
+    publicSave: baseRule.publicSave * multiplier,
+    elim: baseRule.elim * multiplier
+  };
+
+  let circleScopeTitle = "Global (All 3 Circles)";
+  if (state.activeTeam === 'Soleil') circleScopeTitle = "✹ Circle of the Sun";
+  else if (state.activeTeam === 'Lune') circleScopeTitle = "☾ Circle of the Moon";
+  else if (state.activeTeam === 'Etoile') circleScopeTitle = "✦ Circle of the Star";
+
   const nominees = state.data.round_status.filter(r => r.round_id === state.votesRound && r.status === 'nominee').map(r => r.contestant_id);
   const votedCandidates = state.data.votes_live.filter(v => v.round_id === state.votesRound).map(v => v.contestant_id);
   const activeTeamIds = sortedContestants().map(c => c.id);
   const targets = [...new Set([...nominees, ...votedCandidates])].filter(id => activeTeamIds.includes(id));
 
   const rows = targets.map(id => {
+    const cObj = state.data.contestants.find(x => x.id === id);
     const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
-    return { id, name: getContestantName(id), votes: Number(record?.votes_count || 0) };
+    let teamBadge = "";
+    if (isGlobal && cObj) {
+      if (cObj.teamClass === 'theme-sun') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">✹ Sun</span>`;
+      else if (cObj.teamClass === 'theme-moon') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">☾ Moon</span>`;
+      else if (cObj.teamClass === 'theme-star') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">✦ Star</span>`;
+    }
+    return { id, name: getContestantName(id), teamClass: cObj?.teamClass || '', teamBadge, votes: Number(record?.votes_count || 0) };
   }).sort((a, b) => b.votes - a.votes);
+
+  // Determine who is in the Public Save zone (top `baseRule.publicSave` per Circle when in Global, or top `baseRule.publicSave` in active Circle)
+  const savedByScaleIds = new Set();
+  if (isGlobal && state.votesRound !== 'FINAL') {
+    ['theme-sun', 'theme-moon', 'theme-star'].forEach(tc => {
+      rows.filter(r => r.teamClass === tc).slice(0, baseRule.publicSave).forEach(r => savedByScaleIds.add(r.id));
+    });
+  } else {
+    rows.slice(0, displayQuotas.publicSave).forEach(r => savedByScaleIds.add(r.id));
+  }
 
   const totalVotes = rows.reduce((sum, r) => sum + r.votes, 0);
   const maxVotes = rows.length > 0 ? rows[0].votes : 0;
@@ -1574,19 +1770,20 @@ function renderVotes() {
   let votesListHtml = rows.length ? rows.map((r, idx) => {
     const pct = totalVotes > 0 ? (r.votes / totalVotes) * 100 : 0;
     const barPct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
-    const inPublicSaveZone = idx < rule.publicSave;
+    const inPublicSaveZone = savedByScaleIds.has(r.id);
     return `
       <div class="vote-row" style="${inPublicSaveZone ? 'border-color:var(--tarot-gold);' : ''}">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
           <div>
             <strong style="font-family:'Cinzel', serif; font-size:1.15rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
+            ${r.teamBadge}
             ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.6rem;">Scale's Grace</span>` : ''}
           </div>
           <div style="font-weight:600;">${r.votes} votes (${pct.toFixed(1)}%)</div>
         </div>
         <div class="bar"><span style="width:${barPct}%"></span></div>
       </div>`;
-  }).join('') : `<p class="small" style="text-align:center; margin:1.5rem 0;">Silence reigns on the Scale this cycle.</p>`;
+  }).join('') : `<p class="small" style="text-align:center; margin:1.5rem 0;">Silence reigns on the Scale for ${circleScopeTitle} during ${getRoundLabel(state.votesRound)}.</p>`;
 
   const scaleHtml = `
     <div class="scale-showcase">
@@ -1605,21 +1802,24 @@ function renderVotes() {
         </g>
       </svg>
       <div class="scale-quotas">
-        <div class="quota-card shadow-quota"><strong>${rule.shadow}</strong><span class="small">In Shadow Zone</span></div>
-        <div class="quota-card"><strong>${rule.oracleSave}</strong><span class="small">Saved by Oracle</span></div>
-        <div class="quota-card"><strong>${rule.publicSave}</strong><span class="small">Saved by Public</span></div>
-        <div class="quota-card"><strong>${rule.elim}</strong><span class="small">Consumed Cards</span></div>
+        <div class="quota-card shadow-quota"><strong>${displayQuotas.shadow}</strong><span class="small">In Shadow Zone</span></div>
+        <div class="quota-card"><strong>${displayQuotas.oracleSave}</strong><span class="small">Saved by Oracle${multiplier > 1 ? 's' : ''}</span></div>
+        <div class="quota-card"><strong>${displayQuotas.publicSave}</strong><span class="small">Saved by Public</span></div>
+        <div class="quota-card"><strong>${displayQuotas.elim}</strong><span class="small">Consumed Cards</span></div>
       </div>
     </div>
   `;
 
-  let roundsOptionsHtml = ROUND_ORDER.filter(r => r !== 'PRERANK').map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
+  let roundsOptionsHtml = validVoteRounds.map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
   const mainVoteContent = rows.length > 0 ? `<div style="margin-top:2rem;">${votesListHtml}</div>${scaleHtml}` : `${scaleHtml}<div style="margin-top:1.5rem;">${votesListHtml}</div>`;
 
   root.innerHTML = `
     <div class="card-paper">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <h2>The Scale — ${getRoundLabel(state.votesRound)}</h2>
+        <div>
+          <h2 style="margin-bottom:0.25rem;">The Scale — ${getRoundLabel(state.votesRound)}</h2>
+          <p class="small" style="color:var(--tarot-gold); margin:0;">Active View: <strong>${circleScopeTitle}</strong> (Use the top bar to switch between Sun, Moon, Star &amp; Global)</p>
+        </div>
         <div class="filters" style="margin:0;">
           <select id="votesRoundSelect">${roundsOptionsHtml}</select>
           ${CONFIG.VOTE_FORM_URL ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.VOTE_FORM_URL}">✦ Tip the Scale</a>` : ''}
@@ -1627,7 +1827,7 @@ function renderVotes() {
       </div>
       ${mainVoteContent}
       <p class="small" style="margin-top:2rem; color:var(--tarot-gold)">
-        Total votes: ${totalVotes} · Last vision: ${new Date().toLocaleTimeString('en-US')}
+        Total votes (${circleScopeTitle}): ${totalVotes} · Last vision: ${new Date().toLocaleTimeString('en-US')}
       </p>
     </div>
   `;
@@ -1682,21 +1882,21 @@ function renderGrimoire() {
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Cycle</th><th>Works / Songs</th><th>Progression &amp; Quotas per Circle</th></tr>
+            <tr><th>Cycle</th><th>Scoring System</th><th>Progression &amp; Quotas per Circle</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong style="color:var(--tarot-gold)">Pre-Rank (Awakening)</strong></td><td>Open Audition (Nov 1st – Nov 13th)</td><td>Selection of the 48 Initiates split into 3 Circles of 16 (Sun, Moon, Star)</td></tr>
-            <tr><td><strong>Round 1 (16 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>8 Safe • 8 in Shadow Zone (3 saved by Leader, 2 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 2 (13 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>6 Safe • 7 in Shadow Zone (3 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 3 (10 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>4 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 4 (7 per Circle)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>1 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong style="color:var(--tarot-gold)">Finale (Apotheosis)</strong></td><td style="color:var(--muted); font-style:italic;">To Be Announced</td><td>The 12 survivors (4 per Circle) merge: 5 Winners join KÆOS</td></tr>
+            <tr><td><strong style="color:var(--tarot-gold)">Pre-Rank</strong></td><td>Audition Score (/40) — Each of the 4 Oracles scores /10</td><td>Selection of the 48 Initiates split into 3 Circles of 16 (Sun, Moon, Star)</td></tr>
+            <tr><td><strong>Round 1 (16 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank + <strong>Theme Song Bonus (+15 pts max)</strong></td><td>8 Safe • 8 in Shadow Zone (3 saved by Leader, 2 by Public, 3 eliminated)</td></tr>
+            <tr><td><strong>Round 2 (13 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>6 Safe • 7 in Shadow Zone (3 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
+            <tr><td><strong>Round 3 (10 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>4 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
+            <tr><td><strong>Round 4 (7 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>1 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
+            <tr><td><strong style="color:var(--tarot-gold)">Finale</strong></td><td>Vocal (/100) + 4 Oracles Rank + Final Scale</td><td>The 12 survivors (4 per Circle) merge: 5 Winners join KÆOS</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3 style="margin-top:2.8rem;">100-Point Vocal Rubric</h3>
-      <p class="small">The 100-point vocal score is evaluated across these 11 criteria:</p>
+      <h3 style="margin-top:2.8rem;">100-Point Vocal Rubric &amp; Round 1 Bonus</h3>
+      <p class="small">From Round 1 onwards, the 100-point vocal score is evaluated across these 11 criteria (plus up to <strong>+15 Bonus Points</strong> in Round 1 for the official Theme Song <em>"We Are Destiny"</em>):</p>
       <div class="rubric-grid">
         <div class="rubric-item"><span>Pitch</span><span class="rubric-pts">/20</span></div>
         <div class="rubric-item"><span>Vocal Quality</span><span class="rubric-pts">/10</span></div>
@@ -1709,6 +1909,7 @@ function renderGrimoire() {
         <div class="rubric-item"><span>Pronunciation</span><span class="rubric-pts">/5</span></div>
         <div class="rubric-item"><span>Vocal Presence</span><span class="rubric-pts">/5</span></div>
         <div class="rubric-item"><span>Harmonies &amp; Ad-libs</span><span class="rubric-pts">/5</span></div>
+        <div class="rubric-item" style="border-color:var(--tarot-gold); background:rgba(226,185,97,0.08);"><span>✦ Theme Song Bonus (Round 1)</span><span class="rubric-pts">+15 MAX</span></div>
       </div>
 
       ${buildPropheciesHTML()}
