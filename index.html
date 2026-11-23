@@ -14,6 +14,7 @@
       --tarot-danger: #D93838;  
       --tarot-ash: #555555;
       --tarot-ash-dark: #121212;
+      --tarot-up: #6EE7B7;
       --bg: #0A0A0A;
       --panel: #121212;
       --panel2: #1A1A1A;
@@ -49,6 +50,20 @@
       color: var(--tarot-gold); font-weight: 700; letter-spacing: 2.5px;
     }
     .container { width: min(1320px, 94vw); margin: 0 auto; }
+
+    /* ==========================================
+       TOAST NOTIFICATION
+       ========================================== */
+    #site-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: rgba(18, 15, 11, 0.96); border: 1.5px solid var(--tarot-gold);
+      color: #FFF5CC; padding: 0.7rem 1.25rem; border-radius: 6px;
+      font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 18px rgba(226, 185, 97, 0.25);
+      opacity: 0; transform: translateY(16px); pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #site-toast.show { opacity: 1; transform: translateY(0); }
 
     /* ==========================================
        LANDING MENU (4 3D TAROT CARDS)
@@ -117,12 +132,12 @@
     }
 
     /* ==========================================
-       HEADER & CIRCLE SWITCHER
+       HEADER, CIRCLE SWITCHER & LIVE SCHEDULE BAR
        ========================================== */
     #app-dashboard { display: none; opacity: 0; transition: opacity 0.6s ease; }
     header {
       position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px);
-      background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.7);
+      background: rgba(10, 10, 10, 0.92); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.7);
     }
     .topbar { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; padding: 0.7rem 0; }
     
@@ -141,16 +156,42 @@
     .circle-btn:hover { color: var(--tarot-gold); }
     .circle-btn.active { background: rgba(226, 185, 97, 0.14); color: var(--tarot-gold); border-color: var(--tarot-gold); font-weight: 600; box-shadow: 0 0 10px rgba(226, 185, 97, 0.18); }
 
-    nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    nav { display: flex; gap: 0.38rem; flex-wrap: wrap; }
     .nav-link {
       text-decoration: none; color: var(--text); background: var(--panel);
-      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.78rem; font-size: 0.78rem;
+      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.75rem; font-size: 0.76rem;
       transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
     }
     .nav-link:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); }
     .nav-link.active { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 600; }
 
-    main { padding: 2rem 0 4rem; }
+    /* Live Cycle Status Ribbon */
+    .live-cycle-ribbon {
+      background: linear-gradient(90deg, rgba(226,185,97,0.06) 0%, rgba(226,185,97,0.14) 50%, rgba(226,185,97,0.06) 100%);
+      border-bottom: 1px solid rgba(226, 185, 97, 0.18);
+      padding: 0.48rem 0;
+    }
+    .live-cycle-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;
+      font-size: 0.76rem;
+    }
+    .live-cycle-left { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--tarot-gold);
+      box-shadow: 0 0 10px var(--tarot-gold); display: inline-block;
+    }
+    .live-cycle-title {
+      font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 1.8px;
+      color: var(--tarot-gold); text-transform: uppercase;
+    }
+    .live-cycle-sub { color: #ccc6ba; font-size: 0.76rem; }
+    .live-cycle-clock {
+      font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 1.5px;
+      color: #FFF5CC; background: rgba(10, 10, 10, 0.75); border: 1px solid var(--tarot-gold-dim);
+      padding: 0.22rem 0.75rem; border-radius: 4px; font-size: 0.76rem; white-space: nowrap;
+    }
+
+    main { padding: 1.8rem 0 4rem; }
     @keyframes fadeInSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .page { display: none; }
     .page.active { display: block; animation: fadeInSlide 0.45s ease forwards; }
@@ -167,6 +208,48 @@
     .filters { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem; align-items: center; }
     input, select { border-radius: 4px; border: 1px solid var(--line); outline: none; background: var(--bg); color: var(--text); padding: 0.6rem 0.8rem; transition: all 0.3s; font-family: 'Poppins'; }
     input:focus, select:focus { border-color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
+
+    /* ==========================================
+       SURVIVORS KPI STRIP (INITIATES PAGE)
+       ========================================== */
+    .kpi-strip {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem; margin-top: 1.3rem;
+    }
+    .kpi-pill {
+      background: #0d0d0d; border: 1px solid var(--line); border-radius: 6px;
+      padding: 0.75rem 0.95rem; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: all 0.25s ease;
+    }
+    .kpi-pill:hover, .kpi-pill.active-kpi {
+      border-color: var(--tarot-gold); background: rgba(226, 185, 97, 0.08);
+      transform: translateY(-2px);
+    }
+    .kpi-pill.kpi-consumed { cursor: default; border-color: #262626; }
+    .kpi-pill.kpi-consumed:hover { transform: none; border-color: var(--tarot-ash); background: #0d0d0d; }
+    .kpi-lbl { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+    .kpi-pill.active-kpi .kpi-lbl { color: var(--tarot-gold); }
+    .kpi-val { font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; color: #FFF5CC; }
+    .kpi-pill.kpi-consumed .kpi-val { color: #888; }
+
+    /* ==========================================
+       RANK EVOLUTION DELTAS & TRANSFER TAGS
+       ========================================== */
+    .rank-delta {
+      display: inline-block; font-size: 0.68rem; font-weight: 700; margin-left: 6px;
+      letter-spacing: 0.3px; vertical-align: middle;
+    }
+    .rank-delta.up { color: var(--tarot-up); }
+    .rank-delta.down { color: #FF7B7B; }
+    .rank-delta.same { color: #666; }
+
+    .transfer-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-left: 6px; padding: 1px 7px; border-radius: 4px;
+      font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.8px;
+      background: rgba(226, 185, 97, 0.14); border: 1px solid var(--tarot-gold-dim); color: #FFF5CC;
+      text-transform: uppercase;
+    }
     
     /* ==========================================
        CONTESTANTS TAROT CARDS
@@ -241,7 +324,7 @@
     .safe { background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold); border-color: var(--tarot-gold); }
     .nominee { background: var(--tarot-danger); color: #ffffff; border-color: var(--tarot-danger); }
     .saved_judges, .saved_public { background: #141414; color: var(--tarot-gold); border-color: var(--tarot-gold-dim); }
-    .eliminated-pill { background: var(--tarot-ash-dark); color: #777777; border-color: var(--tarot-ash); }
+    .eliminated-pill, .forfeit-pill { background: var(--tarot-ash-dark); color: #8c8c96; border-color: var(--tarot-ash); }
     .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
     .winner { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.45); }
     
@@ -269,6 +352,7 @@
     .btn-primary:hover { background: #f0ca70; box-shadow: 0 0 22px rgba(226, 185, 97, 0.45); }
     
     .profile-nav { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
+    .profile-nav-spacer { margin-left: auto; }
     .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     th { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.75rem 0.45rem; text-align: left; white-space: nowrap; letter-spacing: 1.2px; }
@@ -277,6 +361,37 @@
     .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
     .chip { display: inline-block; border: 1px solid var(--tarot-gold); border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.74rem; background: rgba(226,185,97,0.1); font-weight: 600; }
     .bonus-pill { display: inline-block; background: rgba(226, 185, 97, 0.18); border: 1px solid var(--tarot-gold); color: #FFF5CC; font-family: 'Cinzel', serif; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-left: 5px; }
+
+    /* ==========================================
+       CONCEPT SONGS & PERFORMANCES SHOWCASE
+       ========================================== */
+    .concept-circles-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.4rem; margin-top: 1.3rem;
+    }
+    .concept-circle-card {
+      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
+      padding: 1.4rem; display: flex; flex-direction: column; gap: 0.85rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75); transition: border-color 0.3s ease;
+    }
+    .concept-circle-card.highlighted-circle {
+      border-color: var(--tarot-gold); box-shadow: 0 12px 35px rgba(0,0,0,0.85), 0 0 22px rgba(226, 185, 97, 0.16);
+    }
+    .concept-circle-head {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--line); padding-bottom: 0.75rem;
+    }
+    .concept-circle-head h4 { margin: 0; font-size: 1.05rem; letter-spacing: 2px; }
+    .concept-song-item {
+      background: #141416; border: 1px solid #26262b; border-left: 3px solid var(--tarot-gold);
+      border-radius: 5px; padding: 0.75rem 0.9rem; display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .concept-song-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+    .concept-song-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.96rem; color: #FFF5CC; letter-spacing: 1px; }
+    .concept-song-artist { font-size: 0.76rem; color: var(--tarot-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .concept-house-tag {
+      font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px;
+    }
 
     /* ==========================================
        AUDITION PORTAL & 7 PROPHECY CARDS (ALIGNED)
@@ -393,20 +508,32 @@
     .rubric-item { background: #0d0d0d; border: 1px solid var(--line); border-radius: 4px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; }
     .rubric-pts { font-family: 'Cinzel', serif; color: var(--tarot-gold); font-weight: 700; font-size: 1.05rem; }
 
+    .rules-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; margin: 1.2rem 0 2.4rem; }
+    .rule-lore-box {
+      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
+      padding: 1.4rem 1.5rem;
+    }
+    .rule-lore-box.forfeit-box { border-color: rgba(217, 56, 56, 0.4); }
+    .rule-lore-box h4 { margin: 0 0 0.7rem 0; font-size: 1rem; letter-spacing: 1.8px; }
+    .rule-lore-box ul { margin: 0; padding-left: 1.15rem; color: #d4d0c8; font-size: 0.85rem; line-height: 1.65; }
+    .rule-lore-box li { margin-bottom: 0.45rem; }
+
     @media (max-width: 720px) {
       .topbar { justify-content: center; text-align: center; }
       .circle-switcher { width: 100%; justify-content: center; overflow-x: auto; }
       nav { width: 100%; justify-content: center; }
       .card-paper { padding: 1.25rem; }
+      .live-cycle-inner { justify-content: center; text-align: center; }
     }
   </style>
 </head>
 <body>
 
 <!-- ==========================================
-     CELESTIAL RISING GOLDEN SPARKS
+     CELESTIAL RISING GOLDEN SPARKS & TOAST
      ========================================== -->
 <canvas id="celestial-sparks"></canvas>
+<div id="site-toast">✦ Action confirmed</div>
 
 <!-- ==========================================
      LANDING MENU: THE 4 TAROT CARDS
@@ -530,9 +657,22 @@
       <nav id="nav">
         <a class="nav-link" href="#contestants">Initiates</a>
         <a class="nav-link" href="#rankings">Alignment</a>
+        <a class="nav-link" href="#performances">Songs</a>
         <a class="nav-link" href="#votes">The Scale</a>
         <a class="nav-link" href="#grimoire">Grimoire</a>
       </nav>
+    </div>
+
+    <!-- LIVE CYCLE COUNTDOWN RIBBON -->
+    <div class="live-cycle-ribbon" id="liveCycleRibbon">
+      <div class="container live-cycle-inner">
+        <div class="live-cycle-left">
+          <span class="live-dot"></span>
+          <span class="live-cycle-title" id="liveCycleTitle">ROUND 1 DEADLINE</span>
+          <span class="live-cycle-sub" id="liveCycleSub">Submissions close Nov 25 at 23:59 CET</span>
+        </div>
+        <div class="live-cycle-clock" id="liveCycleClock">—</div>
+      </div>
     </div>
   </header>
 
@@ -540,6 +680,7 @@
     <section id="contestants" class="page active"></section>
     <section id="profile" class="page"></section>
     <section id="rankings" class="page"></section>
+    <section id="performances" class="page"></section>
     <section id="votes" class="page"></section>
     <section id="grimoire" class="page"></section>
   </main>
@@ -547,7 +688,7 @@
 
 <script>
 // ==========================================
-// 1. OFFICIAL CONFIGURATION & 7 PROPHECY LINKS (ALIGNED)
+// 1. OFFICIAL CONFIGURATION, SCHEDULE & 7 PROPHECY LINKS
 // ==========================================
 const CONFIG = {
   SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
@@ -558,10 +699,70 @@ const CONFIG = {
   INSTAGRAM_URL: "https://www.instagram.com/star_kca_academy.svs/",
   CANDIDATE_FOLDER: "candidat",
   NOMINATION_FOLDER: "nomination",
-  REFRESH_MS: 45000
+  REFRESH_MS: 45000,
+  // Easily editable live milestones for the top status ribbon (CET / Paris time +01:00)
+  TIMELINE_EVENTS: [
+    {
+      title: "ROUND 1 SUBMISSION DEADLINE",
+      sub: "Recordings & Round 2 Form close Nov 25 • 23:59 CET",
+      target: "2026-11-25T23:59:59+01:00"
+    },
+    {
+      title: "ROUND 1 PERFORMANCES & JURY RANKING",
+      sub: "Performances posted Nov 26 • Nominations revealed Nov 27",
+      target: "2026-11-27T00:00:00+01:00"
+    },
+    {
+      title: "SHADOW ZONE & THE SCALE PUBLIC VOTE",
+      sub: "Vote open Nov 27 • Official Rankings & Round 2 launch Nov 28",
+      target: "2026-11-28T00:00:00+01:00"
+    }
+  ]
 };
 
-// Prophecy 00 removed so all 7 Prophecies align cleanly on a single row!
+// Round 2 — The Concept Round (12 Exclusive Songs)
+const ROUND_2_CONCEPT_SONGS = [
+  {
+    teamKey: "Soleil",
+    teamClass: "theme-sun",
+    symbol: "✹",
+    circleName: "Circle of the Sun",
+    leader: "Neitsu",
+    songs: [
+      { title: "Looks Can Kill", artist: "IVE", house: "House I • Girl Crush & Teen Crush" },
+      { title: "You're Under Arrest", artist: "ILLIT", house: "House II • Cute, Fresh & Bubblegum" },
+      { title: "Given-Taken", artist: "ENHYPEN", house: "House III • Dark, Gothic & Supernatural" },
+      { title: "POP/STARS", artist: "K/DA", house: "House V • Sci-Fi, Cyberpunk & Virtual" }
+    ]
+  },
+  {
+    teamKey: "Etoile",
+    teamClass: "theme-star",
+    symbol: "✦",
+    circleName: "Circle of the Star",
+    leader: "Aya",
+    songs: [
+      { title: "Pretty Savage", artist: "BLACKPINK", house: "House I • Girl Crush & Teen Crush" },
+      { title: "The Eve", artist: "EXO", house: "House III • Dark, Gothic & Supernatural" },
+      { title: "NEON", artist: "A2O LITE", house: "House V • Sci-Fi, Cyberpunk & Virtual" },
+      { title: "In the morning", artist: "ITZY", house: "House VI • Dreamy, Fairy & Mystical" }
+    ]
+  },
+  {
+    teamKey: "Lune",
+    teamClass: "theme-moon",
+    symbol: "☾",
+    circleName: "Circle of the Moon",
+    leader: "Kaina",
+    songs: [
+      { title: "INCEPTION", artist: "ATEEZ", house: "House I • Girl Crush & Teen Crush" },
+      { title: "After School", artist: "Weeekly", house: "House II • Cute, Fresh & Bubblegum" },
+      { title: "BOCA", artist: "Dreamcatcher", house: "House III • Dark, Gothic & Supernatural" },
+      { title: "Illusion", artist: "aespa", house: "House V • Sci-Fi, Cyberpunk & Virtual" }
+    ]
+  }
+];
+
 const PROPHECIES = [
   { num: "PROPHECY I",   title: "The Grand Reading",     symbol: "✹", unlockDate: "2026-11-01T00:00:00", dateLabel: "Nov 1st",  url: "https://www.instagram.com/reel/DfMfxGDx4IC/?utm_source=ig_web_copy_link&obrf=NTc4MTIwNjQ2YQ==" },
   { num: "PROPHECY II",  title: "The Three Survivors",   symbol: "☾", unlockDate: "2026-11-03T00:00:00", dateLabel: "Nov 3rd",  url: "https://www.instagram.com/reel/DfRuYh2sZMm/?utm_source=ig_web_copy_link&vrfl=NTc4MTIwNjQ2YQ==" },
@@ -573,7 +774,6 @@ const PROPHECIES = [
 ];
 
 const ROUND_ORDER = ["PRERANK", "ROUND_1", "ROUND_2", "ROUND_3", "ROUND_4", "FINAL"];
-// Shortened labels ("Pre-Rank" & "Finale") so table columns stay compact and close together
 const ROUND_LABELS = {
   PRERANK: "Pre-Rank",
   ROUND_1: "Round 1",
@@ -588,6 +788,7 @@ const STATUS_LABELS = {
   saved_judges: "Oracle's Grace",
   saved_public: "Scale's Grace",
   eliminated: "Consumed",
+  forfeit: "Forfeit (No Record)",
   winner: "CHOSEN",
   tbd: "Pending"
 };
@@ -607,18 +808,53 @@ let rankingChartInstance = null;
 let profileChartInstance = null;
 let radarChartInstance = null;
 let countdownInterval = null;
+let liveCycleInterval = null;
 let cardEnterTimeout = null;
 
 const state = {
   data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
   latestRound: "PRERANK",
   selectedRankingsRound: null,
+  userPickedRankingsRound: false,
   rankingView: "default",
   webFocusContestant: "all",
   votesRound: "ROUND_1",
+  userPickedVotesRound: false,
+  perfRoundFilter: "all",
+  searchQuery: "",
+  statusFilter: "all",
   votesTimer: null,
   activeTeam: "Global"
 };
+
+function showToast(msg) {
+  const el = document.getElementById('site-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._tm);
+  el._tm = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function copyProfileLink(contestantId) {
+  const url = `${window.location.origin}${window.location.pathname}#profile/${contestantId}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => showToast('✦ Card link copied to clipboard!')).catch(() => fallbackCopyText(url));
+  } else {
+    fallbackCopyText(url);
+  }
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('✦ Card link copied to clipboard!'); } catch (e) {}
+  document.body.removeChild(ta);
+}
 
 // ==========================================
 // 2. CELESTIAL RISING GOLDEN SPARKS ENGINE
@@ -669,7 +905,40 @@ function initCelestialSparks() {
 }
 
 // ==========================================
-// 3. NAVIGATION, MOBILE AUTO-FLIP & 1-TAP ENTRY
+// 3. LIVE CYCLE COUNTDOWN RIBBON
+// ==========================================
+function startLiveCycleClock() {
+  clearInterval(liveCycleInterval);
+  const updateRibbon = () => {
+    const titleEl = document.getElementById('liveCycleTitle');
+    const subEl = document.getElementById('liveCycleSub');
+    const clockEl = document.getElementById('liveCycleClock');
+    if (!titleEl || !subEl || !clockEl) return;
+
+    const now = Date.now();
+    const nextEvt = (CONFIG.TIMELINE_EVENTS || []).find(ev => new Date(ev.target).getTime() > now);
+
+    if (nextEvt) {
+      const diff = Math.max(0, new Date(nextEvt.target).getTime() - now);
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+      const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+      const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+      titleEl.textContent = nextEvt.title;
+      subEl.textContent = nextEvt.sub;
+      clockEl.textContent = `${d > 0 ? d + 'D ' : ''}${h}H ${m}M ${s}S`;
+    } else {
+      titleEl.textContent = `ACTIVE CYCLE : ${getRoundLabel(state.latestRound).toUpperCase()}`;
+      subEl.textContent = "KÆOS Project — Live Academy Standings & Performances";
+      clockEl.textContent = "✦ LIVE ✦";
+    }
+  };
+  updateRibbon();
+  liveCycleInterval = setInterval(updateRibbon, 1000);
+}
+
+// ==========================================
+// 4. NAVIGATION, MOBILE AUTO-FLIP & 1-TAP ENTRY
 // ==========================================
 function initMobileScrollCardFlip() {
   const isTouch = window.matchMedia('(hover: none)').matches;
@@ -677,17 +946,12 @@ function initMobileScrollCardFlip() {
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('flipped');
-      } else {
-        entry.target.classList.remove('flipped');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('flipped');
+      else entry.target.classList.remove('flipped');
     });
   }, { threshold: 0.62 });
 
-  document.querySelectorAll('#landing-menu .card-container').forEach(card => {
-    observer.observe(card);
-  });
+  document.querySelectorAll('#landing-menu .card-container').forEach(card => observer.observe(card));
 }
 
 function handleCardTap(cardEl, teamFilter) {
@@ -697,12 +961,9 @@ function handleCardTap(cardEl, teamFilter) {
   if (isTouch && !cardEl.classList.contains('flipped')) {
     document.querySelectorAll('#landing-menu .card-container').forEach(c => c.classList.remove('flipped'));
     cardEl.classList.add('flipped');
-    cardEnterTimeout = setTimeout(() => {
-      entrerAcademie(teamFilter);
-    }, 620);
+    cardEnterTimeout = setTimeout(() => entrerAcademie(teamFilter), 620);
     return;
   }
-
   entrerAcademie(teamFilter);
 }
 
@@ -756,14 +1017,74 @@ function retourMenuPrincipale() {
 }
 
 // ==========================================
-// 4. IMAGE FOLDER PATHS (`candidat/` & `nomination/`) + SMART FALLBACK
+// 5. ALL-TERRAIN IMAGE LOADER (CASE & EXTENSION AGNOSTIC)
 // ==========================================
 function getContestantImagePath(c, isNominee = false) {
   const id = c.id;
+  return isNominee
+    ? `${CONFIG.NOMINATION_FOLDER}/${id}-nominee.png`
+    : `${CONFIG.CANDIDATE_FOLDER}/${id}.png`;
+}
+
+function buildFallbackPaths(contestantId, rawName, isNominee) {
+  const cleanRaw = String(rawName || '').trim();
+  const titleCase = contestantId ? contestantId.charAt(0).toUpperCase() + contestantId.slice(1) : '';
+  const upperCase = contestantId ? contestantId.toUpperCase() : '';
+  const rawTitle = cleanRaw ? cleanRaw.charAt(0).toUpperCase() + cleanRaw.slice(1).toLowerCase() : '';
+
+  const nameVariants = [...new Set([contestantId, titleCase, cleanRaw, rawTitle, upperCase].filter(Boolean))];
+  const exts = ['png', 'jpg', 'jpeg', 'webp'];
+  const paths = [];
+  const seen = new Set();
+  const pushUnique = (p) => { if (!seen.has(p)) { seen.add(p); paths.push(p); } };
+
   if (isNominee) {
-    return `${CONFIG.NOMINATION_FOLDER}/${id}-nominee.png`;
+    // 1. Try nomination folder with -nominee / _nominee across cases & extensions
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}-nominee.${ext}`);
+        pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}_nominee.${ext}`);
+      }
+    }
+    // 2. Fall back to normal portrait in candidat/
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`);
+      }
+    }
+    // 3. Fall back to root folder
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${nv}-nominee.${ext}`);
+        pushUnique(`${nv}.${ext}`);
+      }
+    }
+  } else {
+    // 1. Try candidat/ folder across cases & extensions
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`);
+      }
+    }
+    // 2. Try root folder
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${nv}.${ext}`);
+      }
+    }
+    // 3. Fall back to nomination/ folder
+    for (const ext of exts) {
+      for (const nv of nameVariants) {
+        pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}-nominee.${ext}`);
+      }
+    }
   }
-  return `${CONFIG.CANDIDATE_FOLDER}/${id}.png`;
+
+  // Remove the initial src path (index 0 is already tried by the img tag)
+  const initialSrc = isNominee
+    ? `${CONFIG.NOMINATION_FOLDER}/${contestantId}-nominee.png`
+    : `${CONFIG.CANDIDATE_FOLDER}/${contestantId}.png`;
+  return paths.filter(p => p !== initialSrc);
 }
 
 function handleImageFallback(img) {
@@ -774,33 +1095,28 @@ function handleImageFallback(img) {
   const leaderId = String(img.dataset.leader || '').trim();
 
   if (leaderId) {
-    if (step === 0) {
-      img.dataset.fallbackStep = '1';
-      img.src = `${CONFIG.CANDIDATE_FOLDER}/${leaderId}.png`;
+    const leaderTitle = leaderId.charAt(0).toUpperCase() + leaderId.slice(1);
+    const leaderCandidates = [
+      `${CONFIG.CANDIDATE_FOLDER}/${leaderId}.png`,
+      `${CONFIG.CANDIDATE_FOLDER}/${leaderTitle}.png`,
+      `${leaderTitle}.png`,
+      `${leaderId}.jpg`,
+      `${CONFIG.CANDIDATE_FOLDER}/${leaderId}.jpg`
+    ];
+    if (step < leaderCandidates.length) {
+      img.dataset.fallbackStep = String(step + 1);
+      img.src = leaderCandidates[step];
       return;
     }
   }
 
   if (contestantId) {
-    const candidatesToTry = isNominee
-      ? [
-          `${CONFIG.NOMINATION_FOLDER}/${rawName}-nominee.png`,
-          `${CONFIG.NOMINATION_FOLDER}/${contestantId}_nominee.png`,
-          `${CONFIG.CANDIDATE_FOLDER}/${contestantId}.png`,
-          `${CONFIG.CANDIDATE_FOLDER}/${rawName}.png`,
-          `${contestantId}-nominee.png`,
-          `${contestantId}.png`
-        ]
-      : [
-          `${CONFIG.CANDIDATE_FOLDER}/${rawName}.png`,
-          `${contestantId}.png`,
-          `${CONFIG.NOMINATION_FOLDER}/${contestantId}-nominee.png`,
-          `${CONFIG.NOMINATION_FOLDER}/${rawName}-nominee.png`
-        ];
-
-    if (step < candidatesToTry.length) {
+    if (!img._fallbackList) {
+      img._fallbackList = buildFallbackPaths(contestantId, rawName, isNominee);
+    }
+    if (step < img._fallbackList.length) {
       img.dataset.fallbackStep = String(step + 1);
-      img.src = candidatesToTry[step];
+      img.src = img._fallbackList[step];
       return;
     }
   }
@@ -815,7 +1131,7 @@ function handleImageFallback(img) {
 }
 
 // ==========================================
-// 5. GOOGLE SHEETS PARSER & SCORING ENGINE (PRE-RANK /40 + ROUND 1 BONUS)
+// 6. GOOGLE SHEETS PARSER & PER-ROUND CIRCLE TRANSFER ENGINE
 // ==========================================
 function getRoundLabel(id) { return ROUND_LABELS[id] || id; }
 function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
@@ -832,6 +1148,38 @@ function canonicalRoundId(value) {
 function normalizeJudgeName(v) { return String(v || '').trim().toLowerCase(); }
 function getContestantName(id) { return String(state.data.contestants.find(c => c.id === id)?.name || '').trim() || id; }
 function colorForIndex(i) { return `hsl(${(i * 47) % 360} 65% 62%)`; }
+function isEliminatedStatus(st) { return st === 'eliminated' || st === 'forfeit'; }
+
+function teamClassToShortLabel(tc) {
+  if (tc === 'theme-sun') return '✹ Sun';
+  if (tc === 'theme-moon') return '☾ Moon';
+  if (tc === 'theme-star') return '✦ Star';
+  return '☉ Global';
+}
+
+function getContestantTeamForRound(c, roundId) {
+  if (!c) return 'theme-global';
+  if (c.teamByRound && c.teamByRound[roundId] && c.teamByRound[roundId] !== 'theme-global') {
+    return c.teamByRound[roundId];
+  }
+  return c.teamClass || 'theme-global';
+}
+
+function getContestantTransfers(c) {
+  const out = {};
+  if (!c || !c.teamByRound) return out;
+  let prevTeam = null;
+  ROUND_ORDER.forEach(r => {
+    const t = c.teamByRound[r];
+    if (t && t !== 'theme-global') {
+      if (prevTeam && prevTeam !== t) {
+        out[r] = { from: prevTeam, to: t };
+      }
+      prevTeam = t;
+    }
+  });
+  return out;
+}
 
 function parseCSV(text) {
   const rows = []; let row = []; let inQuotes = false; let val = "";
@@ -903,16 +1251,21 @@ function parseNum(val) {
 }
 
 function getStatus(roundId, contestantId) { return state.data.round_status.find(r => r.round_id === roundId && r.contestant_id === contestantId)?.status || ''; }
-function statusClass(status) { return status === 'eliminated' ? 'eliminated-pill' : (status || 'tbd'); }
+function statusClass(status) {
+  if (status === 'eliminated') return 'eliminated-pill';
+  if (status === 'forfeit') return 'forfeit-pill';
+  return status || 'tbd';
+}
 function statusLabel(status) { return STATUS_LABELS[status] || STATUS_LABELS.tbd; }
-function getFirstEliminatedRoundIndex(contestantId) { return ROUND_ORDER.findIndex(round => getStatus(round, contestantId) === 'eliminated'); }
+function getFirstEliminatedRoundIndex(contestantId) { return ROUND_ORDER.findIndex(round => isEliminatedStatus(getStatus(round, contestantId))); }
 
 function getActiveCountForRound(roundId, teamClass) {
   const rIdx = ROUND_ORDER.indexOf(roundId);
   const isGlobalPhase = (roundId === 'PRERANK' || roundId === 'FINAL');
   let count = 0;
   state.data.contestants.forEach(c => {
-    if (!isGlobalPhase && teamClass && c.teamClass !== teamClass) return;
+    const cTeam = getContestantTeamForRound(c, roundId);
+    if (!isGlobalPhase && teamClass && cTeam !== teamClass) return;
     const elimIdx = getFirstEliminatedRoundIndex(c.id);
     if (elimIdx === -1 || elimIdx >= rIdx) count++;
   });
@@ -927,7 +1280,6 @@ function getPerformanceScoreByRound() {
     state.data.contestants.forEach(c => {
       const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
 
-      // SPECIAL RULE FOR PRE-RANK: Each of the 4 judges scores out of 10 (/10) -> Total out of 40 (/40)
       if (round === 'PRERANK') {
         let sumJudges10 = 0;
         let hasJudge10 = false;
@@ -946,8 +1298,7 @@ function getPerformanceScoreByRound() {
         return;
       }
 
-      // ROUNDS 1 TO FINALE: Vocal Score (/100) + Theme Song Bonus (up to +15 pts in R1) + 4 Judges Rank Points
-      const activeCount = getActiveCountForRound(round, c.teamClass);
+      const activeCount = getActiveCountForRound(round, getContestantTeamForRound(c, round));
       const pointsBase = activeCount + 1;
       let totalPoints = 0;
       let hasData = false;
@@ -985,7 +1336,7 @@ function getOfficialRankingByRound(isGlobal = false) {
     const forceGlobal = isGlobal || round === 'FINAL';
     const groups = forceGlobal ? ['all'] : ['theme-sun', 'theme-moon', 'theme-star'];
     groups.forEach(group => {
-      const groupIds = state.data.contestants.filter(c => (forceGlobal || c.teamClass === group)).map(c => c.id);
+      const groupIds = state.data.contestants.filter(c => (forceGlobal || getContestantTeamForRound(c, round) === group)).map(c => c.id);
       const scoredIds = groupIds.filter(id => !Number.isFinite(out[round][id]) && Number.isFinite(perfScores[id]));
       scoredIds.sort((a, b) => perfScores[b] - perfScores[a]);
       let usedRanks = new Set();
@@ -1001,6 +1352,24 @@ function getOfficialRankingByRound(isGlobal = false) {
   return out;
 }
 
+function getRankDeltaHtml(rankingMap, roundId, contestantId, isPerformance) {
+  if (isPerformance) return '';
+  const rIdx = ROUND_ORDER.indexOf(roundId);
+  if (rIdx <= 0) return '';
+  const currVal = rankingMap[roundId]?.[contestantId];
+  if (!Number.isFinite(currVal)) return '';
+  let prevVal = NaN;
+  for (let i = rIdx - 1; i >= 0; i--) {
+    const candidatePrev = rankingMap[ROUND_ORDER[i]]?.[contestantId];
+    if (Number.isFinite(candidatePrev)) { prevVal = candidatePrev; break; }
+  }
+  if (!Number.isFinite(prevVal)) return '';
+  const diff = prevVal - currVal; // positive means climbed up (e.g., #10 -> #6 = +4)
+  if (diff > 0) return `<span class="rank-delta up" title="Up ${diff} from previous cycle">▲${diff}</span>`;
+  if (diff < 0) return `<span class="rank-delta down" title="Down ${Math.abs(diff)} from previous cycle">▼${Math.abs(diff)}</span>`;
+  return `<span class="rank-delta same" title="Unchanged">=</span>`;
+}
+
 async function loadDataFromRoundTabs() {
   const entries = Object.entries(CONFIG.ROUND_TABS);
   const results = await Promise.all(entries.map(([rid, tab]) => fetchSheetTab(tab).then(rows => [rid, rows])));
@@ -1008,7 +1377,8 @@ async function loadDataFromRoundTabs() {
   const contestantsMap = new Map();
   const judge_rankings = []; const scores = []; const submissions = []; const round_status_clean = [];
 
-  Object.entries(rowsByRound).forEach(([round_id, rows]) => {
+  ROUND_ORDER.forEach((round_id) => {
+    const rows = rowsByRound[round_id] || [];
     rows.forEach((row) => {
       const name = String(pickValue(row, ['name', 'contestant', 'contestants', 'candidate', 'candidat']) || '').trim();
       if (!name) return;
@@ -1034,7 +1404,8 @@ async function loadDataFromRoundTabs() {
       
       const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
       let statusValue = statusValueRaw;
-      if (statusValueRaw.includes('public') || statusValueRaw.includes('balance') || statusValueRaw.includes('scale')) statusValue = 'saved_public';
+      if (statusValueRaw.includes('no record') || statusValueRaw.includes('forfeit') || statusValueRaw.includes('absent') || statusValueRaw.includes('abandon') || statusValueRaw === 'dns' || statusValueRaw === 'dnf') statusValue = 'forfeit';
+      else if (statusValueRaw.includes('public') || statusValueRaw.includes('balance') || statusValueRaw.includes('scale')) statusValue = 'saved_public';
       else if (statusValueRaw.includes('judge') || statusValueRaw.includes('jury') || statusValueRaw.includes('oracle')) statusValue = 'saved_judges';
       else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw.includes('elu') || statusValueRaw.includes('chosen')) statusValue = 'winner';
       else if (statusValueRaw.includes('elim') || statusValueRaw.includes('élim') || statusValueRaw.includes('consum')) statusValue = 'eliminated';
@@ -1050,14 +1421,19 @@ async function loadDataFromRoundTabs() {
           bio: '',
           instagram,
           pronouns,
-          teamClass
+          teamClass,
+          teamByRound: teamClass !== 'theme-global' ? { [round_id]: teamClass } : {}
         });
       } else {
         const c = contestantsMap.get(id);
         if (country && !c.country) c.country = country;
         if (pronouns && !c.pronouns) c.pronouns = pronouns;
         if (instagram && !c.instagram) c.instagram = instagram;
-        if (teamClass !== 'theme-global' && c.teamClass === 'theme-global') c.teamClass = teamClass;
+        if (teamClass !== 'theme-global') {
+          c.teamByRound[round_id] = teamClass;
+          // Always reflect the latest assigned Circle (supports Top 8 Circle Transfers!)
+          c.teamClass = teamClass;
+        }
       }
       if (Number.isFinite(officialRank)) judge_rankings.push({ round_id, judge_name: 'official', contestant_id: id, rank: officialRank });
       if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
@@ -1069,7 +1445,7 @@ async function loadDataFromRoundTabs() {
           bonus: Number.isFinite(bonusScore) ? bonusScore : 0
         });
       }
-      if (performance || link) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
+      if (performance || link || link2) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
       if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
 
       JUDGE_NAMES.forEach(jn => {
@@ -1079,20 +1455,33 @@ async function loadDataFromRoundTabs() {
     });
   });
 
+  // Propagate each contestant's Circle forward for rounds where Team wasn't re-typed, and propagate eliminations/forfeits
   const allIds = [...contestantsMap.keys()];
+  contestantsMap.forEach(c => {
+    let lastKnownTeam = c.teamClass || 'theme-global';
+    for (const r of ROUND_ORDER) {
+      if (c.teamByRound[r] && c.teamByRound[r] !== 'theme-global') {
+        lastKnownTeam = c.teamByRound[r];
+      } else if (lastKnownTeam !== 'theme-global') {
+        c.teamByRound[r] = lastKnownTeam;
+      }
+    }
+    if (lastKnownTeam !== 'theme-global') c.teamClass = lastKnownTeam;
+  });
+
   let lastStatusObj = {};
   ROUND_ORDER.forEach(round => {
     allIds.forEach(id => {
       const existingIndex = round_status_clean.findIndex(r => r.round_id === round && r.contestant_id === id);
       if (existingIndex >= 0) { lastStatusObj[id] = round_status_clean[existingIndex].status; }
-      else if (lastStatusObj[id] === 'eliminated') { round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' }); }
+      else if (isEliminatedStatus(lastStatusObj[id])) { round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' }); }
     });
   });
 
   return { contestants: [...contestantsMap.values()], rounds: [], submissions, scores, judge_rankings, round_status: round_status_clean, votes_live: [] };
 }
 
-async function hydrate() {
+async function hydrate(isBackgroundRefresh = false) {
   state.data = await loadDataFromRoundTabs();
   try {
     let votesRaw = await fetchSheetTab('votes_live', CONFIG.VOTE_SHEET_ID);
@@ -1108,10 +1497,16 @@ async function hydrate() {
 
   state.data.contestants = state.data.contestants.filter(c => c.id && !EXCLUDED_NAMES.has(c.id));
   state.latestRound = getLatestRound();
-  state.selectedRankingsRound = state.latestRound;
-  const roundsWithVotes = ROUND_ORDER.filter(r => r !== 'PRERANK' && state.data.votes_live.some(v => v.round_id === r));
-  const fallbackVoteRound = state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound;
-  state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || fallbackVoteRound;
+
+  // Preserve the user's manually selected round during 45s auto-refresh!
+  if (!isBackgroundRefresh || !state.userPickedRankingsRound) {
+    state.selectedRankingsRound = state.latestRound;
+  }
+  if (!isBackgroundRefresh || !state.userPickedVotesRound) {
+    const roundsWithVotes = ROUND_ORDER.filter(r => r !== 'PRERANK' && state.data.votes_live.some(v => v.round_id === r));
+    const fallbackVoteRound = state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound;
+    state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || fallbackVoteRound;
+  }
 }
 
 function getJudgeRankingByRound(judgeName) {
@@ -1141,24 +1536,25 @@ function getLatestRound() {
     const round = ROUND_ORDER[i];
     if (state.data.scores.some(r => r.round_id === round && (Number.isFinite(r.total) || r.bonus > 0)) ||
         state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
-        state.data.round_status.some(r => r.round_id === round && r.status !== '' && r.status !== 'eliminated')) {
+        state.data.round_status.some(r => r.round_id === round && r.status !== '' && !isEliminatedStatus(r.status))) {
       return round;
     }
   }
   return 'PRERANK';
 }
 
-function sortedContestants() {
+function sortedContestants(roundOverride = null) {
+  const targetRound = roundOverride || state.latestRound;
   const officialByRound = getOfficialRankingByRound(state.activeTeam === 'Global');
-  const current = officialByRound[state.latestRound] || {};
+  const current = officialByRound[targetRound] || {};
   let filtered = state.data.contestants;
-  if (state.activeTeam === 'Soleil') filtered = filtered.filter(c => c.teamClass === 'theme-sun');
-  if (state.activeTeam === 'Lune') filtered = filtered.filter(c => c.teamClass === 'theme-moon');
-  if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => c.teamClass === 'theme-star');
+  if (state.activeTeam === 'Soleil') filtered = filtered.filter(c => getContestantTeamForRound(c, targetRound) === 'theme-sun');
+  if (state.activeTeam === 'Lune') filtered = filtered.filter(c => getContestantTeamForRound(c, targetRound) === 'theme-moon');
+  if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => getContestantTeamForRound(c, targetRound) === 'theme-star');
   
   return [...filtered].sort((a, b) => {
-    const aElim = getStatus(state.latestRound, a.id) === 'eliminated' ? 1 : 0;
-    const bElim = getStatus(state.latestRound, b.id) === 'eliminated' ? 1 : 0;
+    const aElim = isEliminatedStatus(getStatus(targetRound, a.id)) ? 1 : 0;
+    const bElim = isEliminatedStatus(getStatus(targetRound, b.id)) ? 1 : 0;
     if (aElim !== bElim) return aElim - bElim;
     const ar = current[a.id]; const br = current[b.id];
     if (Number.isFinite(ar) && Number.isFinite(br)) return ar - br;
@@ -1169,7 +1565,7 @@ function sortedContestants() {
 }
 
 // ==========================================
-// 6. TWO-PHASE COUNTDOWN & 7 PROPHECY CARDS
+// 7. AUDITION COUNTDOWN & 7 PROPHECY CARDS
 // ==========================================
 function startGlobalCountdown() {
   clearInterval(countdownInterval);
@@ -1255,19 +1651,39 @@ function renderAuditionPortal(root) {
 }
 
 // ==========================================
-// 7. PAGE RENDERERS (INITIATES, ALIGNMENT, PROFILE, SCALE, GRIMOIRE)
+// 8. PAGE RENDERERS (INITIATES, ALIGNMENT, SONGS, PROFILE, SCALE, GRIMOIRE)
 // ==========================================
-function renderContestants() {
+function renderContestants(isBackgroundRefresh = false) {
   const root = document.getElementById('contestants');
   if (state.data.contestants.length === 0) {
     renderAuditionPortal(root);
     return;
   }
+  // If user is actively typing in the search bar during the 45s auto-refresh, don't disrupt their cursor!
+  if (isBackgroundRefresh && document.activeElement && document.activeElement.id === 'searchContestant') {
+    return;
+  }
+
   const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
   let teamTitle = "";
   if (state.activeTeam === 'Soleil') teamTitle = ` — ✹ Sun (Neitsu)`;
   if (state.activeTeam === 'Lune') teamTitle = ` — ☾ Moon (Kaina)`;
   if (state.activeTeam === 'Etoile') teamTitle = ` — ✦ Star (Aya)`;
+
+  // Active Survivors KPI calculation per Circle
+  const isAliveNow = (c) => {
+    const st = getStatus(state.latestRound, c.id);
+    const elimIdx = getFirstEliminatedRoundIndex(c.id);
+    return !isEliminatedStatus(st) && (elimIdx === -1 || elimIdx > ROUND_ORDER.indexOf(state.latestRound));
+  };
+  const allList = state.data.contestants;
+  const activeAll = allList.filter(isAliveNow);
+  const sunActive = activeAll.filter(c => c.teamClass === 'theme-sun').length;
+  const moonActive = activeAll.filter(c => c.teamClass === 'theme-moon').length;
+  const starActive = activeAll.filter(c => c.teamClass === 'theme-star').length;
+  const consumedCount = allList.length - activeAll.length;
+
+  const safeSearchVal = String(state.searchQuery || '').replace(/"/g, '&quot;');
 
   root.innerHTML = `
     <div class="card-paper">
@@ -1278,16 +1694,42 @@ function renderContestants() {
             The stars are aligned for cycle: <span class="chip" style="font-weight:bold; color:var(--bg); background:var(--tarot-gold)">${getRoundLabel(state.latestRound)}</span>
           </p>
         </div>
+        <button class="btn" onclick="location.hash='#performances'" style="padding:0.42rem 0.9rem; font-size:0.72rem;">✦ Round 2 Concept Songs</button>
       </div>
-      <div class="filters" style="margin-top:1.5rem;">
-        <input id="searchContestant" placeholder="Search an initiate..." />
+
+      <div class="kpi-strip">
+        <div class="kpi-pill ${state.activeTeam === 'Global' ? 'active-kpi' : ''}" onclick="switchTeam('Global')" title="View all active Initiates">
+          <span class="kpi-lbl">☉ Active</span>
+          <span class="kpi-val">${activeAll.length}<span style="font-size:0.72rem;color:var(--muted);">/${allList.length}</span></span>
+        </div>
+        <div class="kpi-pill ${state.activeTeam === 'Soleil' ? 'active-kpi' : ''}" onclick="switchTeam('Soleil')" title="Filter Circle of the Sun">
+          <span class="kpi-lbl">✹ Sun</span>
+          <span class="kpi-val">${sunActive}</span>
+        </div>
+        <div class="kpi-pill ${state.activeTeam === 'Lune' ? 'active-kpi' : ''}" onclick="switchTeam('Lune')" title="Filter Circle of the Moon">
+          <span class="kpi-lbl">☾ Moon</span>
+          <span class="kpi-val">${moonActive}</span>
+        </div>
+        <div class="kpi-pill ${state.activeTeam === 'Etoile' ? 'active-kpi' : ''}" onclick="switchTeam('Etoile')" title="Filter Circle of the Star">
+          <span class="kpi-lbl">✦ Star</span>
+          <span class="kpi-val">${starActive}</span>
+        </div>
+        ${consumedCount > 0 ? `
+        <div class="kpi-pill kpi-consumed">
+          <span class="kpi-lbl">Consumed</span>
+          <span class="kpi-val">${consumedCount}</span>
+        </div>` : ''}
+      </div>
+
+      <div class="filters" style="margin-top:1.4rem; margin-bottom:0;">
+        <input id="searchContestant" value="${safeSearchVal}" placeholder="Search an initiate..." />
         <select id="statusFilter">
-          <option value="all">All destinies</option>
-          <option value="safe">Upright Card (Safe)</option>
-          <option value="nominee">Shadow Zone</option>
-          <option value="saved_judges">Oracle's Grace</option>
-          <option value="saved_public">Scale's Grace</option>
-          <option value="eliminated">Consumed</option>
+          <option value="all" ${state.statusFilter === 'all' ? 'selected' : ''}>All destinies</option>
+          <option value="safe" ${state.statusFilter === 'safe' ? 'selected' : ''}>Upright Card (Safe)</option>
+          <option value="nominee" ${state.statusFilter === 'nominee' ? 'selected' : ''}>Shadow Zone</option>
+          <option value="saved_judges" ${state.statusFilter === 'saved_judges' ? 'selected' : ''}>Oracle's Grace</option>
+          <option value="saved_public" ${state.statusFilter === 'saved_public' ? 'selected' : ''}>Scale's Grace</option>
+          <option value="eliminated" ${state.statusFilter === 'eliminated' ? 'selected' : ''}>Consumed / Forfeit</option>
         </select>
       </div>
     </div>
@@ -1295,12 +1737,17 @@ function renderContestants() {
   `;
 
   const draw = () => {
-    const q = document.getElementById('searchContestant').value.toLowerCase().trim();
+    const q = document.getElementById('searchContestant').value;
     const f = document.getElementById('statusFilter').value;
-    const list = sortedContestants().filter(c => c.name.toLowerCase().includes(q)).filter(c => {
+    state.searchQuery = q;
+    state.statusFilter = f;
+
+    const qNorm = q.toLowerCase().trim();
+    const list = sortedContestants().filter(c => c.name.toLowerCase().includes(qNorm)).filter(c => {
       let status = getStatus(state.latestRound, c.id);
       if (!status && getFirstEliminatedRoundIndex(c.id) !== -1 && getFirstEliminatedRoundIndex(c.id) <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
       if (f === 'all') return true;
+      if (f === 'eliminated') return isEliminatedStatus(status);
       return status === f || (f === 'safe' && ['winner', 'second', 'third', 'fourth', 'fifth'].includes(status));
     });
 
@@ -1314,13 +1761,14 @@ function renderContestants() {
         const rank = currentRanks[c.id];
         const rankDisplay = Number.isFinite(rank) ? 'ARCANA ' + (rank < 10 ? '0' + rank : rank) : 'TBD';
         let extraClass = '';
-        if (status === 'eliminated') extraClass = 'eliminated';
+        if (isEliminatedStatus(status)) extraClass = 'eliminated';
         else if (status === 'nominee') extraClass = 'danger-zone';
         const teamClass = c.teamClass || 'theme-global';
         const isNom = status === 'nominee';
         const imgSrc = getContestantImagePath(c, isNom);
         let badgeHtml = '';
         if (status === 'nominee') badgeHtml = `<div class="tarot-badge nominee">Shadow Zone</div>`;
+        else if (status === 'forfeit') badgeHtml = `<div class="tarot-badge forfeit-pill">No Record</div>`;
         else if (status === 'saved_judges') badgeHtml = `<div class="tarot-badge saved_judges">Oracle's Grace</div>`;
         else if (status === 'saved_public') badgeHtml = `<div class="tarot-badge saved_public">Scale's Grace</div>`;
         else if (status === 'winner') badgeHtml = `<div class="tarot-badge winner">✦ CHOSEN</div>`;
@@ -1356,9 +1804,9 @@ function renderRankings() {
   const activeRound = state.selectedRankingsRound || state.latestRound;
   const isGlobal = state.activeTeam === 'Global';
 
-  const list = sortedContestants().sort((a, b) => {
-    const aElim = getStatus(activeRound, a.id) === 'eliminated' ? 1 : 0;
-    const bElim = getStatus(activeRound, b.id) === 'eliminated' ? 1 : 0;
+  const list = sortedContestants(activeRound).sort((a, b) => {
+    const aElim = isEliminatedStatus(getStatus(activeRound, a.id)) ? 1 : 0;
+    const bElim = isEliminatedStatus(getStatus(activeRound, b.id)) ? 1 : 0;
     if (aElim !== bElim) return aElim - bElim;
     const va = rankingMap[activeRound]?.[a.id]; const vb = rankingMap[activeRound]?.[b.id];
     if (Number.isFinite(va) && Number.isFinite(vb)) return isPerformance ? vb - va : va - vb;
@@ -1371,7 +1819,7 @@ function renderRankings() {
     nominee: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'nominee' && teamIds.includes(r.contestant_id)),
     saved_judges: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_judges' && teamIds.includes(r.contestant_id)),
     saved_public: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'saved_public' && teamIds.includes(r.contestant_id)),
-    eliminated: state.data.round_status.filter(r => r.round_id === activeRound && r.status === 'eliminated' && teamIds.includes(r.contestant_id))
+    eliminated: state.data.round_status.filter(r => r.round_id === activeRound && isEliminatedStatus(r.status) && teamIds.includes(r.contestant_id))
   };
 
   let optionsHtml = viewOptions.map(o => `<option value="${o.value}" ${o.value === state.rankingView ? 'selected' : ''}>${o.label}</option>`).join('');
@@ -1381,25 +1829,30 @@ function renderRankings() {
     list.map(c => `<option value="${c.id}" ${state.webFocusContestant === c.id ? 'selected' : ''}>Focus: ${getContestantName(c.id)}</option>`).join('');
 
   let rowsHtml = list.map((c, idx) => {
+    const transfers = getContestantTransfers(c);
     let cellsHtml = ROUND_ORDER.map(r => {
       const v = rankingMap[r]?.[c.id];
       const elimIndex = getFirstEliminatedRoundIndex(c.id);
       const isDeadInTable = elimIndex !== -1 && elimIndex < ROUND_ORDER.indexOf(r);
+      const trTag = transfers[r] ? `<span class="transfer-tag" title="Circle Transfer: ${teamClassToShortLabel(transfers[r].from)} to ${teamClassToShortLabel(transfers[r].to)}">➔ ${teamClassToShortLabel(transfers[r].to)}</span>` : '';
       if (Number.isFinite(v)) {
         let displayV = (isPerformance && v % 1 !== 0) ? v.toFixed(1) : v;
         if (isPerformance && r === 'PRERANK') displayV = `${displayV} / 40`;
+        const deltaHtml = !isDeadInTable ? getRankDeltaHtml(rankingMap, r, c.id, isPerformance) : '';
         if (!isPerformance && isDeadInTable) return `<td><span style="color:var(--tarot-ash); font-weight:600;">${displayV}</span> <span class="pill eliminated-pill" style="font-size:0.55rem; padding:0.15rem 0.4rem; margin-left:6px;">Consumed</span></td>`;
-        return `<td>${displayV}</td>`;
+        return `<td>${displayV}${deltaHtml}${trTag}</td>`;
       }
       let st = getStatus(r, c.id);
-      if (st && st !== 'eliminated' && !isDeadInTable) return `<td><span class="pill ${statusClass(st)}" style="font-size:0.68rem; padding:0.15rem 0.5rem;">${statusLabel(st)}</span></td>`;
-      if (st === 'eliminated' || isDeadInTable) return `<td><span class="pill eliminated-pill" style="font-size:0.68rem; padding:0.15rem 0.5rem;">Consumed</span></td>`;
-      return '<td>—</td>';
+      if (st && !isEliminatedStatus(st) && !isDeadInTable) return `<td><span class="pill ${statusClass(st)}" style="font-size:0.68rem; padding:0.15rem 0.5rem;">${statusLabel(st)}</span>${trTag}</td>`;
+      if (isEliminatedStatus(st) || isDeadInTable) {
+        const lbl = st === 'forfeit' ? 'Forfeit' : 'Consumed';
+        return `<td><span class="pill eliminated-pill" style="font-size:0.68rem; padding:0.15rem 0.5rem;">${lbl}</span></td>`;
+      }
+      return `<td>—${trTag}</td>`;
     }).join('');
     return `<tr><td>${idx + 1}</td><td><a href="#profile/${c.id}">${getContestantName(c.id)}</a></td>${cellsHtml}</tr>`;
   }).join('');
 
-  // Dynamic vertical height for Web of Destiny: 640px for 16-member Circle, 960px for 48-member Global!
   const chartHeightPx = isGlobal ? 960 : 640;
   const maxRankScale = isGlobal ? 48 : 16;
 
@@ -1410,9 +1863,9 @@ function renderRankings() {
         <select id="rankingViewSelect">${optionsHtml}</select>
         <select id="rankingsRoundSelect">${roundsHtml}</select>
       </div>
-      <p class="small" style="color:var(--tarot-gold)">Aura evolution across the cycles.</p>
+      <p class="small" style="color:var(--tarot-gold)">Aura evolution across the cycles (▲ / ▼ show rank movement vs previous cycle).</p>
       <div class="table-wrap">
-        <table style="max-width: 980px;">
+        <table style="max-width: 1060px;">
           <thead><tr><th style="width:70px;">${isPerformance ? 'Pos' : 'Arcana'}</th><th style="width:170px;">Initiate</th>${thRoundsHtml}</tr></thead>
           <tbody>${rowsHtml}</tbody>
         </table>
@@ -1421,7 +1874,7 @@ function renderRankings() {
       <p class="small"><span style="color:var(--tarot-danger); font-weight:bold;">Shadow Zone :</span> ${nominations.nominee.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
       <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">Oracle's Grace :</span> ${nominations.saved_judges.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
       <p class="small"><span style="color:var(--tarot-gold); font-weight:bold;">Scale's Grace :</span> ${nominations.saved_public.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
-      <p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">Consumed Cards :</span> ${nominations.eliminated.map(x => getContestantName(x.contestant_id)).join(', ') || '—'}</p>
+      <p class="small"><span style="color:var(--tarot-ash); font-weight:bold;">Consumed / Forfeit Cards :</span> ${nominations.eliminated.map(x => getContestantName(x.contestant_id) + (x.status === 'forfeit' ? ' (No Record)' : '')).join(', ') || '—'}</p>
     </div>
     <div class="card-paper">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:1rem;">
@@ -1436,7 +1889,11 @@ function renderRankings() {
   `;
 
   document.getElementById('rankingViewSelect').addEventListener('change', (e) => { state.rankingView = e.target.value; renderRankings(); });
-  document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => { state.selectedRankingsRound = e.target.value; renderRankings(); });
+  document.getElementById('rankingsRoundSelect').addEventListener('change', (e) => {
+    state.selectedRankingsRound = e.target.value;
+    state.userPickedRankingsRound = true;
+    renderRankings();
+  });
   document.getElementById('webFocusSelect').addEventListener('change', (e) => { state.webFocusContestant = e.target.value; renderRankings(); });
 
   try {
@@ -1453,7 +1910,7 @@ function renderRankings() {
         labels: ROUND_ORDER.map(r => getRoundLabel(r)),
         datasets: list.map((c, idx) => {
           const elimIndex = getFirstEliminatedRoundIndex(c.id);
-          const isEliminated = getStatus(activeRound, c.id) === 'eliminated';
+          const isEliminated = isEliminatedStatus(getStatus(activeRound, c.id));
           const isFocused = !hasFocus || state.webFocusContestant === c.id;
           const baseColor = colorForIndex(idx);
           const dimAlpha = hasFocus && !isFocused ? 0.12 : (isEliminated ? 0.25 : 1);
@@ -1507,6 +1964,103 @@ function renderRankings() {
   } catch (err) { console.error(err); }
 }
 
+function renderPerformances() {
+  const root = document.getElementById('performances');
+  const isGlobal = state.activeTeam === 'Global';
+
+  const visibleConceptCircles = isGlobal
+    ? ROUND_2_CONCEPT_SONGS
+    : ROUND_2_CONCEPT_SONGS.filter(g => g.teamKey === state.activeTeam);
+
+  const conceptCardsHtml = visibleConceptCircles.map(grp => `
+    <div class="concept-circle-card ${!isGlobal ? 'highlighted-circle' : ''}">
+      <div class="concept-circle-head">
+        <h4>${grp.symbol} ${grp.circleName}</h4>
+        <span class="chip" style="font-size:0.68rem;">Leader: ${grp.leader}</span>
+      </div>
+      ${grp.songs.map(song => `
+        <div class="concept-song-item">
+          <div class="concept-song-top">
+            <span class="concept-song-title">${song.title}</span>
+            <span class="concept-song-artist">${song.artist}</span>
+          </div>
+          <div class="concept-house-tag">${song.house}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  // Dynamic Performances Archive pulled from Google Sheet submissions
+  const teamIds = new Set(sortedContestants().map(c => c.id));
+  const roundFilter = state.perfRoundFilter || 'all';
+  const filteredSubs = state.data.submissions.filter(s => {
+    if (!teamIds.has(s.contestant_id)) return false;
+    if (roundFilter !== 'all' && s.round_id !== roundFilter) return false;
+    return Boolean(s.song_title || s.youtube_url || s.bandlab_url);
+  }).sort((a, b) => {
+    const rd = ROUND_ORDER.indexOf(b.round_id) - ROUND_ORDER.indexOf(a.round_id);
+    if (rd !== 0) return rd;
+    return getContestantName(a.contestant_id).localeCompare(getContestantName(b.contestant_id));
+  });
+
+  const roundFilterOptions = `<option value="all" ${roundFilter === 'all' ? 'selected' : ''}>All Cycles</option>` +
+    ROUND_ORDER.map(r => `<option value="${r}" ${roundFilter === r ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
+
+  const archiveRowsHtml = filteredSubs.length > 0 ? filteredSubs.map(s => {
+    const cObj = state.data.contestants.find(x => x.id === s.contestant_id);
+    const cTeamLbl = teamClassToShortLabel(getContestantTeamForRound(cObj, s.round_id));
+    return `
+      <tr>
+        <td><strong>${getRoundLabel(s.round_id)}</strong></td>
+        <td><a href="#profile/${s.contestant_id}">${getContestantName(s.contestant_id)}</a></td>
+        <td><span class="chip" style="font-size:0.68rem;">${cTeamLbl}</span></td>
+        <td>${s.song_title || '—'}${s.group_song ? `<br><span class="small">${s.group_song}</span>` : ''}</td>
+        <td>
+          ${s.youtube_url ? `<a class="btn" style="padding:0.28rem 0.68rem; font-size:0.72rem;" target="_blank" rel="noopener noreferrer" href="${s.youtube_url}">Observe Ritual</a>` : ''}
+          ${s.bandlab_url ? ` <a class="btn" style="padding:0.28rem 0.68rem; font-size:0.72rem;" target="_blank" rel="noopener noreferrer" href="${s.bandlab_url}">BandLab</a>` : ''}
+          ${!s.youtube_url && !s.bandlab_url ? '—' : ''}
+        </td>
+      </tr>
+    `;
+  }).join('') : `<tr><td colspan="5" class="small" style="text-align:center; padding:1.4rem;">No recorded rituals published yet for this filter. Round 1 performances arrive November 26!</td></tr>`;
+
+  root.innerHTML = `
+    <div class="card-paper">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h2 style="margin-bottom:0.3rem;">Round 2 — The Concept Round Songs</h2>
+          <p class="small" style="color:var(--tarot-gold); margin:0;">
+            Each Celestial Circle has 4 exclusive Concept Songs (3 teams of 3 &amp; 1 team of 4 per Circle • No duplicate Concept or Artist).
+          </p>
+        </div>
+        ${!isGlobal ? `<button class="btn" onclick="switchTeam('Global')" style="padding:0.42rem 0.9rem; font-size:0.72rem;">☉ Show All 3 Circles</button>` : ''}
+      </div>
+      <div class="concept-circles-grid">${conceptCardsHtml}</div>
+    </div>
+
+    <div class="card-paper">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <h3 style="border:none; margin:0; padding:0;">Recorded Rituals Archive</h3>
+          <p class="small" style="margin:4px 0 0 0;">Direct links to every published performance across the season.</p>
+        </div>
+        <select id="perfRoundSelect">${roundFilterOptions}</select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cycle</th><th>Initiate</th><th>Circle</th><th>Song / Unit</th><th>Visions</th></tr></thead>
+          <tbody>${archiveRowsHtml}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('perfRoundSelect').addEventListener('change', (e) => {
+    state.perfRoundFilter = e.target.value;
+    renderPerformances();
+  });
+}
+
 function renderProfile(contestantId) {
   const c = state.data.contestants.find(x => x.id === contestantId);
   const root = document.getElementById('profile');
@@ -1521,16 +2075,22 @@ function renderProfile(contestantId) {
   const prevContestant = profileIndex > 0 ? profileOrder[profileIndex - 1] : null;
   const nextContestant = profileIndex >= 0 && profileIndex < profileOrder.length - 1 ? profileOrder[profileIndex + 1] : null;
   const submissions = state.data.submissions.filter(s => s.contestant_id === c.id).sort((a,b) => ROUND_ORDER.indexOf(a.round_id) - ROUND_ORDER.indexOf(b.round_id));
+  const transfers = getContestantTransfers(c);
+  const transferEntries = Object.entries(transfers);
 
   let circleBadgeHtml = `<div class="circle-badge-pill">☉ Unassigned Circle</div>`;
   if (c.teamClass === 'theme-sun') circleBadgeHtml = `<div class="circle-badge-pill">✹ Circle of the Sun — Neitsu</div>`;
   else if (c.teamClass === 'theme-moon') circleBadgeHtml = `<div class="circle-badge-pill">☾ Circle of the Moon — Kaina</div>`;
   else if (c.teamClass === 'theme-star') circleBadgeHtml = `<div class="circle-badge-pill">✦ Circle of the Star — Aya</div>`;
 
+  const transferHistoryHtml = transferEntries.length > 0
+    ? `<div style="margin-bottom:0.75rem;">${transferEntries.map(([rid, tr]) => `<span class="transfer-tag" style="margin-left:0; margin-right:6px; font-size:0.68rem; padding:3px 9px;">${getRoundLabel(rid)} Transfer : ${teamClassToShortLabel(tr.from)} ➔ ${teamClassToShortLabel(tr.to)}</span>`).join('')}</div>`
+    : '';
+
   const meta = [
     c.country ? `Land : ${c.country}` : '',
     c.pronouns ? `Identity : ${c.pronouns}` : '',
-    c.instagram ? `Grimoire (Insta) : <a href="${c.instagram.startsWith('http') ? c.instagram : 'https://instagram.com/' + c.instagram.replace('@', '')}" target="_blank" style="color:var(--tarot-gold)">${c.instagram}</a>` : ''
+    c.instagram ? `Grimoire (Insta) : <a href="${c.instagram.startsWith('http') ? c.instagram : 'https://instagram.com/' + c.instagram.replace('@', '')}" target="_blank" rel="noopener noreferrer" style="color:var(--tarot-gold)">${c.instagram}</a>` : ''
   ].filter(Boolean).join(' · ');
 
   let roundsRowsHtml = ROUND_ORDER.map(r => {
@@ -1541,16 +2101,18 @@ function renderProfile(contestantId) {
     const scoreRec = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id);
     const rawVocal = scoreRec?.total;
     const rawBonus = scoreRec?.bonus || 0;
+    const trBadge = transfers[r] ? `<span class="transfer-tag">${teamClassToShortLabel(transfers[r].from)} ➔ ${teamClassToShortLabel(transfers[r].to)}</span>` : '';
+    const rkVal = official[r]?.[c.id];
+    const deltaHtml = !isEliminatedStatus(st) ? getRankDeltaHtml(official, r, c.id, false) : '';
 
     if (r === 'PRERANK') {
-      // PRE-RANK ROW: Each Judge is out of 10 (/10) and Total Power is out of 40 (/40)
       const jCellsPre = JUDGE_NAMES.map(j => {
         const jVal = judgesByName[j]?.['PRERANK']?.[c.id];
         return `<td>${Number.isFinite(jVal) ? `${jVal}<span style="color:var(--muted);font-size:0.75em;">/10</span>` : '—'}</td>`;
       }).join('');
       const preTotStr = Number.isFinite(pScore) ? `${pScore % 1 === 0 ? pScore : pScore.toFixed(1)} <span style="font-size:0.78em;color:var(--muted);">/ 40</span>` : '—';
       const preSt = st || (Number.isFinite(official['PRERANK']?.[c.id]) ? 'safe' : '');
-      return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${official[r]?.[c.id] ?? '—'}</td>${jCellsPre}<td><span style="color:var(--muted);font-size:0.8em;">Audition (/40)</span></td><td><strong style="color:var(--tarot-gold)">${preTotStr}</strong></td><td><span class="pill ${statusClass(preSt)}">${statusLabel(preSt)}</span></td></tr>`;
+      return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${rkVal ?? '—'}</td>${jCellsPre}<td><span style="color:var(--muted);font-size:0.8em;">Audition (/40)</span></td><td><strong style="color:var(--tarot-gold)">${preTotStr}</strong></td><td><span class="pill ${statusClass(preSt)}">${statusLabel(preSt)}</span></td></tr>`;
     }
 
     let pScoreStr = Number.isFinite(pScore) ? (pScore % 1 === 0 ? pScore.toString() : pScore.toFixed(1)) : '—';
@@ -1559,7 +2121,7 @@ function renderProfile(contestantId) {
       vocalStr += ` <span class="bonus-pill" title="Theme Song Bonus (Max +15 pts)">+${rawBonus} Bonus</span>`;
     }
     const jCellsHtml = JUDGE_NAMES.map(j => `<td>${judgesByName[j]?.[r]?.[c.id] ?? '—'}</td>`).join('');
-    return `<tr><td><strong>${getRoundLabel(r)}</strong></td><td>${official[r]?.[c.id] ?? '—'}</td>${jCellsHtml}<td>${vocalStr}</td><td><strong style="color:var(--tarot-gold)">${pScoreStr}</strong></td><td><span class="pill ${statusClass(st)}">${statusLabel(st)}</span></td></tr>`;
+    return `<tr><td><strong>${getRoundLabel(r)}</strong>${trBadge}</td><td>${rkVal ?? '—'}${deltaHtml}</td>${jCellsHtml}<td>${vocalStr}</td><td><strong style="color:var(--tarot-gold)">${pScoreStr}</strong></td><td><span class="pill ${statusClass(st)}">${statusLabel(st)}</span></td></tr>`;
   }).join('');
 
   let perfsRowsHtml = submissions.length > 0 ? submissions.map(s => `
@@ -1567,17 +2129,17 @@ function renderProfile(contestantId) {
       <td><strong>${getRoundLabel(s.round_id) || s.round_id}</strong></td>
       <td>${s.song_title || 'Pending'}${s.group_song ? `<br><span style="color:var(--muted); font-size:0.85em">${s.group_song}</span>` : ''}</td>
       <td>
-        ${s.youtube_url ? `<a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" href="${s.youtube_url}">Observe Ritual</a>` : '—'}
-        ${s.bandlab_url ? ` <a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" href="${s.bandlab_url}">BandLab</a>` : ''}
+        ${s.youtube_url ? `<a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" rel="noopener noreferrer" href="${s.youtube_url}">Observe Ritual</a>` : '—'}
+        ${s.bandlab_url ? ` <a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" rel="noopener noreferrer" href="${s.bandlab_url}">BandLab</a>` : ''}
       </td>
     </tr>`).join('') : `<tr><td colspan="3">No visions recorded.</td></tr>`;
 
   const dynamicRankLabel = isGlobalView ? 'Global Arcana (/48)' : 'Circle Arcana (/16)';
   const latestSt = getStatus(state.latestRound, c.id);
   const isNom = latestSt === 'nominee';
+  const isElim = isEliminatedStatus(latestSt);
   const profileImgSrc = getContestantImagePath(c, isNom);
 
-  // Check if Round 1+ data exists for the Pentagram (never invent fake 75/100 or 50% in Pre-Rank!)
   const r = state.latestRound;
   const activeVocalRec = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id);
   const hasRealPentagramData = (r !== 'PRERANK') && (
@@ -1595,7 +2157,6 @@ function renderProfile(contestantId) {
          </p>
        </div>`;
 
-  // Aura Fluctuation scale: /16 inside Sun, Moon, Star circles, /48 in Global!
   const fluctuationMaxRank = isGlobalView ? 48 : 16;
   const fluctuationScopeLabel = isGlobalView ? "Global (/48)" : "Circle (/16)";
 
@@ -1605,16 +2166,18 @@ function renderProfile(contestantId) {
         <button class="btn" onclick="location.hash='#contestants'">← Back to cards</button>
         ${prevContestant ? `<button class="btn" onclick="location.hash='#profile/${prevContestant.id}'">← ${getContestantName(prevContestant.id)}</button>` : ''}
         ${nextContestant ? `<button class="btn" onclick="location.hash='#profile/${nextContestant.id}'">${getContestantName(nextContestant.id)} →</button>` : ''}
+        <button class="btn btn-primary profile-nav-spacer" onclick="copyProfileLink('${c.id}')">✦ Share Card Link</button>
       </div>
       <div class="row two">
         <div style="display:flex; justify-content:center;">
-          <div class="profile-img-wrap ${isNom ? 'danger-zone' : ''}">
+          <div class="profile-img-wrap ${isNom ? 'danger-zone' : (isElim ? 'eliminated' : '')}">
             <img class="profile-img" src="${profileImgSrc}" data-contestant-id="${c.id}" data-raw-name="${c.name}" data-is-nominee="${isNom ? '1' : '0'}" alt="${c.name}" onerror="handleImageFallback(this)" />
           </div>
         </div>
         <div class="profile-content">
           <h2 style="font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.35rem;">${getContestantName(c.id)}</h2>
           ${circleBadgeHtml}
+          ${transferHistoryHtml}
           ${meta ? `<p class="small" style="font-size:0.95rem; color:var(--tarot-gold); margin-top:0.2rem;">${meta}</p>` : ''}
           <h3 style="margin-top:1.5rem;">Book of Cycles</h3>
           <p class="small" style="margin-top:0; margin-bottom:0.8rem;">Pre-Rank: 4 Oracles (/10 each = /40) · Round 1: Vocal (/100) + Theme Song Bonus (max +15 pts) + 4 Oracles Ranking</p>
@@ -1646,7 +2209,7 @@ function renderProfile(contestantId) {
     </div>
   `;
 
-  const maxActive = getActiveCountForRound(r, c.teamClass);
+  const maxActive = getActiveCountForRound(r, getContestantTeamForRound(c, r));
   const rankToPct = (rk) => Number.isFinite(rk) && rk >= 1 ? Math.round(Math.max(15, ((maxActive - rk + 1) / maxActive) * 100)) : 0;
 
   try {
@@ -1723,7 +2286,6 @@ function renderVotes() {
 
   const isGlobal = state.activeTeam === 'Global';
   const baseRule = ROUND_RULES[state.votesRound] || ROUND_RULES.ROUND_1;
-  // In Global view (for Rounds 1-4), multiply the per-circle quotas by 3 (e.g., 24 in Shadow Zone, 9 Oracle, 6 Public, 9 Consumed in Round 1!)
   const multiplier = (isGlobal && state.votesRound !== 'FINAL') ? 3 : 1;
   const displayQuotas = {
     shadow: baseRule.shadow * multiplier,
@@ -1739,22 +2301,20 @@ function renderVotes() {
 
   const nominees = state.data.round_status.filter(r => r.round_id === state.votesRound && r.status === 'nominee').map(r => r.contestant_id);
   const votedCandidates = state.data.votes_live.filter(v => v.round_id === state.votesRound).map(v => v.contestant_id);
-  const activeTeamIds = sortedContestants().map(c => c.id);
+  const activeTeamIds = sortedContestants(state.votesRound).map(c => c.id);
   const targets = [...new Set([...nominees, ...votedCandidates])].filter(id => activeTeamIds.includes(id));
 
   const rows = targets.map(id => {
     const cObj = state.data.contestants.find(x => x.id === id);
     const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
+    const cTeam = getContestantTeamForRound(cObj, state.votesRound);
     let teamBadge = "";
     if (isGlobal && cObj) {
-      if (cObj.teamClass === 'theme-sun') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">✹ Sun</span>`;
-      else if (cObj.teamClass === 'theme-moon') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">☾ Moon</span>`;
-      else if (cObj.teamClass === 'theme-star') teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">✦ Star</span>`;
+      teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">${teamClassToShortLabel(cTeam)}</span>`;
     }
-    return { id, name: getContestantName(id), teamClass: cObj?.teamClass || '', teamBadge, votes: Number(record?.votes_count || 0) };
+    return { id, name: getContestantName(id), teamClass: cTeam, teamBadge, votes: Number(record?.votes_count || 0) };
   }).sort((a, b) => b.votes - a.votes);
 
-  // Determine who is in the Public Save zone (top `baseRule.publicSave` per Circle when in Global, or top `baseRule.publicSave` in active Circle)
   const savedByScaleIds = new Set();
   if (isGlobal && state.votesRound !== 'FINAL') {
     ['theme-sun', 'theme-moon', 'theme-star'].forEach(tc => {
@@ -1831,7 +2391,11 @@ function renderVotes() {
       </p>
     </div>
   `;
-  document.getElementById('votesRoundSelect').addEventListener('change', (e) => { state.votesRound = e.target.value; renderVotes(); });
+  document.getElementById('votesRoundSelect').addEventListener('change', (e) => {
+    state.votesRound = e.target.value;
+    state.userPickedVotesRound = true;
+    renderVotes();
+  });
 }
 
 function renderGrimoire() {
@@ -1887,7 +2451,7 @@ function renderGrimoire() {
           <tbody>
             <tr><td><strong style="color:var(--tarot-gold)">Pre-Rank</strong></td><td>Audition Score (/40) — Each of the 4 Oracles scores /10</td><td>Selection of the 48 Initiates split into 3 Circles of 16 (Sun, Moon, Star)</td></tr>
             <tr><td><strong>Round 1 (16 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank + <strong>Theme Song Bonus (+15 pts max)</strong></td><td>8 Safe • 8 in Shadow Zone (3 saved by Leader, 2 by Public, 3 eliminated)</td></tr>
-            <tr><td><strong>Round 2 (13 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>6 Safe • 7 in Shadow Zone (3 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
+            <tr><td><strong>Round 2 — Concept Round (13)</strong></td><td>Vocal (/100) + 4 Oracles Rank • 4 Exclusive Songs / Circle</td><td>6 Safe • 7 in Shadow Zone (3 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
             <tr><td><strong>Round 3 (10 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>4 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
             <tr><td><strong>Round 4 (7 per Circle)</strong></td><td>Vocal (/100) + 4 Oracles Rank</td><td>1 Safe • 6 in Shadow Zone (2 saved by Leader, 1 by Public, 3 eliminated)</td></tr>
             <tr><td><strong style="color:var(--tarot-gold)">Finale</strong></td><td>Vocal (/100) + 4 Oracles Rank + Final Scale</td><td>The 12 survivors (4 per Circle) merge: 5 Winners join KÆOS</td></tr>
@@ -1895,7 +2459,28 @@ function renderGrimoire() {
         </table>
       </div>
 
-      <h3 style="margin-top:2.8rem;">100-Point Vocal Rubric &amp; Round 1 Bonus</h3>
+      <h3 style="margin-top:2.6rem;">Special Laws of the Sanctuary</h3>
+      <div class="rules-grid-2">
+        <div class="rule-lore-box">
+          <h4>✦ The Circle Transfer Benefit (Permanent Rule)</h4>
+          <ul>
+            <li><strong>Eligibility:</strong> Only direct <strong>Upright Safe</strong> Initiates unlock the right to request a Circle Transfer (<strong>R1: Top 8</strong> · <strong>R2: Top 6</strong> · <strong>R3: Top 4</strong> · <strong>R4: Top 1</strong>). Shadow Zone nominees — even if saved by Oracle's Grace or Scale's Grace — stay in their Circle.</li>
+            <li><strong>Balanced Swaps:</strong> Transfers only occur through a matching <strong>1-for-1 Swap</strong> or a <strong>3-Way Rotation</strong> (Sun ➔ Star ➔ Moon ➔ Sun) so every Circle stays equal.</li>
+            <li><strong>Priority &amp; Secrecy:</strong> Processed by highest Circle Rank first (Total Power breaks ties). Requests are optional, never guaranteed, and <strong>100% confidential</strong> if unmatched.</li>
+            <li><strong>At Your Own Risk:</strong> Approved shifts are permanent (new Leader, Circle chat &amp; songs) until you earn Safe again.</li>
+          </ul>
+        </div>
+        <div class="rule-lore-box forfeit-box">
+          <h4 style="color:#FF8585;">✧ No Record &amp; Direct Elimination Law</h4>
+          <ul>
+            <li><strong>Direct Elimination:</strong> Any Initiate who fails to submit a recording before the official deadline (<strong>No Record / Forfeit</strong>) is immediately consumed to ash without passing through the Shadow Zone.</li>
+            <li><strong>Quota Adjustment:</strong> Each forfeit counts toward the Circle's elimination quota for that round (e.g., 1 forfeit leaves 2 eliminations in the Shadow Zone).</li>
+            <li><strong>No Nomination (All Safe):</strong> If <strong>3 or more Initiates</strong> in a Circle do not submit a recording, the round's elimination quota is already fulfilled — no Shadow Zone nomination takes place and all recording Initiates automatically advance as Safe.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:2.6rem;">100-Point Vocal Rubric &amp; Round 1 Bonus</h3>
       <p class="small">From Round 1 onwards, the 100-point vocal score is evaluated across these 11 criteria (plus up to <strong>+15 Bonus Points</strong> in Round 1 for the official Theme Song <em>"We Are Destiny"</em>):</p>
       <div class="rubric-grid">
         <div class="rubric-item"><span>Pitch</span><span class="rubric-pts">/20</span></div>
@@ -1917,9 +2502,10 @@ function renderGrimoire() {
   `;
 }
 
-function renderAll() {
-  renderContestants();
+function renderAll(isBackgroundRefresh = false) {
+  renderContestants(isBackgroundRefresh);
   renderRankings();
+  renderPerformances();
   renderVotes();
   renderGrimoire();
   if (location.hash && location.hash.startsWith('#profile/')) {
@@ -1965,14 +2551,22 @@ async function boot() {
     initCelestialSparks();
     initMobileScrollCardFlip();
     updateCircleSwitcherUI();
+    startLiveCycleClock();
     setupNav();
-    await hydrate();
-    renderAll();
+    await hydrate(false);
+    renderAll(false);
 
-    clearTimeout(state.votesTimer);
+    let lastDataSignature = JSON.stringify(state.data);
+    clearInterval(state.votesTimer);
     state.votesTimer = setInterval(async () => {
-      await hydrate();
-      renderAll();
+      await hydrate(true);
+      const nextSignature = JSON.stringify(state.data);
+      if (nextSignature !== lastDataSignature) {
+        lastDataSignature = nextSignature;
+        renderAll(true);
+      } else if (location.hash === '#votes') {
+        renderVotes();
+      }
     }, CONFIG.REFRESH_MS);
   } catch (error) {
     console.error("Critical startup error:", error);
