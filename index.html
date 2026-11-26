@@ -1598,7 +1598,7 @@ async function loadDataFromRoundGids() {
     allIds.forEach(id => {
       const existingIndex = round_status_clean.findIndex(r => r.round_id === round && r.contestant_id === id);
       if (existingIndex >= 0) lastStatusObj[id] = round_status_clean[existingIndex].status;
-      else if (isEliminatedStatus(lastStatusObj[id])) round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' });
+      else if (isEliminatedStatus(lastStatusObj[id])) round_status_clean.push({ round_id: round, contestant_id: id, status: 'eliminated' });
     });
   });
 
