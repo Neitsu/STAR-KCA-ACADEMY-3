@@ -1304,7 +1304,7 @@ function parseCSV(text) {
 async function fetchSheetByGid(gid, customSheetId = null) {
   const targetId = customSheetId || CONFIG.SHEET_ID;
   if (!targetId || gid === null || gid === undefined || String(gid).trim() === '') return [];
-  const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&_=${Date.now()}`;
+  const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&headers=1&_=${Date.now()}`;
   try {
     const response = await fetch(url);
     if (!response.ok) return [];
@@ -1677,9 +1677,10 @@ function sortedContestants(roundOverride = null) {
   if (state.activeTeam === 'Lune') filtered = filtered.filter(c => getContestantTeamForRound(c, targetRound) === 'theme-moon');
   if (state.activeTeam === 'Etoile') filtered = filtered.filter(c => getContestantTeamForRound(c, targetRound) === 'theme-star');
   
+  const statusRound = roundOverride || state.latestRound;
   return [...filtered].sort((a, b) => {
-    const aElim = isEliminatedStatus(getStatus(targetRound, a.id)) ? 1 : 0;
-    const bElim = isEliminatedStatus(getStatus(targetRound, b.id)) ? 1 : 0;
+    const aElim = isEliminatedStatus(getStatus(statusRound, a.id) || getStatus(targetRound, a.id)) ? 1 : 0;
+    const bElim = isEliminatedStatus(getStatus(statusRound, b.id) || getStatus(targetRound, b.id)) ? 1 : 0;
     if (aElim !== bElim) return aElim - bElim;
     const ar = current[a.id]; const br = current[b.id];
     if (Number.isFinite(ar) && Number.isFinite(br)) return ar - br;
