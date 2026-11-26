@@ -1,723 +1,1188 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KÆOS PROJECT — Star KCA Academy</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --tarot-bg: #181818;      
-      --tarot-gold: #E2B961;    
-      --tarot-gold-dim: rgba(226, 185, 97, 0.22);
-      --tarot-danger: #D93838;  
-      --tarot-ash: #555555;
-      --tarot-ash-dark: #121212;
-      --tarot-up: #6EE7B7;
-      --bg: #0A0A0A;
-      --panel: #121212;
-      --panel2: #1A1A1A;
-      --text: #F0EDE5;
-      --muted: #888888;
-      --line: #2E2E2E;
-    }
-    
-    * { box-sizing: border-box; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--tarot-gold); }
+/* ============================================================================
+   MOTEUR VISUEL CINÉMATIQUE V17 — ZÉRO-LAG GPU BLIT + RITUEL CENDRE DNR
+   - Fond 1:1 hors-zoom (Or / Éclipse Rubis / Cendre DNR)
+   - Étui 3D & Emblèmes pré-cachés en sprites (0 courbe Bézier par frame)
+   - Fissures organiques + Combustion 100 % en flocons de cendre & braises
+   - Compteurs 2 ou 3 pilules (SAFE • ASH DNR • SHADOW) + Rappel DNR sur l'Autel
+   ============================================================================ */
+const masterCanvas = document.getElementById("master-video-canvas");
+const masterCtx = masterCanvas.getContext("2d", { alpha: false });
+let stageRenderLoopId = null, lastFrameTime = performance.now();
+let activeRenderFpsCap = 0;
 
-    body {
-      margin: 0; font-family: 'Poppins', sans-serif; color: var(--text);
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, #1a150e 0%, #0A0A0A 65%);
-      background-attachment: fixed; overflow-x: hidden;
-    }
+// Télémétrie FPS / ms en direct (affichée dans le bandeau REC)
+const perfMon = { frames: 0, lastStamp: performance.now(), fps: 60, avgDrawMs: 0 };
 
-    /* ==========================================
-       CELESTIAL RISING SPARKS BACKGROUND CANVAS
-       ========================================== */
-    #celestial-sparks {
-      position: fixed; inset: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 0;
-    }
-    #landing-menu, #app-dashboard { position: relative; z-index: 2; }
-    
-    h1, h2, h3, h4 {
-      font-family: 'Cinzel', 'Playfair Display', serif;
-      color: var(--tarot-gold); font-weight: 700; letter-spacing: 2.5px;
-    }
-    .container { width: min(1320px, 94vw); margin: 0 auto; }
+let burstParticles = [], shockwaveRings = [], sealShards = [], lockFlashes = [], ashFlakes = [];
 
-    /* ==========================================
-       TOAST NOTIFICATION
-       ========================================== */
-    #site-toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 999;
-      background: rgba(18, 15, 11, 0.96); border: 1.5px solid var(--tarot-gold);
-      color: #FFF5CC; padding: 0.7rem 1.25rem; border-radius: 6px;
-      font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 18px rgba(226, 185, 97, 0.25);
-      opacity: 0; transform: translateY(16px); pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-    #site-toast.show { opacity: 1; transform: translateY(0); }
+// 3 nuages de brume volumétrique légers
+const mistClouds = Array.from({ length: 3 }, (_, i) => ({
+  x: (i * 360 + 120) % STAGE_W,
+  y: (i * 540 + 260) % 1920,
+  size: 560 + (i % 2) * 140,
+  vx: (i % 2 === 0 ? 1 : -1) * (13 + i * 5),
+  phase: i * 1.6
+}));
 
-    /* ==========================================
-       LANDING MENU (4 3D TAROT CARDS)
-       ========================================== */
-    #landing-menu {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 2rem 0; transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    .menu-header { text-align: center; margin-bottom: 2.2rem; color: var(--tarot-gold); padding: 0 1rem; }
-    .menu-header h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: 6px; text-transform: uppercase; margin: 0 0 10px 0; text-shadow: 0 0 25px rgba(226, 185, 97, 0.35); }
-    .menu-header p { font-size: clamp(0.75rem, 2vw, 1rem); letter-spacing: 6px; text-transform: uppercase; margin: 0; color: #999; }
-    .menu-sub-hint {
-      display: inline-block; margin-top: 14px; padding: 5px 18px;
-      border: 1px solid var(--tarot-gold-dim); border-radius: 99px;
-      background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold);
-      font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-    
-    .cards-layout { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; max-width: 1400px; padding: 20px; }
-    .card-container { width: 270px; height: 430px; perspective: 1500px; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
-    .tarot-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
-    
-    @media (hover: hover) {
-      .card-container:hover .tarot-flip-card { transform: rotateY(180deg) translateY(-16px); }
-    }
-    .card-container.flipped .tarot-flip-card { transform: rotateY(180deg) translateY(-10px); }
-    
-    .card-face {
-      position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.85); padding: 10px;
-    }
-    .card-front {
-      display: flex; justify-content: center; align-items: center;
-      background-image: linear-gradient(rgba(226, 185, 97, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 185, 97, 0.14) 1px, transparent 1px);
-      background-size: 20px 20px; background-position: center;
-    }
-    .card-front::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.55) 0%, rgba(10,10,10,0.94) 100%); }
-    .card-front-inner { position: relative; z-index: 2; width: 88%; height: 92%; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; }
-    .card-front-label { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 3px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; opacity: 0.92; }
-    .front-tap-badge {
-      position: absolute; bottom: 20px; font-family: 'Cinzel', serif;
-      font-size: 0.64rem; font-weight: 700; letter-spacing: 2px;
-      color: var(--tarot-gold); border: 1px solid var(--tarot-gold-dim);
-      background: rgba(10, 10, 10, 0.85); padding: 4px 12px; border-radius: 99px;
-      text-transform: uppercase;
-    }
+// 38 poussières d'or / braises / cendres montantes
+const ambientSparks = Array.from({ length: 38 }, () => ({
+  x: Math.random() * STAGE_W,
+  y: Math.random() * 1920,
+  size: 10 + Math.random() * 14,
+  vy: 0.48 + Math.random() * 0.9,
+  swayAmp: 0.24 + Math.random() * 0.42,
+  swaySpeed: 0.012 + Math.random() * 0.02,
+  phase: Math.random() * Math.PI * 2,
+  baseAlpha: 0.30 + Math.random() * 0.54
+}));
 
-    .front-symbol {
-      width: 84px; height: 84px; border: 2px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg);
-      display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: var(--tarot-gold);
-      box-shadow: 0 0 25px rgba(226, 185, 97, 0.25), inset 0 0 15px rgba(226, 185, 97, 0.3); text-shadow: 0 0 15px rgba(226, 185, 97, 0.8);
-    }
-    .card-back { transform: rotateY(180deg); }
+// Cache paresseux (lazy) de l'Étui 3D & des Emblèmes vectoriels
+const v17Cache = { key: "", sleeveFront: null, emblemGold: null, emblemLight: null };
 
-    @keyframes pulseEnterBtn {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(226, 185, 97, 0.5); }
-      50% { transform: scale(1.06); box-shadow: 0 0 24px rgba(226, 185, 97, 0.85); }
-    }
-    .enter-hint {
-      position: absolute; bottom: 50px; background: var(--tarot-gold); color: #0A0A0A;
-      font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
-      padding: 6px 16px; border-radius: 99px; text-transform: uppercase; z-index: 5;
-      animation: pulseEnterBtn 2.4s infinite ease-in-out;
-    }
+function ensureV17BoxSprites(theme) {
+  const k = `${theme.type}|${theme.fullTitle}`;
+  if (v17Cache.key === k && v17Cache.sleeveFront) return;
+  v17Cache.key = k;
 
-    /* ==========================================
-       HEADER, CIRCLE SWITCHER & LIVE SCHEDULE BAR
-       ========================================== */
-    #app-dashboard { display: none; opacity: 0; transition: opacity 0.6s ease; }
-    header {
-      position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px);
-      background: rgba(10, 10, 10, 0.92); border-bottom: 1px solid var(--tarot-gold-dim); box-shadow: 0 4px 25px rgba(0,0,0,0.7);
-    }
-    .topbar { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; padding: 0.7rem 0; }
-    
-    .brand { cursor: pointer; transition: transform 0.3s ease; }
-    .brand:hover { transform: scale(1.02); }
-    .brand h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 4px; color: var(--tarot-gold); }
-    .brand p { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; }
-    
-    .circle-switcher { display: flex; align-items: center; gap: 0.35rem; background: #0d0d0d; padding: 4px; border-radius: 6px; border: 1px solid var(--line); }
-    .circle-btn {
-      background: transparent; color: var(--muted); border: 1px solid transparent; border-radius: 4px;
-      padding: 0.32rem 0.65rem; font-size: 0.76rem; font-family: 'Poppins'; cursor: pointer;
-      transition: all 0.25s ease; display: flex; align-items: center; gap: 5px; white-space: nowrap;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-    .circle-btn:hover { color: var(--tarot-gold); }
-    .circle-btn.active { background: rgba(226, 185, 97, 0.14); color: var(--tarot-gold); border-color: var(--tarot-gold); font-weight: 600; box-shadow: 0 0 10px rgba(226, 185, 97, 0.18); }
+  v17Cache.emblemGold  = makeOffscreen(180, 180, ctx => drawVectorEmblemAt(ctx, theme.type, 90, 90, 72, "#E2B961", 0));
+  v17Cache.emblemLight = makeOffscreen(180, 180, ctx => drawVectorEmblemAt(ctx, theme.type, 90, 90, 72, "#FFF5CC", 0));
 
-    nav { display: flex; gap: 0.38rem; flex-wrap: wrap; }
-    .nav-link {
-      text-decoration: none; color: var(--text); background: var(--panel);
-      border: 1px solid var(--line); border-radius: 4px; padding: 0.4rem 0.75rem; font-size: 0.76rem;
-      transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .nav-link:hover { border-color: var(--tarot-gold); color: var(--tarot-gold); }
-    .nav-link.active { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 600; }
+  v17Cache.sleeveFront = makeOffscreen(572, 872, ctx => {
+    const W = 286, H = 436;
+    ctx.scale(2, 2);
+    ctx.translate(W / 2, H / 2);
 
-    /* Live Cycle Status Ribbon */
-    .live-cycle-ribbon {
-      background: linear-gradient(90deg, rgba(226,185,97,0.06) 0%, rgba(226,185,97,0.14) 50%, rgba(226,185,97,0.06) 100%);
-      border-bottom: 1px solid rgba(226, 185, 97, 0.18);
-      padding: 0.48rem 0;
-    }
-    .live-cycle-inner {
-      display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;
-      font-size: 0.76rem;
-    }
-    .live-cycle-left { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--tarot-gold);
-      box-shadow: 0 0 10px var(--tarot-gold); display: inline-block;
-    }
-    .live-cycle-title {
-      font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 1.8px;
-      color: var(--tarot-gold); text-transform: uppercase;
-    }
-    .live-cycle-sub { color: #ccc6ba; font-size: 0.76rem; }
-    .live-cycle-clock {
-      font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 1.5px;
-      color: #FFF5CC; background: rgba(10, 10, 10, 0.75); border: 1px solid var(--tarot-gold-dim);
-      padding: 0.22rem 0.75rem; border-radius: 4px; font-size: 0.76rem; white-space: nowrap;
-    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(-W / 2, -H / 2);
+    ctx.lineTo(-44, -H / 2);
+    ctx.arc(0, -H / 2, 44, Math.PI, 0, true);
+    ctx.lineTo(W / 2, -H / 2);
+    ctx.lineTo(W / 2, H / 2);
+    ctx.lineTo(-W / 2, H / 2);
+    ctx.closePath();
+    ctx.clip();
 
-    main { padding: 1.8rem 0 4rem; }
-    @keyframes fadeInSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .page { display: none; }
-    .page.active { display: block; animation: fadeInSlide 0.45s ease forwards; }
+    const sleeveGrad = ctx.createLinearGradient(-W / 2, -H / 2, W / 2, H / 2);
+    sleeveGrad.addColorStop(0, "#1F1811");
+    sleeveGrad.addColorStop(0.5, "#110E0B");
+    sleeveGrad.addColorStop(1, "#1C160F");
+    ctx.fillStyle = sleeveGrad; ctx.fillRect(-W / 2, -H / 2, W, H);
 
-    .card-paper {
-      background: rgba(18, 18, 18, 0.92); backdrop-filter: blur(8px);
-      border: 1px solid var(--tarot-gold-dim); border-radius: 6px; padding: 2rem; margin-bottom: 2rem;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.85), inset 0 0 25px rgba(226,185,97,0.02); position: relative;
-    }
-    h2 { font-size: clamp(1.45rem, 3vw, 1.95rem); text-transform: uppercase; margin-top: 0; }
-    h3 { font-size: 1.25rem; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-    .small { color: var(--muted); font-size: 0.84rem; }
-    
-    .filters { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem; align-items: center; }
-    input, select { border-radius: 4px; border: 1px solid var(--line); outline: none; background: var(--bg); color: var(--text); padding: 0.6rem 0.8rem; transition: all 0.3s; font-family: 'Poppins'; }
-    input:focus, select:focus { border-color: var(--tarot-gold); box-shadow: 0 0 10px var(--tarot-gold-dim); }
+    ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 4; ctx.strokeRect(-W / 2 + 2, -H / 2 + 2, W - 4, H - 4);
+    ctx.lineWidth = 1.6; ctx.strokeRect(-W / 2 + 18, -H / 2 + 18, W - 36, H - 36);
+    ctx.strokeStyle = "rgba(226, 185, 97, 0.4)"; ctx.strokeRect(-W / 2 + 24, -H / 2 + 24, W - 48, H - 48);
 
-    /* ==========================================
-       SURVIVORS KPI STRIP (INITIATES PAGE)
-       ========================================== */
-    .kpi-strip {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 0.75rem; margin-top: 1.3rem;
-    }
-    .kpi-pill {
-      background: #0d0d0d; border: 1px solid var(--line); border-radius: 6px;
-      padding: 0.75rem 0.95rem; display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; transition: all 0.25s ease;
-    }
-    .kpi-pill:hover, .kpi-pill.active-kpi {
-      border-color: var(--tarot-gold); background: rgba(226, 185, 97, 0.08);
-      transform: translateY(-2px);
-    }
-    .kpi-pill.kpi-consumed { cursor: default; border-color: #262626; }
-    .kpi-pill.kpi-consumed:hover { transform: none; border-color: var(--tarot-ash); background: #0d0d0d; }
-    .kpi-lbl { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
-    .kpi-pill.active-kpi .kpi-lbl { color: var(--tarot-gold); }
-    .kpi-val { font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; color: #FFF5CC; }
-    .kpi-pill.kpi-consumed .kpi-val { color: #888; }
+    ctx.beginPath();
+    ctx.moveTo(0, -H / 2 + 88); ctx.lineTo(W / 2 - 34, 24); ctx.lineTo(0, H / 2 - 35); ctx.lineTo(-W / 2 + 34, 24);
+    ctx.closePath(); ctx.stroke();
 
-    /* ==========================================
-       RANK EVOLUTION DELTAS & TRANSFER TAGS
-       ========================================== */
-    .rank-delta {
-      display: inline-block; font-size: 0.68rem; font-weight: 700; margin-left: 6px;
-      letter-spacing: 0.3px; vertical-align: middle;
-    }
-    .rank-delta.up { color: var(--tarot-up); }
-    .rank-delta.down { color: #FF7B7B; }
-    .rank-delta.same { color: #666; }
+    ctx.fillStyle = "#0E0C0A"; ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, 26, 78, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.setLineDash([5, 7]); ctx.beginPath(); ctx.arc(0, 26, 89, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
 
-    .transfer-tag {
-      display: inline-flex; align-items: center; gap: 4px;
-      margin-left: 6px; padding: 1px 7px; border-radius: 4px;
-      font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.8px;
-      background: rgba(226, 185, 97, 0.14); border: 1px solid var(--tarot-gold-dim); color: #FFF5CC;
-      text-transform: uppercase;
-    }
-    
-    /* ==========================================
-       CONTESTANTS TAROT CARDS
-       ========================================== */
-    .contestants-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); align-items: center; justify-items: center; padding: 1rem 0; }
-    .tarot-card {
-      width: 270px; height: 415px; background-color: var(--tarot-bg); border: 2px solid var(--tarot-gold);
-      border-radius: 6px; padding: 10px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.85);
-      cursor: pointer; transition: transform 0.35s ease, box-shadow 0.35s ease; overflow: hidden;
-    }
-    .tarot-card::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(125deg, transparent 30%, rgba(226, 185, 97, 0.12) 50%, transparent 70%);
-      transform: translateX(-100%); transition: transform 0.6s ease; pointer-events: none;
-    }
-    .tarot-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 25px var(--tarot-gold-dim); z-index: 10; }
-    .tarot-card:hover::after { transform: translateX(100%); }
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#FFF5CC"; ctx.font = '800 14.5px "Cinzel", serif';
+    ctx.fillText("KAEOS ARCANA", 0, -H / 2 + 102);
+    ctx.fillStyle = "#E2B961"; ctx.font = '800 16px "Cinzel", serif';
+    ctx.fillText(theme.fullTitle, 0, H / 2 - 48);
+    ctx.restore();
 
-    .tarot-inner-border { position: absolute; inset: 10px; border: 1px solid var(--tarot-gold); display: flex; flex-direction: column; align-items: center; }
-    .corner { position: absolute; width: 6px; height: 6px; border: 1px solid var(--tarot-gold); border-radius: 50%; background-color: var(--tarot-bg); }
-    .corner-tl { top: -4px; left: -4px; } .corner-tr { top: -4px; right: -4px; }
-    .corner-bl { bottom: -4px; left: -4px; } .corner-br { bottom: -4px; right: -4px; }
-    .tarot-top-icon { position: absolute; top: -11px; color: var(--tarot-gold); font-size: 14px; background: var(--tarot-bg); padding: 0 8px; }
+    ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, -H / 2, 44, Math.PI, 0, true); ctx.stroke();
+  });
+}
 
-    .tarot-name {
-      color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 1.55rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase; margin-top: 24px; z-index: 2; text-align: center;
-      width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px;
-    }
-    .tarot-image-container { position: absolute; top: 76px; width: 100%; height: 230px; display: flex; justify-content: center; align-items: center; }
-    .tarot-image-container img { max-width: 95%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.65)); transition: filter 0.3s ease, transform 0.3s ease; }
-    .tarot-card:hover .tarot-image-container img { transform: scale(1.03); }
+function drawCachedEmblem(ctx, isLight, cx, cy, r, rot = 0) {
+  const img = isLight ? v17Cache.emblemLight : v17Cache.emblemGold;
+  if (!img) return;
+  const sz = r * 2.5;
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (rot) ctx.rotate(rot);
+  ctx.drawImage(img, -sz / 2, -sz / 2, sz, sz);
+  ctx.restore();
+}
 
-    .tarot-badge { position: absolute; bottom: 50px; z-index: 3; font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; }
-    .tarot-rank { position: absolute; bottom: 16px; color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+// État global de la scène V17
+const stageScene = {
+  eclipseMix: 0,
+  eclipsePulse: 0,
+  ashMix: 0,
+  ashPulse: 0,
+  wheelAngle: 0,
+  pillarAlpha: 0,
+  camera: { zoom: 1, targetZoom: 1, x: 0, y: 0, targetX: 0, targetY: 0, shakeAmp: 0, breathAmp: 1 },
+  flash: { alpha: 0, color: "#FFF5CC" },
+  chromaticAmp: 0,
+  altarTitle: { alpha: 0, dissolveProg: 0, eyebrow: "", main: "", sub: "" },
+  dnrBanner: { alpha: 0, title: "", sub: "" },
+  box3D: {
+    alpha: 0, x: STAGE_CX, y: 940, scale: 1,
+    flapProg: 0, deckOutTopProg: 0, sealGlow: 0, sealCrackProg: 0,
+    safeProtectedCount: 8, levitateAmp: 0, frontOverlayActive: false, sealedPulse: 0
+  },
+  counters: {
+    alpha: 0,
+    safeCount: 0, safeTotal: 8,
+    shadowCount: 0, shadowTotal: 8,
+    dnrCount: 0, dnrTotal: 0,
+    pulseSafe: 0, pulseShadow: 0, pulseDnr: 0
+  },
+  verdictRibbon: { alpha: 0, mode: "safe", title: "", sub: "", y: 1260, expandProg: 0 },
+  duel: { active: false, alpha: 0, energyProg: 0, leftX: 285, rightX: 795, y: 945, labelAlpha: 0, spotlightPos: 0, spotlightAlpha: 0 },
+  ending: { alpha: 0, balanceAlpha: 0, beamsAlpha: 0, dnrNames: [] },
+  cards: []
+};
 
-    .theme-sun .front-symbol::before { content: '✹'; font-size: 2.8rem; }
-    .theme-sun .tarot-top-icon::before { content: '✹'; }
-    .theme-sun .tarot-rank::before, .theme-sun .tarot-rank::after { content: '✹'; font-size: 0.7rem; }
-    
-    .theme-moon .front-symbol::before { content: '☾'; font-size: 2.8rem; margin-top: -4px; }
-    .theme-moon .tarot-top-icon::before { content: '☾'; font-size: 15px; }
-    .theme-moon .tarot-rank::before { content: '☽'; font-size: 0.85rem; }
-    .theme-moon .tarot-rank::after { content: '☾'; font-size: 0.85rem; }
-    
-    .theme-star .front-symbol::before { content: '✦'; font-size: 2.9rem; }
-    .theme-star .tarot-top-icon::before { content: '✦'; }
-    .theme-star .tarot-rank::before, .theme-star .tarot-rank::after { content: '✦'; font-size: 0.75rem; }
-    
-    .theme-global .front-symbol::before { content: '☉'; font-size: 2.8rem; }
-    .theme-global .tarot-top-icon::before { content: '☉'; font-size: 15px; }
-    .theme-global .tarot-rank::before, .theme-global .tarot-rank::after { content: '☉'; font-size: 0.85rem; }
+function lerpNum(a, b, t) { return a + (b - a) * t; }
 
-    @keyframes dangerPulse {
-      0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.85), 0 0 18px rgba(217, 56, 56, 0.35); }
-      50% { box-shadow: 0 20px 45px rgba(0,0,0,0.9), 0 0 32px rgba(217, 56, 56, 0.65); }
-    }
-    .danger-zone { border-color: var(--tarot-danger); animation: dangerPulse 3s infinite ease-in-out; }
-    .danger-zone:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 35px var(--tarot-danger); }
-    .danger-zone .tarot-inner-border, .danger-zone .corner { border-color: var(--tarot-danger); }
-    .danger-zone .tarot-name, .danger-zone .tarot-rank, .danger-zone .tarot-top-icon { color: var(--tarot-danger); }
-    .danger-zone .tarot-image-container img { filter: drop-shadow(0 0 14px rgba(217, 56, 56, 0.75)) drop-shadow(0 8px 15px rgba(0,0,0,0.8)); }
+// Déclencheurs FX (plafonnés pour garantir une fluidité constante)
+function triggerFXBurst(cx, cy, type = "gold", cnt = 20, speedMult = 1) {
+  const maxAdd = Math.min(cnt, Math.max(0, 95 - burstParticles.length));
+  for (let i = 0; i < maxAdd; i++) {
+    const a = Math.random() * Math.PI * 2, sp = (2.2 + Math.random() * 8.2) * speedMult;
+    burstParticles.push({
+      x: cx + (Math.random() - 0.5) * 44, y: cy + (Math.random() - 0.5) * 44,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.2,
+      size: 16 + Math.random() * 18, alpha: 1, type
+    });
+  }
+}
+function triggerShockwaveRing(cx, cy, col, maxR = 360, lineW = 4.5) {
+  shockwaveRings.push({ x: cx, y: cy, r: 24, maxR, alpha: 0.94, color: col, lineW });
+}
+function triggerSlotLockFlash(cx, cy, isShadow) {
+  lockFlashes.push({ x: cx, y: cy, r: 16, maxR: 135, alpha: 0.9, color: isShadow ? "#FF6666" : "#FFF5CC" });
+}
+function triggerSealShards(cx, cy, col = "#FFF5CC", cnt = 18) {
+  for (let i = 0; i < cnt; i++) {
+    const a = Math.random() * Math.PI * 2, sp = 3 + Math.random() * 9;
+    sealShards.push({
+      x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2.6,
+      rot: Math.random() * Math.PI * 2, vRot: (Math.random() - 0.5) * 0.35,
+      size: 6 + Math.random() * 11, alpha: 1, color: i % 2 === 0 ? col : "#E2B961"
+    });
+  }
+}
+function spawnAshAndEmbers(cx, cy, cnt = 14, spreadX = 240, spreadY = 60) {
+  const maxAdd = Math.min(cnt, Math.max(0, 150 - ashFlakes.length));
+  for (let i = 0; i < maxAdd; i++) {
+    const emb = i % 3 === 0;
+    ashFlakes.push({
+      x: cx + (Math.random() - 0.5) * spreadX,
+      y: cy + (Math.random() - 0.5) * spreadY,
+      vx: (Math.random() - 0.5) * 2.2,
+      vy: -1.4 - Math.random() * 3.2,
+      r: emb ? (2.0 + Math.random() * 2.4) : (3.2 + Math.random() * 4.4),
+      rot: Math.random() * Math.PI * 2,
+      vRot: (Math.random() - 0.5) * 0.09,
+      alpha: 0.96,
+      color: emb ? "#FF6B26" : (Math.random() > 0.5 ? "#A4A4B2" : "#62626E"),
+      isEmber: emb
+    });
+  }
+}
+function triggerCameraShake(amp = 14) {
+  if (appState.settings.cameraFx === "off") return;
+  stageScene.camera.shakeAmp = Math.max(stageScene.camera.shakeAmp, amp);
+}
+function triggerImpactFlash(color = "#FFF5CC", alpha = 0.22) {
+  stageScene.flash.color = color;
+  stageScene.flash.alpha = Math.min(0.26, Math.max(stageScene.flash.alpha, alpha));
+}
 
-    .eliminated { border-color: var(--tarot-ash); background-color: var(--tarot-ash-dark); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .eliminated:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
-    .eliminated .tarot-inner-border, .eliminated .corner { border-color: var(--tarot-ash); }
-    .eliminated .corner, .eliminated .tarot-top-icon { background-color: var(--tarot-ash-dark); }
-    .eliminated .tarot-name, .eliminated .tarot-rank, .eliminated .tarot-top-icon { color: #555; }
-    .eliminated .tarot-image-container img { filter: grayscale(100%) contrast(120%) brightness(45%); opacity: 0.75; }
+/* ============================================================================
+   GÉOMÉTRIE ADAPTATIVE PARFAITEMENT CADRÉE (REEL 9:16 & POST 3:4)
+   ============================================================================ */
+function getDynamicFanSpreadPosition(slotIdx, remTotal, climaxZoom = false) {
+  const is916 = isReel916();
+  if (remTotal <= 0) return { x: STAGE_CX, y: is916 ? 1240 : 900, scale: 0.62, rotDeg: 0 };
+  const t = remTotal === 1 ? 0.5 : slotIdx / (remTotal - 1);
+  const pivotX = STAGE_CX;
+  const pivotY = is916 ? (climaxZoom ? 490 : 410) : (climaxZoom ? 280 : 225);
+  const radius = is916 ? (climaxZoom ? 740 : 810) : (climaxZoom ? 620 : 660);
+  const maxAngleDeg = Math.min(21.5, Math.max(climaxZoom ? 7 : 3, (remTotal - 1) * (climaxZoom ? 3.5 : 1.45)));
+  const angleDeg = (t - 0.5) * 2 * maxAngleDeg;
+  const angleRad = (90 - angleDeg) * Math.PI / 180;
+  return {
+    x: pivotX + Math.cos(angleRad) * radius,
+    y: pivotY + Math.sin(angleRad) * radius,
+    scale: is916 ? (climaxZoom ? 0.72 : 0.64) : (climaxZoom ? 0.68 : 0.61),
+    rotDeg: -angleDeg * 0.82
+  };
+}
 
-    .pill { display: inline-block; padding: 0.24rem 0.62rem; border-radius: 4px; font-size: 0.68rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
-    .safe { background: rgba(226, 185, 97, 0.08); color: var(--tarot-gold); border-color: var(--tarot-gold); }
-    .nominee { background: var(--tarot-danger); color: #ffffff; border-color: var(--tarot-danger); }
-    .saved_judges, .saved_public { background: #141414; color: var(--tarot-gold); border-color: var(--tarot-gold-dim); }
-    .eliminated-pill, .forfeit-pill { background: var(--tarot-ash-dark); color: #8c8c96; border-color: var(--tarot-ash); }
-    .tbd { background: var(--panel2); color: var(--muted); border-color: var(--line); }
-    .winner { background: var(--tarot-gold); color: var(--bg); border-color: var(--tarot-gold); font-weight: 800; box-shadow: 0 0 15px rgba(226, 185, 97, 0.45); }
-    
-    .row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-    @media (min-width: 880px) {
-      .row.two { grid-template-columns: 310px 1fr; gap: 2rem; align-items: start; }
-      .row.charts-split { grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: stretch; }
-    }
-    
-    .profile-img-wrap { width: 100%; max-width: 310px; background: var(--tarot-bg); border: 2px solid var(--tarot-gold); border-radius: 6px; padding: 12px; display: flex; justify-content: center; position: relative; }
-    .profile-img-wrap::before { content:''; position: absolute; inset: 6px; border: 1px solid var(--tarot-gold); pointer-events: none; }
-    .profile-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2; }
-    .profile-content { min-width: 0; width: 100%; }
-    .circle-badge-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(226, 185, 97, 0.12); border: 1px solid var(--tarot-gold);
-      color: var(--tarot-gold); font-family: 'Cinzel', serif; font-size: 0.78rem;
-      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 4px; margin-bottom: 0.8rem;
-    }
-    
-    .btn { text-decoration: none; color: var(--tarot-gold); border: 1px solid var(--tarot-gold); background: transparent; border-radius: 4px; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins'; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; }
-    .btn:hover { background: var(--tarot-gold); color: var(--bg); box-shadow: 0 0 15px var(--tarot-gold-dim); }
-    .btn-primary { background: var(--tarot-gold); color: var(--bg); }
-    .btn-primary:hover { background: #f0ca70; box-shadow: 0 0 22px rgba(226, 185, 97, 0.45); }
-    
-    .profile-nav { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.8rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
-    .profile-nav-spacer { margin-left: auto; }
-    .table-wrap { overflow-x: auto; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--tarot-gold); border-bottom: 2px solid var(--tarot-gold); padding: 0.75rem 0.45rem; text-align: left; white-space: nowrap; letter-spacing: 1.2px; }
-    td { border-bottom: 1px dotted var(--line); padding: 0.72rem 0.45rem; text-align: left; white-space: nowrap; }
-    .table-wrap a { color: var(--tarot-gold); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-    .table-wrap a:hover { color: #fff; text-shadow: 0 0 8px var(--tarot-gold-dim); }
-    .chip { display: inline-block; border: 1px solid var(--tarot-gold); border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.74rem; background: rgba(226,185,97,0.1); font-weight: 600; }
-    .bonus-pill { display: inline-block; background: rgba(226, 185, 97, 0.18); border: 1px solid var(--tarot-gold); color: #FFF5CC; font-family: 'Cinzel', serif; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-left: 5px; }
+function getCenteredUpperSafePosition(slotIdx, currentCount) {
+  const is916 = isReel916(), n = Math.max(1, currentCount);
+  const t = n === 1 ? 0.5 : slotIdx / (n - 1);
+  const spanX = Math.min(740, (n - 1) * 104);
+  const x = STAGE_CX + (t - 0.5) * spanX;
+  const baseY = is916 ? 275 : 192;
+  const arcY = baseY + Math.pow((t - 0.5) * 2, 2) * 24;
+  const rotDeg = (t - 0.5) * Math.min(18, (n - 1) * 2.5);
+  return { x, y: arcY, scale: is916 ? 0.61 : 0.56, rotDeg };
+}
 
-    /* ==========================================
-       CONCEPT SONGS & PERFORMANCES SHOWCASE
-       ========================================== */
-    .concept-circles-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 1.4rem; margin-top: 1.3rem;
-    }
-    .concept-circle-card {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
-      padding: 1.4rem; display: flex; flex-direction: column; gap: 0.85rem;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75); transition: border-color 0.3s ease;
-    }
-    .concept-circle-card.highlighted-circle {
-      border-color: var(--tarot-gold); box-shadow: 0 12px 35px rgba(0,0,0,0.85), 0 0 22px rgba(226, 185, 97, 0.16);
-    }
-    .concept-circle-head {
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--line); padding-bottom: 0.75rem;
-    }
-    .concept-circle-head h4 { margin: 0; font-size: 1.05rem; letter-spacing: 2px; }
-    .concept-song-item {
-      background: #141416; border: 1px solid #26262b; border-left: 3px solid var(--tarot-gold);
-      border-radius: 5px; padding: 0.75rem 0.9rem; display: flex; flex-direction: column; gap: 0.25rem;
-    }
-    .concept-song-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
-    .concept-song-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.96rem; color: #FFF5CC; letter-spacing: 1px; }
-    .concept-song-artist { font-size: 0.76rem; color: var(--tarot-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-    .concept-house-tag {
-      font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px;
-    }
+function getCenteredLowerShadowPosition(slotIdx, currentCount) {
+  const is916 = isReel916(), n = Math.max(1, currentCount);
+  const t = n === 1 ? 0.5 : slotIdx / (n - 1);
+  const spanX = Math.min(740, (n - 1) * 104);
+  const x = STAGE_CX + (t - 0.5) * spanX;
+  const baseY = is916 ? 1685 : 1265;
+  const arcY = baseY - Math.pow((t - 0.5) * 2, 2) * 18;
+  const rotDeg = (t - 0.5) * Math.min(14, (n - 1) * 2.0);
+  return { x, y: arcY, scale: is916 ? 0.59 : 0.54, rotDeg };
+}
 
-    /* ==========================================
-       AUDITION PORTAL & 7 PROPHECY CARDS (ALIGNED)
-       ========================================== */
-    .audition-hero {
-      text-align: center; padding: 2.8rem 1.5rem;
-      background: radial-gradient(circle at center, rgba(226,185,97,0.06) 0%, transparent 70%);
+function getRevealStagePositions(count, isDuel = false) {
+  const cy = isReel916() ? 930 : 660;
+  if (count === 1) return [{ x: STAGE_CX, y: cy, scale: isReel916() ? 1.64 : 1.46 }];
+  if (count === 2) {
+    return [
+      { x: isDuel ? 285 : 310, y: cy, scale: isDuel ? (isReel916() ? 1.44 : 1.32) : (isReel916() ? 1.42 : 1.32) },
+      { x: isDuel ? 795 : 770, y: cy, scale: isDuel ? (isReel916() ? 1.44 : 1.32) : (isReel916() ? 1.42 : 1.32) }
+    ];
+  }
+  // 3 cartes côte à côte (ex: groupe DNR)
+  const sc = isReel916() ? 1.12 : 1.04;
+  const span = 650;
+  return Array.from({ length: count }, (_, i) => {
+    const t = count <= 1 ? 0.5 : i / (count - 1);
+    return { x: STAGE_CX + (t - 0.5) * span, y: cy, scale: sc };
+  });
+}
+
+function getRoyalDoubleArcShadowPosition(index, total) {
+  const is916 = isReel916();
+  if (total <= 4) {
+    const t = total <= 1 ? 0.5 : index / (total - 1);
+    const spanX = Math.min(760, (total - 1) * 250);
+    return { x: STAGE_CX + (t - 0.5) * spanX, y: (is916 ? 1160 : 880) + Math.pow((t - 0.5) * 2, 2) * 38, scale: is916 ? 0.96 : 0.90, rotDeg: (t - 0.5) * 14 };
+  }
+  const topCount = Math.ceil(total / 2), botCount = total - topCount;
+  const isTop = index < topCount;
+  const rIdx = isTop ? index : (index - topCount), rTot = isTop ? topCount : botCount;
+  const t = rTot <= 1 ? 0.5 : rIdx / (rTot - 1);
+  const spanX = Math.min(760, (rTot - 1) * 248);
+  const x = STAGE_CX + (t - 0.5) * spanX;
+  const arcDrop = Math.pow((t - 0.5) * 2, 2) * 34;
+  const baseY = is916 ? (isTop ? 945 : 1445) : (isTop ? 710 : 1130);
+  return {
+    x,
+    y: baseY + arcDrop,
+    scale: total <= 8 ? (is916 ? 0.88 : 0.82) : (is916 ? 0.76 : 0.70),
+    rotDeg: (t - 0.5) * 13
+  };
+}
+
+/* ============================================================================
+   1. SANCTUAIRE VIVANT — FOND 1:1 (OR / RUBIS / CENDRE) + COUCHES ANIMÉES
+   ============================================================================ */
+function drawStaticBackdrop1to1(ctx) {
+  const effCrim = Math.max(0, Math.min(1, stageScene.eclipseMix + stageScene.eclipsePulse));
+  const effAsh  = Math.max(0, Math.min(1, stageScene.ashMix + stageScene.ashPulse));
+  if (fxCache.bgGold) ctx.drawImage(fxCache.bgGold, 0, 0);
+  if (effCrim > 0.01 && fxCache.bgCrim) {
+    ctx.save(); ctx.globalAlpha = effCrim; ctx.drawImage(fxCache.bgCrim, 0, 0); ctx.restore();
+  }
+  if (effAsh > 0.01 && fxCache.bgAsh) {
+    ctx.save(); ctx.globalAlpha = effAsh; ctx.drawImage(fxCache.bgAsh, 0, 0); ctx.restore();
+  }
+}
+
+function drawLivingSanctuaryLayersV17(ctx, now, dt) {
+  const effCrim = Math.max(0, Math.min(1, stageScene.eclipseMix + stageScene.eclipsePulse));
+  const effAsh  = Math.max(0, Math.min(1, stageScene.ashMix + stageScene.ashPulse));
+  const cy = getAltarCenterY();
+
+  const mistImg = effAsh > 0.45 ? fxCache.mistAsh : (effCrim > 0.5 ? fxCache.mistCrim : fxCache.mistGold);
+  if (mistImg) {
+    ctx.save();
+    for (let i = 0; i < mistClouds.length; i++) {
+      const mc = mistClouds[i];
+      mc.x += mc.vx * dt; mc.phase += dt * 0.42;
+      if (mc.x < -mc.size * 0.5) mc.x = STAGE_W + mc.size * 0.5;
+      if (mc.x > STAGE_W + mc.size * 0.5) mc.x = -mc.size * 0.5;
+      const my = (mc.y % STAGE_H) + Math.sin(mc.phase) * 24;
+      ctx.globalAlpha = 0.48 + 0.22 * Math.sin(mc.phase * 1.3);
+      ctx.drawImage(mistImg, mc.x - mc.size * 0.5, my - mc.size * 0.5, mc.size, mc.size);
     }
-    .countdown-phase-lbl {
-      font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--tarot-gold);
-      letter-spacing: 4px; text-transform: uppercase; margin-top: 1.6rem; display: block;
+    ctx.restore();
+  }
+
+  const drawRing = (imgG, imgC, imgA, rot) => {
+    const img = effAsh > 0.45 ? imgA : (effCrim > 0.5 ? imgC : imgG);
+    if (!img) return;
+    ctx.save(); ctx.translate(STAGE_CX, cy); ctx.rotate(rot);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    ctx.restore();
+  };
+  drawRing(fxCache.astroOuterGold, fxCache.astroOuterCrim, fxCache.astroOuterAsh,  stageScene.wheelAngle * 0.6);
+  drawRing(fxCache.astroMidGold,   fxCache.astroMidCrim,   fxCache.astroMidAsh,   -stageScene.wheelAngle * 0.95);
+  drawRing(fxCache.astroInnerGold, fxCache.astroInnerCrim, fxCache.astroInnerAsh,  stageScene.wheelAngle * 1.4);
+
+  if (stageScene.pillarAlpha > 0.01 && fxCache.pillarGold) {
+    const pPulse = 0.88 + 0.12 * Math.sin(now * 0.003);
+    ctx.save();
+    ctx.globalAlpha = stageScene.pillarAlpha * pPulse;
+    ctx.drawImage(fxCache.pillarGold, STAGE_CX - 230, 0, 460, cy + 360);
+    ctx.restore();
+  }
+
+  if (stageScene.ending.beamsAlpha > 0.01 && fxCache.beamCrim) {
+    ctx.save();
+    const beamXs = [180, 420, 660, 900];
+    const bTop = isReel916() ? 580 : 420, bH = isReel916() ? 1240 : 960;
+    for (let i = 0; i < beamXs.length; i++) {
+      const sw = 0.65 + 0.35 * Math.sin(now * 0.002 + i * 1.4);
+      ctx.globalAlpha = stageScene.ending.beamsAlpha * sw * 0.78;
+      ctx.drawImage(fxCache.beamCrim, beamXs[i] - 130, bTop, 260, bH);
     }
-    .countdown-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 2rem; }
-    .countdown-box {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      width: 95px; padding: 0.9rem 0.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    ctx.restore();
+  }
+}
+
+/* ============================================================================
+   2. TITRE D'OUVERTURE & BANNIÈRE RITUEL DNR (ÉLIMINATIONS DIRECTES)
+   ============================================================================ */
+function drawAltarOpeningTitleV17(ctx, now) {
+  const at = stageScene.altarTitle;
+  if (at.alpha <= 0.01) return;
+  const is916 = isReel916();
+  const topY = is916 ? 255 : 155;
+  const botY = is916 ? 1560 : 1220;
+
+  ctx.save();
+  ctx.globalAlpha = at.alpha * (1 - at.dissolveProg);
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+
+  drawCachedEmblem(ctx, false, STAGE_CX - 115, topY - 40, 24,  now * 0.0005);
+  drawCachedEmblem(ctx, true,  STAGE_CX,       topY - 40, 30, -now * 0.0005);
+  drawCachedEmblem(ctx, false, STAGE_CX + 115, topY - 40, 24,  now * 0.0005);
+
+  ctx.fillStyle = "#E2B961"; ctx.font = '800 17px "Cinzel", serif';
+  ctx.fillText(at.eyebrow.toUpperCase(), STAGE_CX, topY + 26);
+
+  ctx.fillStyle = "#FFF5CC"; ctx.font = '900 54px "Cinzel", serif';
+  ctx.fillText(at.main.toUpperCase(), STAGE_CX, topY + 90, 960);
+
+  ctx.strokeStyle = "rgba(226, 185, 97, 0.5)"; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(180, botY - 46); ctx.lineTo(495, botY - 46);
+  ctx.moveTo(585, botY - 46); ctx.lineTo(900, botY - 46);
+  ctx.stroke();
+  ctx.fillStyle = "#FFF5CC"; drawSmallStarOnCtx(ctx, STAGE_CX, botY - 46, 8, 4, now * 0.002);
+
+  ctx.fillStyle = "#FFF5CC"; ctx.font = '800 26px "Cinzel", serif';
+  ctx.fillText(at.sub.toUpperCase(), STAGE_CX, botY + 12, 920);
+  ctx.fillStyle = "rgba(226, 185, 97, 0.88)"; ctx.font = 'italic 500 23px "Playfair Display", serif';
+  ctx.fillText("Breaking the golden seal reveals every Initiate's destiny", STAGE_CX, botY + 60, 920);
+  ctx.restore();
+}
+
+function drawDnrRitualBannerV17(ctx, now) {
+  const db = stageScene.dnrBanner;
+  if (db.alpha <= 0.01) return;
+  const y = isReel916() ? 450 : 285;
+  ctx.save();
+  ctx.globalAlpha = db.alpha;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "#B4B4C2"; ctx.font = '800 16px "Cinzel", serif';
+  ctx.fillText("UNRECORDED INITIATES — DIRECT ELIMINATION", STAGE_CX, y - 42);
+  ctx.fillStyle = "#F0F0F8"; ctx.font = '900 40px "Cinzel", serif';
+  ctx.fillText(db.title.toUpperCase(), STAGE_CX, y + 4, 940);
+  if (db.sub) {
+    ctx.fillStyle = "rgba(195, 195, 210, 0.85)"; ctx.font = 'italic 500 21px "Playfair Display", serif';
+    ctx.fillText(db.sub, STAGE_CX, y + 48, 900);
+  }
+  ctx.restore();
+}
+
+/* ============================================================================
+   3. ÉTUI DE TAROT 3D EN 2 COUCHES — 100% SPRITE CACHÉ
+   ============================================================================ */
+function drawRoyalTarotTuckBoxBackV17(ctx, boxState, now) {
+  if (boxState.alpha <= 0.01) return;
+  const { x, y, scale, flapProg, deckOutTopProg, sealGlow, levitateAmp, sealedPulse } = boxState;
+  const levY = (levitateAmp || 0) * Math.sin(now * 0.0024) * 11;
+  const W = 286, H = 436;
+
+  ctx.save();
+  ctx.globalAlpha = boxState.alpha;
+  ctx.translate(x, y + levY);
+  ctx.scale(scale, scale);
+
+  const totalGlow = Math.min(1, (sealGlow || 0) + (sealedPulse || 0) * (0.28 + 0.18 * Math.sin(now * 0.0032)));
+  if (totalGlow > 0.01 && fxCache.raysGold) {
+    ctx.save();
+    ctx.globalAlpha = totalGlow * 0.92;
+    ctx.rotate(now * 0.00075);
+    ctx.drawImage(fxCache.raysGold, -420, -420, 840, 840);
+    ctx.restore();
+  }
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.78)";
+  ctx.beginPath(); ctx.roundRect(-W / 2 + 12, -H / 2 + 22 - levY * 0.4, W, H, 12); ctx.fill();
+
+  ctx.fillStyle = "#080405"; ctx.strokeStyle = "#9E721D"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(-W / 2, -H / 2, W, H, 10); ctx.fill(); ctx.stroke();
+
+  ctx.save();
+  ctx.translate(0, -H / 2);
+  const flapH = 74, tongueH = 34;
+  if (flapProg > 0.25) {
+    const openAmt = (flapProg - 0.25) / 0.75;
+    const curFlapH = flapH * openAmt;
+    ctx.fillStyle = "#18080A"; ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.roundRect(-W / 2 + 2, -curFlapH, W - 4, curFlapH + 4, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#22170D";
+    ctx.beginPath();
+    ctx.moveTo(-85, -curFlapH);
+    ctx.bezierCurveTo(-75, -curFlapH - tongueH * openAmt, 75, -curFlapH - tongueH * openAmt, 85, -curFlapH);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+
+  if (deckOutTopProg > 0.005 && deckOutTopProg < 0.995 && backSpriteHi) {
+    const liftUpY = -deckOutTopProg * 390;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(-W / 2 + 8, -H / 2 - 460, W - 16, H + 448); ctx.clip();
+    ctx.translate(0, liftUpY);
+    ctx.fillStyle = "#D4AF37"; ctx.beginPath(); ctx.roundRect(-123, -187, 246, 374, 8); ctx.fill();
+    ctx.drawImage(backSpriteHi, -120, -185, 240, 370);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function drawRoyalTarotTuckBoxFrontV17(ctx, boxState, now) {
+  if (boxState.alpha <= 0.01) return;
+  const { x, y, scale, flapProg, sealGlow, sealCrackProg, levitateAmp } = boxState;
+  const levY = (levitateAmp || 0) * Math.sin(now * 0.0024) * 11;
+  const W = 286, H = 436;
+
+  ctx.save();
+  ctx.globalAlpha = boxState.alpha;
+  ctx.translate(x, y + levY);
+  ctx.scale(scale, scale);
+
+  if (v17Cache.sleeveFront) {
+    ctx.drawImage(v17Cache.sleeveFront, -W / 2, -H / 2, W, H);
+  }
+  drawCachedEmblem(ctx, sealGlow > 0.2, 0, 26, 56, now * 0.0005);
+
+  if (flapProg <= 0.25) {
+    const closeRatio = 1 - (flapProg / 0.25);
+    const tipY = 50 * closeRatio;
+    ctx.save();
+    ctx.translate(0, -H / 2);
+    ctx.fillStyle = "#18130E"; ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(-W / 2, 0); ctx.lineTo(W / 2, 0);
+    ctx.lineTo(W / 2 - 22, tipY); ctx.lineTo(-W / 2 + 22, tipY);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    const crack = sealCrackProg || 0;
+    ctx.fillStyle = crack > 0 ? "#2A1F0E" : "#14100C";
+    ctx.strokeStyle = crack > 0 ? "#FFFFFF" : "#FFF5CC";
+    ctx.lineWidth = 2.6 + crack * 1.5;
+    ctx.beginPath(); ctx.arc(0, tipY, 21, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#FFF5CC"; drawSmallStarOnCtx(ctx, 0, tipY, 11, 4, crack * 1.2);
+
+    if (crack > 0.02) {
+      ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 2.4;
+      [-0.7, 0.2, 1.3, 2.5, -2.1].forEach(ang => {
+        const len = 18 + crack * 48;
+        ctx.beginPath();
+        ctx.moveTo(0, tipY);
+        ctx.lineTo(Math.cos(ang) * len * 0.5, tipY + Math.sin(ang) * len * 0.5 + 4);
+        ctx.lineTo(Math.cos(ang + 0.14) * len, tipY + Math.sin(ang + 0.14) * len);
+        ctx.stroke();
+      });
     }
-    .countdown-num { font-family: 'Cinzel', serif; font-size: 2rem; color: var(--tarot-gold); font-weight: 800; line-height: 1; }
-    .countdown-lbl { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 6px; }
+    ctx.restore();
+  }
 
-    .prophecies-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-      gap: 0.9rem; margin-top: 1.4rem;
+  ctx.restore();
+}
+
+/* ============================================================================
+   4. FOUDRE RUBIS (SHADOW), RUBAN DE VERDICT (SAFE/SHADOW/DNR) & DUEL 1V1
+   ============================================================================ */
+function drawRubyLightningAroundCard(ctx, cx, cy, scale, alpha, now) {
+  if (alpha <= 0.02) return;
+  const hw = 128 * scale, hh = 194 * scale;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.globalAlpha = alpha;
+  const bolts = [
+    [-hw, -hh, -hw - 68 * scale, -hh - 54 * scale],
+    [ hw, -hh,  hw + 68 * scale, -hh - 54 * scale],
+    [-hw,  hh, -hw - 64 * scale,  hh + 48 * scale],
+    [ hw,  hh,  hw + 64 * scale,  hh + 48 * scale]
+  ];
+  bolts.forEach(([x1, y1, x2, y2], idx) => {
+    const mx1 = lerpNum(x1, x2, 0.35) + Math.sin(now * 0.04 + idx * 2.3) * 14 * scale;
+    const my1 = lerpNum(y1, y2, 0.35) + Math.cos(now * 0.05 + idx) * 14 * scale;
+    const mx2 = lerpNum(x1, x2, 0.72) + Math.cos(now * 0.06 - idx * 1.9) * 12 * scale;
+    const my2 = lerpNum(y1, y2, 0.72) + Math.sin(now * 0.045 + idx * 3) * 12 * scale;
+    ctx.strokeStyle = "rgba(217, 56, 56, 0.65)"; ctx.lineWidth = 7.5 * scale;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(mx1, my1); ctx.lineTo(mx2, my2); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.strokeStyle = "#FFD6D6"; ctx.lineWidth = 2.4 * scale;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(mx1, my1); ctx.lineTo(mx2, my2); ctx.lineTo(x2, y2); ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawVerdictRibbonV17(ctx, now) {
+  const vr = stageScene.verdictRibbon;
+  if (appState.settings.verdictRibbon === "off" || vr.alpha <= 0.01) return;
+  const isSh = vr.mode === "shadow", isDnr = vr.mode === "dnr";
+  const col = isSh ? "#D93838" : (isDnr ? "#9A9AA6" : "#E2B961");
+  const bgCol = isSh ? "rgba(32, 6, 8, 0.94)" : (isDnr ? "rgba(20, 20, 26, 0.94)" : "rgba(20, 16, 10, 0.94)");
+  const txtCol = isSh ? "#FFD6D6" : (isDnr ? "#ECECF4" : "#FFF5CC");
+  const subCol = isSh ? "#FF9999" : (isDnr ? "#B4B4C2" : "#E2B961");
+  const halfW = 355 * Math.max(0.15, vr.expandProg);
+
+  ctx.save();
+  ctx.globalAlpha = vr.alpha;
+  ctx.translate(STAGE_CX, vr.y);
+
+  ctx.fillStyle = bgCol; ctx.strokeStyle = col; ctx.lineWidth = 2.2;
+  ctx.beginPath(); ctx.roundRect(-halfW, -38, halfW * 2, 76, 12); ctx.fill(); ctx.stroke();
+
+  if (vr.expandProg > 0.45) {
+    ctx.globalAlpha = vr.alpha * Math.min(1, (vr.expandProg - 0.45) / 0.55);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = txtCol; ctx.font = '900 25px "Cinzel", serif';
+    ctx.fillText(vr.title, 0, vr.sub ? -10 : 0, halfW * 1.85);
+    if (vr.sub) {
+      ctx.fillStyle = subCol; ctx.font = '700 13.5px "Cinzel", serif';
+      ctx.fillText(vr.sub, 0, 18, halfW * 1.85);
     }
-    @media (min-width: 1080px) {
-      .prophecies-grid { grid-template-columns: repeat(7, 1fr); }
+    ctx.fillStyle = txtCol;
+    drawSmallStarOnCtx(ctx, -halfW + 22, 0, 7, 4, now * 0.003);
+    drawSmallStarOnCtx(ctx,  halfW - 22, 0, 7, 4, -now * 0.003);
+  }
+  ctx.restore();
+}
+
+function drawDuelStageFXV17(ctx, duel, now) {
+  if (!duel.active || duel.alpha <= 0.01) return;
+  const { leftX, rightX, y, energyProg, alpha, labelAlpha, spotlightPos, spotlightAlpha } = duel;
+  const midX = (leftX + rightX) / 2;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  if (spotlightAlpha > 0.01 && fxCache.pillarGold) {
+    const spotX = lerpNum(leftX, rightX, (spotlightPos + 1) * 0.5);
+    ctx.save();
+    ctx.globalAlpha = alpha * spotlightAlpha * 0.72;
+    ctx.drawImage(fxCache.pillarGold, spotX - 190, y - 560, 380, 1080);
+    ctx.restore();
+  }
+
+  if (energyProg > 0.02) {
+    const span = (rightX - leftX) * 0.5 * energyProg;
+    const drawBolt = (xStart, xEnd, glowCol, coreCol, amp) => {
+      const segs = 9;
+      ctx.beginPath(); ctx.moveTo(xStart, y);
+      for (let i = 1; i < segs; i++) {
+        const t = i / segs, bx = lerpNum(xStart, xEnd, t);
+        const jit = Math.sin(now * 0.036 + i * 2.1) * amp + Math.cos(now * 0.058 - i * 1.4) * (amp * 0.5);
+        ctx.lineTo(bx, y + jit);
+      }
+      ctx.lineTo(xEnd, y);
+      ctx.strokeStyle = glowCol; ctx.lineWidth = 9.5; ctx.stroke();
+      ctx.strokeStyle = coreCol; ctx.lineWidth = 3.0; ctx.stroke();
+    };
+    drawBolt(leftX, leftX + span, "rgba(226, 185, 97, 0.55)", "#FFF5CC", 19);
+    drawBolt(rightX, rightX - span, "rgba(217, 56, 56, 0.58)", "#FFD6D6", 19);
+
+    if (energyProg > 0.85 && fxCache.sparkWhite) {
+      const clashSize = 115 + 28 * Math.sin(now * 0.028);
+      ctx.drawImage(fxCache.sparkWhite, midX - clashSize / 2, y - clashSize / 2, clashSize, clashSize);
     }
-    .prophecy-card {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold); border-radius: 6px;
-      padding: 1.15rem 0.65rem; text-align: center; text-decoration: none;
-      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-      min-height: 185px; position: relative; transition: all 0.3s ease;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  }
+
+  if (labelAlpha > 0.01) {
+    const lblY = y - (isReel916() ? 360 : 320);
+    ctx.save(); ctx.globalAlpha = labelAlpha;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#E2B961"; ctx.font = '800 18px "Cinzel", serif';
+    ctx.fillText("THE FINAL VERDICT", STAGE_CX, lblY - 40);
+    ctx.fillStyle = "#FFF5CC"; ctx.font = '900 44px "Cinzel", serif';
+    ctx.fillText("1 SAFE  •  1 SHADOW", STAGE_CX, lblY + 8);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/* ============================================================================
+   5. RENDU CARTE TAROT V17 (SAFE + SHADOW + FISSURES & COMBUSTION 100% DNR)
+   ============================================================================ */
+function drawFastCachedTarotCardV17(ctx, cardObj, now) {
+  const effAlpha = cardObj.alpha * (cardObj.dimFactor ?? 1);
+  if (effAlpha <= 0.01 || (cardObj.burnProg || 0) >= 0.995) return;
+
+  const flip = cardObj.flip, isFront = flip >= 0.5;
+  const scaleX = Math.max(0.03, Math.abs(Math.cos(flip * Math.PI)));
+  const edgeSin = Math.sin(flip * Math.PI);
+  const targetIsSh  = cardObj.c.status === "shadow";
+  const targetIsDnr = cardObj.c.status === "dnr";
+  const elev = cardObj.elevation || 0;
+  const W = 240, H = 370, x = -120, y = -185;
+  const useMip = cardObj.scale < 0.72;
+  const floatY = (cardObj.floatAmp || 0) * Math.sin(now * 0.0022 + (cardObj.floatPhase || 0));
+  const drawX = cardObj.x + (cardObj.shakeX || 0);
+  const drawY = cardObj.y + (cardObj.shakeY || 0) + floatY;
+  const burnProg = cardObj.burnProg || 0;
+
+  if ((cardObj.mandalaAlpha || 0) > 0.01 && fxCache.mandalaGold) {
+    const mSize = 540 * cardObj.scale;
+    ctx.save();
+    ctx.globalAlpha = cardObj.mandalaAlpha * effAlpha;
+    ctx.translate(drawX, drawY); ctx.rotate(now * 0.0009);
+    ctx.drawImage(fxCache.mandalaGold, -mSize / 2, -mSize / 2, mSize, mSize);
+    ctx.restore();
+  }
+
+  if (cardObj.auraAlpha > 0.01) {
+    const rImg = targetIsDnr ? fxCache.raysAsh : (targetIsSh ? fxCache.raysCrim : fxCache.raysGold);
+    if (rImg) {
+      const rSize = 620 * cardObj.scale;
+      ctx.save();
+      ctx.globalAlpha = cardObj.auraAlpha * effAlpha * 0.85 * (1 - burnProg);
+      ctx.translate(drawX, drawY); ctx.rotate(now * 0.0011 * (targetIsSh ? -1 : 1));
+      ctx.drawImage(rImg, -rSize / 2, -rSize / 2, rSize, rSize);
+      ctx.restore();
     }
-    .prophecy-card::before {
-      content: ''; position: absolute; inset: 5px; border: 1px solid rgba(226, 185, 97, 0.28);
-      border-radius: 3px; pointer-events: none;
+  }
+
+  if ((cardObj.lightningAlpha || 0) > 0.01) {
+    drawRubyLightningAroundCard(ctx, drawX, drawY, cardObj.scale, cardObj.lightningAlpha * effAlpha, now);
+  }
+
+  ctx.save();
+  ctx.globalAlpha = effAlpha;
+  ctx.translate(drawX, drawY);
+  ctx.rotate((cardObj.rotDeg || 0) * Math.PI / 180);
+
+  // Ombre portée (réduite au fil de la combustion DNR)
+  if (burnProg < 0.85) {
+    const shOff = 6 + elev * 18;
+    ctx.fillStyle = cardObj.selectGlow > 0.1
+      ? `rgba(255, 245, 204, ${(0.48 * cardObj.selectGlow).toFixed(2)})`
+      : `rgba(0, 0, 0, ${((0.56 + elev * 0.24) * (1 - burnProg)).toFixed(2)})`;
+    ctx.beginPath();
+    ctx.roundRect((x + shOff * 0.5) * cardObj.scale * Math.max(0.15, scaleX), (y + shOff) * cardObj.scale, W * cardObj.scale * Math.max(0.15, scaleX), H * cardObj.scale * (1 - burnProg * 0.9), 10 * cardObj.scale);
+    ctx.fill();
+  }
+
+  // Tranche 3D dorée pendant le retournement
+  if (edgeSin > 0.08) {
+    const edgeShift = (flip < 0.5 ? -1 : 1) * edgeSin * 11 * cardObj.scale;
+    ctx.fillStyle = targetIsDnr && isFront ? "#8E8E9B" : "#E8C56E";
+    ctx.beginPath();
+    ctx.roundRect(edgeShift + x * cardObj.scale * scaleX, y * cardObj.scale, W * cardObj.scale * scaleX, H * cardObj.scale, 8 * cardObj.scale);
+    ctx.fill();
+  }
+
+  ctx.scale(cardObj.scale * scaleX, cardObj.scale);
+
+  // Masque de désintégration DNR (du bas vers le haut avec lisière de braise)
+  let burnY = H / 2 + 12;
+  if (burnProg > 0.002) {
+    burnY = (H / 2) + 12 - burnProg * (H + 34);
+    ctx.beginPath();
+    ctx.moveTo(x - 16, y - 24);
+    ctx.lineTo(x + W + 16, y - 24);
+    ctx.lineTo(x + W + 16, burnY);
+    for (let bx = x + W; bx >= x; bx -= 12) {
+      const jag = Math.sin(bx * 0.14 + now * 0.012) * 7.5 + Math.cos(bx * 0.28) * 3.5;
+      ctx.lineTo(bx, burnY + jag);
     }
-    .prophecy-card.unlocked:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 22px rgba(226, 185, 97, 0.32);
-      background: radial-gradient(circle at center, rgba(226,185,97,0.12) 0%, #0d0d0d 75%);
+    ctx.closePath();
+    ctx.clip();
+  }
+
+  const pack = cardSpritesMap[cardObj.idx];
+  const sprites = pack ? (useMip ? pack.mip : pack.hi) : null;
+  const sW = useMip ? MIP_W : HI_W, sH = useMip ? MIP_H : HI_H;
+
+  if (!isFront) {
+    const bSpr = useMip ? backSpriteMip : backSpriteHi;
+    if (bSpr) ctx.drawImage(bSpr, x, y, W, H);
+    if (cardObj.selectGlow > 0.1) {
+      ctx.strokeStyle = "#FFF5CC"; ctx.lineWidth = 3.5;
+      ctx.beginPath(); ctx.roundRect(x, y, W, H, 8); ctx.stroke();
     }
-    .prophecy-card.locked {
-      border-color: #262626; background: #090909; opacity: 0.6; cursor: default;
+  } else if (cardObj.purifyProg >= 0 && cardObj.purifyProg < 1 && sprites) {
+    const p = cardObj.purifyProg;
+    const splitY = (H / 2) - p * H;
+    const splitSpriteY = (1 - p) * sH;
+    const finalSprite = targetIsDnr ? sprites.dnr : (targetIsSh ? sprites.shadowNoChain : sprites.safe);
+
+    if (splitSpriteY > 0) ctx.drawImage(sprites.neutral, 0, 0, sW, splitSpriteY, x, y, W, splitY - y);
+    if (splitSpriteY < sH) ctx.drawImage(finalSprite, 0, splitSpriteY, sW, sH - splitSpriteY, x, splitY, W, (y + H) - splitY);
+
+    const waveCol = targetIsDnr ? "rgba(185, 185, 200, 0.90)" : (targetIsSh ? "rgba(255, 85, 85, 0.92)" : "rgba(255, 245, 204, 0.92)");
+    ctx.fillStyle = waveCol; ctx.fillRect(x, splitY - 11, W, 22);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillRect(x, splitY - 3, W, 6);
+  } else if (sprites) {
+    let activeSprite = sprites.neutral;
+    if (cardObj.colorState === "dnr") activeSprite = sprites.dnr;
+    else if (cardObj.colorState === "safe") activeSprite = sprites.safe;
+    else if (cardObj.colorState === "shadow") activeSprite = (cardObj.chainProg >= 1 ? sprites.shadow : sprites.shadowNoChain);
+    ctx.drawImage(activeSprite, x, y, W, H);
+  }
+
+  if (isFront && targetIsSh && cardObj.chainProg > 0.01 && cardObj.chainProg < 1) {
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(x, y, W, H, 8); ctx.clip();
+    drawPerimeterSealChains(ctx, W, H, 1, cardObj.chainProg);
+    ctx.restore();
+  }
+
+  // Fissures incandescentes pour les cartes "Did Not Record"
+  if (isFront && (cardObj.crackProg || 0) > 0.01) {
+    const cp = cardObj.crackProg, heat = cardObj.crackHeat ?? 1;
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(x, y, W, H, 8); ctx.clip();
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    CARD_CRACK_PATHS.forEach((po, idx) => {
+      const lp = Math.max(0, Math.min(1, (cp - idx * 0.08) / 0.72));
+      if (lp <= 0) return;
+      if (heat > 0.05) {
+        ctx.strokeStyle = `rgba(255, 85, 30, ${(heat * 0.72).toFixed(3)})`;
+        ctx.lineWidth = po.width * 2.6;
+        strokeProgressivePolyline(ctx, po.pts, lp);
+      }
+      ctx.strokeStyle = heat > 0.4 ? "#FFE6AA" : "#1C1C22";
+      ctx.lineWidth = po.width;
+      strokeProgressivePolyline(ctx, po.pts, lp);
+      if (heat <= 0.4) {
+        ctx.strokeStyle = "rgba(180, 180, 196, 0.72)";
+        ctx.lineWidth = 0.9;
+        strokeProgressivePolyline(ctx, po.pts, lp);
+      }
+    });
+    ctx.restore();
+  }
+
+  // Lisière incandescente de braise sur le front de combustion DNR
+  if (burnProg > 0.002 && burnProg < 0.99) {
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(x, y, W, H, 8); ctx.clip();
+    ctx.strokeStyle = "rgba(255, 78, 22, 0.85)"; ctx.lineWidth = 10; ctx.lineCap = "round";
+    ctx.beginPath();
+    for (let bx = x; bx <= x + W; bx += 12) {
+      const jag = Math.sin(bx * 0.14 + now * 0.012) * 7.5 + Math.cos(bx * 0.28) * 3.5;
+      bx === x ? ctx.moveTo(bx, burnY + jag) : ctx.lineTo(bx, burnY + jag);
     }
-    .prophecy-card.locked::before { border-color: #1c1c1c; }
-    .prophecy-num { font-family: 'Cinzel', serif; font-size: 0.63rem; letter-spacing: 2px; color: var(--tarot-gold); text-transform: uppercase; }
-    .prophecy-card.locked .prophecy-num { color: #666; }
-    .prophecy-glyph {
-      width: 42px; height: 42px; border: 1px solid var(--tarot-gold); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; color: var(--tarot-gold); margin: 0.55rem 0;
-      background: #141414; box-shadow: 0 0 15px rgba(226, 185, 97, 0.2);
+    ctx.stroke();
+    ctx.strokeStyle = "#FFF2B2"; ctx.lineWidth = 3.2; ctx.stroke();
+    ctx.restore();
+  }
+
+  if ((cardObj.borderGlow || 0) > 0.02) {
+    ctx.strokeStyle = targetIsDnr ? `rgba(185, 185, 200, ${cardObj.borderGlow.toFixed(2)})`
+      : (targetIsSh && cardObj.colorState === "shadow" ? `rgba(255, 110, 110, ${cardObj.borderGlow.toFixed(2)})` : `rgba(255, 245, 204, ${cardObj.borderGlow.toFixed(2)})`);
+    ctx.lineWidth = 5.5;
+    ctx.beginPath(); ctx.roundRect(x - 2, y - 2, W + 4, H + 4, 10); ctx.stroke();
+  }
+
+  const autoFlipSheen = (isFront && flip < 0.96 && !targetIsDnr) ? ((flip - 0.5) * 2) : -1;
+  const activeSheen = (cardObj.sheenProg >= 0 && cardObj.sheenProg <= 1) ? cardObj.sheenProg : autoFlipSheen;
+  if (isFront && activeSheen >= 0 && activeSheen <= 1) {
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(x, y, W, H, 8); ctx.clip();
+    ctx.rotate(-Math.PI / 4.3);
+    const swX = -320 + activeSheen * 640;
+    ctx.fillStyle = targetIsSh && cardObj.colorState === "shadow" ? "rgba(255, 190, 190, 0.24)" : "rgba(255, 252, 232, 0.30)";
+    ctx.fillRect(swX - 34, -420, 68, 840);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.22)";
+    ctx.fillRect(swX - 10, -420, 20, 840);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/* ============================================================================
+   6. COMPTEURS EN DIRECT (SAFE • ASH DNR • SHADOW) & AUTEL FINAL
+   ============================================================================ */
+function drawLiveCountersHUDV17(ctx, now) {
+  const c = stageScene.counters;
+  if (c.alpha <= 0.01) return;
+  const y = isReel916() ? 98 : 66;
+  const hasDnr = c.dnrTotal > 0;
+  const safeLeft = Math.max(0, c.safeTotal - c.safeCount);
+  const isFinalSafeTension = c.safeTotal > 0 && safeLeft === 1;
+
+  ctx.save();
+  ctx.globalAlpha = c.alpha;
+  ctx.textBaseline = "middle";
+
+  const pillW = hasDnr ? 290 : 320;
+  const leftX = hasDnr ? 190 : 215;
+  const rightX = STAGE_W - leftX;
+
+  // Pilule SAFE
+  const sPulse = (c.pulseSafe || 0) + (isFinalSafeTension ? (0.35 + 0.35 * Math.sin(now * 0.008)) : 0);
+  ctx.save(); ctx.translate(leftX, y); ctx.scale(1 + sPulse * 0.07, 1 + sPulse * 0.07);
+  ctx.fillStyle = "rgba(18, 15, 10, 0.92)";
+  ctx.strokeStyle = isFinalSafeTension ? "#FFF5CC" : "#E2B961"; ctx.lineWidth = isFinalSafeTension ? 2.6 : 1.8;
+  ctx.beginPath(); ctx.roundRect(-pillW / 2, -26, pillW, 52, 26); ctx.fill(); ctx.stroke();
+  ctx.textAlign = "center"; ctx.fillStyle = "#FFF5CC"; ctx.font = `800 ${hasDnr ? 15.5 : 17}px "Cinzel", serif`;
+  ctx.fillText(isFinalSafeTension ? `SAFE : ${toRoman(c.safeCount)} / ${toRoman(c.safeTotal)} • LAST` : `SAFE : ${toRoman(c.safeCount)} / ${toRoman(c.safeTotal)}`, 0, 1, pillW - 22);
+  ctx.restore();
+
+  // Pilule centrale ASH DNR (uniquement si au moins 1 candidat DNR)
+  if (hasDnr) {
+    const dPulse = c.pulseDnr || 0;
+    ctx.save(); ctx.translate(STAGE_CX, y); ctx.scale(1 + dPulse * 0.07, 1 + dPulse * 0.07);
+    ctx.fillStyle = "rgba(22, 22, 28, 0.94)";
+    ctx.strokeStyle = "#9A9AA6"; ctx.lineWidth = 1.8 + dPulse;
+    ctx.beginPath(); ctx.roundRect(-124, -24, 248, 48, 24); ctx.fill(); ctx.stroke();
+    ctx.textAlign = "center"; ctx.fillStyle = "#E4E4EE"; ctx.font = '800 14.5px "Cinzel", serif';
+    ctx.fillText(`DNR ASH : ${toRoman(c.dnrCount)} / ${toRoman(c.dnrTotal)}`, 0, 1, 226);
+    ctx.restore();
+  }
+
+  // Pilule SHADOW
+  const shPulse = c.pulseShadow || 0;
+  ctx.save(); ctx.translate(rightX, y); ctx.scale(1 + shPulse * 0.07, 1 + shPulse * 0.07);
+  ctx.fillStyle = "rgba(24, 8, 9, 0.92)";
+  ctx.strokeStyle = "#D93838"; ctx.lineWidth = 1.8 + shPulse;
+  ctx.beginPath(); ctx.roundRect(-pillW / 2, -26, pillW, 52, 26); ctx.fill(); ctx.stroke();
+  ctx.textAlign = "center"; ctx.fillStyle = "#FFD6D6"; ctx.font = `800 ${hasDnr ? 15.5 : 17}px "Cinzel", serif`;
+  ctx.fillText(`SHADOW : ${toRoman(c.shadowCount)} / ${toRoman(c.shadowTotal)}`, 0, 1, pillW - 22);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawAnimatedGoldenScaleV17(ctx, cx, cy, sc, now) {
+  const tilt = Math.sin(now * 0.0018) * 0.105;
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc);
+  ctx.strokeStyle = "#E2B961"; ctx.fillStyle = "#E2B961"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0, -48); ctx.lineTo(0, 52); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(-38, 48, 76, 8, 4); ctx.fill();
+  ctx.fillStyle = "#FFF5CC"; drawSmallStarOnCtx(ctx, 0, -56, 10, 4, now * 0.002);
+
+  ctx.save(); ctx.translate(0, -32); ctx.rotate(tilt);
+  ctx.strokeStyle = "#FFF5CC"; ctx.lineWidth = 3.2;
+  ctx.beginPath(); ctx.moveTo(-78, 0); ctx.lineTo(78, 0); ctx.stroke();
+  [[-74, "#E2B961"], [74, "#FF6666"]].forEach(([px, col]) => {
+    ctx.save(); ctx.translate(px, 0); ctx.rotate(-tilt);
+    ctx.strokeStyle = "#E2B961"; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-20, 38); ctx.moveTo(0, 0); ctx.lineTo(20, 38); ctx.stroke();
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(0, 36, 22, 0.1 * Math.PI, 0.9 * Math.PI, false); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  });
+  ctx.restore();
+  ctx.restore();
+}
+
+function drawAltarOfTheScaleOverlayV17(ctx, theme, now) {
+  if (stageScene.ending.alpha <= 0.01) return;
+  const s = appState.settings, is916 = isReel916();
+  const dnrList = stageScene.ending.dnrNames || [];
+  const medY = is916 ? 210 : 145, sealedTxtY = is916 ? 378 : 268, divY = is916 ? 430 : 308, titleY = is916 ? 495 : 356, subY = is916 ? 548 : 398;
+
+  ctx.save();
+  ctx.globalAlpha = stageScene.ending.alpha;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+
+  if (stageScene.ending.balanceAlpha > 0.01) {
+    ctx.save(); ctx.globalAlpha = stageScene.ending.balanceAlpha * 0.25;
+    drawAnimatedGoldenScaleV17(ctx, STAGE_CX, is916 ? 510 : 360, is916 ? 1.55 : 1.15, now);
+    ctx.restore();
+  }
+
+  const meds = [
+    { rom: toRoman(s.quotaOracle), lbl: `SAVED BY ${theme.leader}`, col: "#E2B961", x: 185, y: medY },
+    { rom: toRoman(s.quotaPublic), lbl: "SAVED BY THE SCALE",       col: "#FFF5CC", x: 895, y: medY }
+  ];
+  meds.forEach(q => {
+    ctx.save(); ctx.translate(q.x, q.y);
+    ctx.fillStyle = "rgba(16, 10, 10, 0.94)"; ctx.strokeStyle = q.col; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(0, 0, 54, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.arc(0, 0, 63, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = "#FFFFFF"; ctx.font = '900 34px "Cinzel", serif'; ctx.fillText(q.rom, 0, -2);
+    ctx.fillStyle = q.col; ctx.font = '800 13px "Cinzel", serif'; ctx.fillText(q.lbl, 0, 82);
+    ctx.restore();
+  });
+
+  ctx.fillStyle = "#FFF5CC"; ctx.font = '800 14.5px "Cinzel", serif';
+  ctx.fillText(`${toRoman(stageScene.box3D.safeProtectedCount)} SAFE SEALED IN THE SANCTUARY`, STAGE_CX, sealedTxtY);
+
+  ctx.strokeStyle = "rgba(217, 56, 56, 0.52)"; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(110, divY); ctx.lineTo(485, divY); ctx.moveTo(595, divY); ctx.lineTo(970, divY); ctx.stroke();
+  ctx.fillStyle = "#FF8585"; drawSmallStarOnCtx(ctx, STAGE_CX, divY, 8.5, 4, now * 0.002);
+
+  ctx.fillStyle = "#FFD6D6"; ctx.font = '900 42px "Cinzel", serif';
+  ctx.fillText("THE SHADOW ZONE — TIP THE SCALE", STAGE_CX, titleY, 960);
+
+  ctx.fillStyle = "#FF8585"; ctx.font = '800 16px "Cinzel", serif';
+  ctx.fillText(`${toRoman(s.quotaElim)} INITIATES WILL BE CONSUMED TO ASH   —   PUBLIC VOTE OPEN IN BIO`, STAGE_CX, subY, 960);
+
+  // Rappel discret des candidats directement éliminés pour "Did Not Record"
+  if (dnrList.length > 0) {
+    const dnrY = is916 ? 1685 : 1388;
+    const dnrTxt = `DIRECTLY ELIMINATED (DID NOT RECORD) : ${dnrList.join("  •  ")}`;
+    ctx.save();
+    ctx.fillStyle = "rgba(20, 20, 26, 0.90)";
+    ctx.strokeStyle = "rgba(154, 154, 166, 0.62)"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(115, dnrY - 20, 850, 40, 20); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#D8D8E4"; ctx.font = '700 13.5px "Cinzel", serif';
+    ctx.fillText(dnrTxt, STAGE_CX, dnrY + 1, 815);
+    ctx.restore();
+  }
+
+  if (is916) {
+    drawAnimatedGoldenScaleV17(ctx, STAGE_CX, dnrList.length > 0 ? 1785 : 1765, 0.70, now);
+    ctx.fillStyle = "rgba(226, 185, 97, 0.80)"; ctx.font = '700 15px "Cinzel", serif';
+    ctx.fillText((s.igHandle || "STAR KCA ACADEMY — KAEOS PROJECT").toUpperCase(), STAGE_CX, 1865);
+  }
+  ctx.restore();
+}
+
+/* ============================================================================
+   7. BOUCLE MASTER V17 ZÉRO-LAG (GPU BILINÉAIRE + FOND 1:1 + CENDRES DNR)
+   ============================================================================ */
+function renderMasterCanvasFrame(now = performance.now()) {
+  const drawT0 = performance.now();
+  const dt = Math.min(0.06, Math.max(0.001, (now - lastFrameTime) / 1000));
+  const frameStep = dt * 60;
+  lastFrameTime = now;
+
+  const S = masterCanvas.width / STAGE_W;
+  const ctx = masterCtx;
+  const theme = CIRCLE_THEMES[appState.settings.circle] || CIRCLE_THEMES.Soleil;
+  ensureV17BoxSprites(theme);
+
+  stageScene.wheelAngle += dt * 0.16;
+  stageScene.eclipsePulse = Math.max(0, stageScene.eclipsePulse - dt * 0.88);
+  stageScene.ashPulse = Math.max(0, stageScene.ashPulse - dt * 0.72);
+  stageScene.counters.pulseSafe = Math.max(0, stageScene.counters.pulseSafe - dt * 2.2);
+  stageScene.counters.pulseShadow = Math.max(0, stageScene.counters.pulseShadow - dt * 2.2);
+  stageScene.counters.pulseDnr = Math.max(0, stageScene.counters.pulseDnr - dt * 2.2);
+  stageScene.flash.alpha = Math.max(0, stageScene.flash.alpha - dt * 2.2);
+  stageScene.chromaticAmp = Math.max(0, stageScene.chromaticAmp - dt * 3.0);
+
+  const cam = stageScene.camera;
+  const camEnabled = appState.settings.cameraFx !== "off";
+  cam.zoom += (cam.targetZoom - cam.zoom) * Math.min(1, dt * 5.0);
+  cam.x += (cam.targetX - cam.x) * Math.min(1, dt * 5.0);
+  cam.y += (cam.targetY - cam.y) * Math.min(1, dt * 5.0);
+  cam.shakeAmp = Math.max(0, cam.shakeAmp * Math.pow(0.85, frameStep));
+
+  const breathScale = camEnabled ? (1 + Math.sin(now * 0.0011) * 0.005 * (cam.breathAmp || 0)) : 1;
+  const shakeOffX = camEnabled && cam.shakeAmp > 0.2 ? (Math.random() - 0.5) * 2 * cam.shakeAmp : 0;
+  const shakeOffY = camEnabled && cam.shakeAmp > 0.2 ? (Math.random() - 0.5) * 2 * cam.shakeAmp : 0;
+  const effZoom = camEnabled ? (cam.zoom * breathScale) : 1;
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "low";
+  ctx.scale(S, S);
+
+  // 1. Fond 1:1 hors-caméra
+  drawStaticBackdrop1to1(ctx);
+
+  // Début Caméra Cinématique
+  ctx.save();
+  ctx.translate(STAGE_CX + shakeOffX - (camEnabled ? cam.x : 0), STAGE_CY + shakeOffY - (camEnabled ? cam.y : 0));
+  ctx.scale(effZoom, effZoom);
+  ctx.translate(-STAGE_CX, -STAGE_CY);
+
+  // 2. Couches vivantes du Sanctuaire
+  drawLivingSanctuaryLayersV17(ctx, now, dt);
+
+  // 3. Titre d'ouverture & Bannière DNR
+  drawAltarOpeningTitleV17(ctx, now);
+  drawDnrRitualBannerV17(ctx, now);
+
+  // 4. Étui 3D — COUCHE ARRIÈRE
+  if (stageScene.box3D.alpha > 0.01) {
+    drawRoyalTarotTuckBoxBackV17(ctx, stageScene.box3D, now);
+  }
+
+  // 5. Cartes qui plongent PHYSIQUEMENT DANS l'étui
+  const sortedCards = [...stageScene.cards].sort((a, b) => (a.zOrder || 0) - (b.zOrder || 0));
+  if (stageScene.box3D.frontOverlayActive && stageScene.box3D.alpha > 0.01) {
+    const b = stageScene.box3D;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, 0, STAGE_W, b.y + 210 * b.scale); ctx.clip();
+    for (let i = 0; i < sortedCards.length; i++) {
+      if (sortedCards[i].inBoxLayer) drawFastCachedTarotCardV17(ctx, sortedCards[i], now);
     }
-    .prophecy-card.locked .prophecy-glyph { border-color: #333; color: #555; box-shadow: none; }
-    .prophecy-title { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--text); font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 0.6rem 0; line-height: 1.25; }
-    .prophecy-card.locked .prophecy-title { color: #666; }
-    .prophecy-status {
-      font-size: 0.58rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 3px 9px; border-radius: 3px; background: var(--tarot-gold); color: var(--bg);
+    ctx.restore();
+  }
+
+  // 6. Étui 3D — COUCHE AVANT
+  if (stageScene.box3D.alpha > 0.01) {
+    drawRoyalTarotTuckBoxFrontV17(ctx, stageScene.box3D, now);
+  }
+
+  // 7. Autel de la Balance (Acte IV)
+  drawAltarOfTheScaleOverlayV17(ctx, theme, now);
+
+  // 8. Projecteur & Arc d'énergie du Duel Final 1v1
+  drawDuelStageFXV17(ctx, stageScene.duel, now);
+
+  // 9. Toutes les autres Cartes de Tarot
+  for (let i = 0; i < sortedCards.length; i++) {
+    if (!sortedCards[i].inBoxLayer) drawFastCachedTarotCardV17(ctx, sortedCards[i], now);
+  }
+
+  // 10. Ruban Calligraphique de Verdict (Safe / Shadow / DNR)
+  drawVerdictRibbonV17(ctx, now);
+
+  // 11. Ondes de choc, Flashs de verrouillage, Éclats & Flocons de Cendre DNR
+  for (let i = shockwaveRings.length - 1; i >= 0; i--) {
+    const sw = shockwaveRings[i];
+    sw.r += ((sw.maxR - sw.r) * 0.095 + 4.5) * frameStep;
+    sw.alpha -= 0.025 * frameStep;
+    if (sw.alpha <= 0) { shockwaveRings.splice(i, 1); continue; }
+    ctx.save(); ctx.strokeStyle = sw.color; ctx.lineWidth = sw.lineW || 4.5;
+    ctx.globalAlpha = Math.max(0, sw.alpha);
+    ctx.beginPath(); ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  }
+  for (let i = lockFlashes.length - 1; i >= 0; i--) {
+    const lf = lockFlashes[i];
+    lf.r += (lf.maxR - lf.r) * 0.16 * frameStep + 2.5 * frameStep;
+    lf.alpha -= 0.042 * frameStep;
+    if (lf.alpha <= 0) { lockFlashes.splice(i, 1); continue; }
+    ctx.save(); ctx.strokeStyle = lf.color; ctx.lineWidth = 3.2;
+    ctx.globalAlpha = Math.max(0, lf.alpha);
+    ctx.beginPath(); ctx.arc(lf.x, lf.y, lf.r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  }
+  for (let i = sealShards.length - 1; i >= 0; i--) {
+    const sh = sealShards[i];
+    sh.x += sh.vx * frameStep; sh.y += sh.vy * frameStep; sh.vy += 0.22 * frameStep;
+    sh.rot += sh.vRot * frameStep; sh.alpha -= 0.022 * frameStep;
+    if (sh.alpha <= 0) { sealShards.splice(i, 1); continue; }
+    ctx.save(); ctx.translate(sh.x, sh.y); ctx.rotate(sh.rot);
+    ctx.fillStyle = sh.color; ctx.globalAlpha = Math.max(0, sh.alpha);
+    ctx.beginPath(); ctx.moveTo(0, -sh.size); ctx.lineTo(sh.size * 0.6, sh.size * 0.4); ctx.lineTo(-sh.size * 0.5, sh.size * 0.6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  for (let i = ashFlakes.length - 1; i >= 0; i--) {
+    const af = ashFlakes[i];
+    af.x += (af.vx + Math.sin(af.rot) * 0.4) * frameStep;
+    af.y += af.vy * frameStep;
+    af.rot += af.vRot * frameStep;
+    af.alpha -= 0.013 * frameStep;
+    if (af.alpha <= 0) { ashFlakes.splice(i, 1); continue; }
+    ctx.save(); ctx.globalAlpha = Math.max(0, af.alpha); ctx.translate(af.x, af.y); ctx.rotate(af.rot); ctx.fillStyle = af.color;
+    if (af.isEmber) {
+      ctx.beginPath(); ctx.arc(0, 0, af.r, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.moveTo(-af.r, -af.r * 0.5); ctx.lineTo(af.r, -af.r * 0.8); ctx.lineTo(af.r * 0.7, af.r); ctx.lineTo(-af.r * 0.8, af.r * 0.6); ctx.closePath(); ctx.fill();
     }
-    .prophecy-card.locked .prophecy-status {
-      background: #151515; color: #666; border: 1px solid #2a2a2a;
+    ctx.restore();
+  }
+
+  // Particules d'explosion & poussières ambiantes
+  ctx.save();
+  for (let i = burstParticles.length - 1; i >= 0; i--) {
+    const b = burstParticles[i];
+    b.x += b.vx * frameStep; b.y += b.vy * frameStep; b.alpha -= 0.026 * frameStep;
+    if (b.alpha <= 0) { burstParticles.splice(i, 1); continue; }
+    const spr = b.type === "crimson" ? fxCache.sparkCrim : (b.type === "ash" ? fxCache.sparkAsh : (b.type === "white" ? fxCache.sparkWhite : fxCache.sparkGold));
+    if (spr) {
+      ctx.globalAlpha = Math.max(0, b.alpha);
+      ctx.drawImage(spr, b.x - b.size / 2, b.y - b.size / 2, b.size, b.size);
     }
-
-    /* ==========================================
-       SEALED PENTAGRAM STATE (PRE-RANK)
-       ========================================== */
-    .sealed-pentagram-box {
-      height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; padding: 1.5rem; background: radial-gradient(circle, rgba(226,185,97,0.06) 0%, transparent 70%);
-      border: 1px dashed rgba(226, 185, 97, 0.25); border-radius: 6px;
+  }
+  const effCrim = Math.max(0, Math.min(1, stageScene.eclipseMix + stageScene.eclipsePulse));
+  const effAsh  = Math.max(0, Math.min(1, stageScene.ashMix + stageScene.ashPulse));
+  const ambSpr = effAsh > 0.45 ? fxCache.sparkAsh : (effCrim > 0.45 ? fxCache.sparkCrim : fxCache.sparkGold);
+  if (ambSpr) {
+    for (let i = 0; i < ambientSparks.length; i++) {
+      const p = ambientSparks[i];
+      p.y -= (p.vy * (1 + effCrim * 0.75)) * frameStep;
+      p.phase += p.swaySpeed * frameStep;
+      p.x += Math.sin(p.phase) * p.swayAmp * frameStep;
+      if (p.y < -18) { p.y = STAGE_H + 18; p.x = Math.random() * STAGE_W; }
+      ctx.globalAlpha = p.baseAlpha * (0.48 + 0.52 * Math.sin(p.phase * 2));
+      ctx.drawImage(ambSpr, p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
     }
-    .sealed-pentagram-glyph {
-      width: 68px; height: 68px; border: 1.5px solid var(--tarot-gold-dim); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--tarot-gold);
-      margin-bottom: 1rem; box-shadow: 0 0 25px rgba(226, 185, 97, 0.15);
+  }
+  ctx.restore();
+
+  ctx.restore(); // Fin Caméra
+
+  // 12. HUD Compteurs fixes + Flash léger
+  drawLiveCountersHUDV17(ctx, now);
+
+  if (stageScene.flash.alpha > 0.01) {
+    ctx.save(); ctx.globalAlpha = stageScene.flash.alpha; ctx.fillStyle = stageScene.flash.color;
+    ctx.fillRect(0, 0, STAGE_W, STAGE_H); ctx.restore();
+  }
+  if (stageScene.chromaticAmp > 0.01) {
+    ctx.save(); ctx.strokeStyle = `rgba(255, 45, 55, ${(stageScene.chromaticAmp * 0.55).toFixed(3)})`;
+    ctx.lineWidth = 18 * stageScene.chromaticAmp; ctx.strokeRect(10, 10, STAGE_W - 20, STAGE_H - 20); ctx.restore();
+  }
+
+  ctx.restore();
+
+  // Télémétrie FPS / ms
+  const drawMs = performance.now() - drawT0;
+  perfMon.avgDrawMs = perfMon.avgDrawMs ? (perfMon.avgDrawMs * 0.9 + drawMs * 0.1) : drawMs;
+  perfMon.frames++;
+  if (now - perfMon.lastStamp >= 500) {
+    perfMon.fps = Math.round((perfMon.frames * 1000) / (now - perfMon.lastStamp));
+    perfMon.frames = 0;
+    perfMon.lastStamp = now;
+    const titleEl = document.getElementById("esb-title");
+    if (titleEl && typeof activeRecorder !== "undefined" && activeRecorder && activeRecorder.state === "recording") {
+      titleEl.textContent = `REC V17 • ${perfMon.fps} FPS (${perfMon.avgDrawMs.toFixed(1)}ms)`;
     }
+  }
+}
 
-    /* ==========================================
-       ANIMATED SCALE (VOTES PAGE) & GRIMOIRE
-       ========================================== */
-    .scale-showcase {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 1.8rem 1rem; margin: 1.5rem 0; background: #0d0d0d; border: 1px solid var(--line); border-radius: 6px;
-    }
-    @keyframes rockBeam { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
-    .scale-svg { width: 220px; height: 130px; overflow: visible; }
-    .scale-beam-group { transform-origin: 110px 35px; animation: rockBeam 6s ease-in-out infinite; }
-    .scale-quotas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.2rem; }
-    .quota-card { background: #121212; border: 1px solid var(--line); border-radius: 6px; padding: 0.75rem 1.2rem; text-align: center; min-width: 155px; }
-    .quota-card.shadow-quota { border-color: rgba(217, 56, 56, 0.5); }
-    .quota-card strong { display: block; font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--text); }
-    .quota-card.shadow-quota strong { color: var(--tarot-danger); }
+function startStageRenderLoop(fpsCap = 0) {
+  if (stageRenderLoopId) cancelAnimationFrame(stageRenderLoopId);
+  activeRenderFpsCap = fpsCap;
+  lastFrameTime = performance.now();
+  perfMon.frames = 0; perfMon.lastStamp = performance.now(); perfMon.avgDrawMs = 0;
+  function loop(now) { renderMasterCanvasFrame(now); stageRenderLoopId = requestAnimationFrame(loop); }
+  stageRenderLoopId = requestAnimationFrame(loop);
+}
 
-    .vote-row { margin-bottom: 1.2rem; background: #0e0e0e; padding: 0.95rem 1.15rem; border-radius: 6px; border: 1px solid var(--line); }
-    .bar { width: 100%; height: 7px; background: #222; border-radius: 999px; overflow: hidden; margin-top: 0.55rem; }
-    .bar > span { display: block; height: 100%; background: var(--tarot-gold); transition: width 0.6s ease; box-shadow: 0 0 10px rgba(226, 185, 97, 0.5); }
-
-    .grimoire-intro { text-align: center; max-width: 820px; margin: 0 auto 2.5rem; padding: 1.8rem; background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px; }
-    .grimoire-motto { font-family: 'Cinzel', serif; color: var(--tarot-gold); letter-spacing: 5px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
-    .oracles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin: 1.5rem 0 2.8rem; }
-    .oracle-box {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
-      padding: 1.6rem 1.3rem; text-align: center; display: flex; flex-direction: column; align-items: center;
-      transition: border-color 0.3s ease, transform 0.3s ease;
-    }
-    .oracle-box:hover { border-color: var(--tarot-gold); transform: translateY(-4px); }
-    .oracle-symbol { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: var(--tarot-gold); margin-bottom: 0.6rem; text-shadow: 0 0 15px rgba(226, 185, 97, 0.35); }
-    .oracle-eye-svg { width: 46px; height: 32px; overflow: visible; filter: drop-shadow(0 0 8px rgba(226, 185, 97, 0.35)); }
-    .rubric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
-    .rubric-item { background: #0d0d0d; border: 1px solid var(--line); border-radius: 4px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-    .rubric-pts { font-family: 'Cinzel', serif; color: var(--tarot-gold); font-weight: 700; font-size: 1.05rem; }
-
-    .rules-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; margin: 1.2rem 0 2.4rem; }
-    .rule-lore-box {
-      background: #0d0d0d; border: 1px solid var(--tarot-gold-dim); border-radius: 6px;
-      padding: 1.4rem 1.5rem;
-    }
-    .rule-lore-box.forfeit-box { border-color: rgba(217, 56, 56, 0.4); }
-    .rule-lore-box h4 { margin: 0 0 0.7rem 0; font-size: 1rem; letter-spacing: 1.8px; }
-    .rule-lore-box ul { margin: 0; padding-left: 1.15rem; color: #d4d0c8; font-size: 0.85rem; line-height: 1.65; }
-    .rule-lore-box li { margin-bottom: 0.45rem; }
-
-    @media (max-width: 720px) {
-      .topbar { justify-content: center; text-align: center; }
-      .circle-switcher { width: 100%; justify-content: center; overflow-x: auto; }
-      nav { width: 100%; justify-content: center; }
-      .card-paper { padding: 1.25rem; }
-      .live-cycle-inner { justify-content: center; text-align: center; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ==========================================
-     CELESTIAL RISING GOLDEN SPARKS & TOAST
-     ========================================== -->
-<canvas id="celestial-sparks"></canvas>
-<div id="site-toast">✦ Action confirmed</div>
-
-<!-- ==========================================
-     LANDING MENU: THE 4 TAROT CARDS
-     ========================================== -->
-<div id="landing-menu">
-  <div class="menu-header">
-    <h1>Star KCA Academy</h1>
-    <p>KÆOS PROJECT • Choose your destiny</p>
-    <div class="menu-sub-hint">✦ Tap a card to enter the Academy ✦</div>
-  </div>
-
-  <div class="cards-layout">
-    <div class="card-container" data-team="Soleil" onclick="handleCardTap(this, 'Soleil')">
-      <div class="tarot-flip-card theme-sun">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Sun</div>
-            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">NEITSU</div>
-            <div class="tarot-image-container"><img src="neitsu.png" data-leader="neitsu" alt="Neitsu" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">✦ Click to Enter ✹</div>
-            <div class="tarot-rank">THE SUN</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-container" data-team="Lune" onclick="handleCardTap(this, 'Lune')">
-      <div class="tarot-flip-card theme-moon">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Moon</div>
-            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">KAINA</div>
-            <div class="tarot-image-container"><img src="kaina.png" data-leader="kaina" alt="Kaina" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">✦ Click to Enter ☾</div>
-            <div class="tarot-rank">THE MOON</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-container" data-team="Etoile" onclick="handleCardTap(this, 'Etoile')">
-      <div class="tarot-flip-card theme-star">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The Star</div>
-            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">AYA</div>
-            <div class="tarot-image-container"><img src="aya.png" data-leader="aya" alt="Aya" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">✦ Click to Enter ✦</div>
-            <div class="tarot-rank">THE STAR</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-container" data-team="Global" onclick="handleCardTap(this, 'Global')">
-      <div class="tarot-flip-card theme-global">
-        <div class="card-face card-front">
-          <div class="card-front-inner">
-            <div class="front-symbol"></div>
-            <div class="card-front-label">The World</div>
-            <div class="front-tap-badge">✦ Tap to Enter ✦</div>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="tarot-inner-border">
-            <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
-            <div class="tarot-top-icon"></div>
-            <div class="tarot-name">GLOBAL</div>
-            <div class="tarot-image-container"><img src="world.png" data-leader="world" alt="Global World" onerror="handleImageFallback(this)"></div>
-            <div class="enter-hint">✦ Click to Enter ☉</div>
-            <div class="tarot-rank">THE WORLD</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==========================================
-     ACADEMY DASHBOARD
-     ========================================== -->
-<div id="app-dashboard">
-  <header>
-    <div class="container topbar">
-      <div class="brand" onclick="retourMenuPrincipale()" title="Return to Tarot Menu">
-        <h1>KÆOS PROJECT</h1>
-        <p>The Oracles' Academy</p>
-      </div>
-
-      <div class="circle-switcher" id="circleSwitcher">
-        <button class="circle-btn" data-team="Global" onclick="switchTeam('Global')">☉ Global</button>
-        <button class="circle-btn" data-team="Soleil" onclick="switchTeam('Soleil')">✹ Sun</button>
-        <button class="circle-btn" data-team="Lune" onclick="switchTeam('Lune')">☾ Moon</button>
-        <button class="circle-btn" data-team="Etoile" onclick="switchTeam('Etoile')">✦ Star</button>
-      </div>
-
-      <nav id="nav">
-        <a class="nav-link" href="#contestants">Initiates</a>
-        <a class="nav-link" href="#rankings">Alignment</a>
-        <a class="nav-link" href="#performances">Songs</a>
-        <a class="nav-link" href="#votes">The Scale</a>
-        <a class="nav-link" href="#grimoire">Grimoire</a>
-      </nav>
-    </div>
-
-    <!-- LIVE CYCLE COUNTDOWN RIBBON -->
-    <div class="live-cycle-ribbon" id="liveCycleRibbon">
-      <div class="container live-cycle-inner">
-        <div class="live-cycle-left">
-          <span class="live-dot"></span>
-          <span class="live-cycle-title" id="liveCycleTitle">ROUND 1 DEADLINE</span>
-          <span class="live-cycle-sub" id="liveCycleSub">Submissions close Nov 25 at 23:59 CET</span>
-        </div>
-        <div class="live-cycle-clock" id="liveCycleClock">—</div>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <section id="contestants" class="page active"></section>
-    <section id="profile" class="page"></section>
-    <section id="rankings" class="page"></section>
-    <section id="performances" class="page"></section>
-    <section id="votes" class="page"></section>
-    <section id="grimoire" class="page"></section>
-  </main>
-</div>
-
-<script>
+// ========== FIN DE LA PARTIE 3 / 4 (COLLER LA PARTIE 4 JUSTE EN DESSOUS) ==========
+      <script>
 // ==========================================
-// 1. OFFICIAL CONFIGURATION, SCHEDULE & 7 PROPHECY LINKS
+// 1. OFFICIAL CONFIGURATION, EXACT GIDS & 7 PROPHECY LINKS
 // ==========================================
 const CONFIG = {
   SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
-  VOTE_SHEET_ID: "1h64VnOm1s63QJUbn0GEXyvX2MqiwCPYeedHBq1QhDaI",
-  ROUND_TABS: { PRERANK: "PRERANK", ROUND_1: "R1", ROUND_2: "R2", ROUND_3: "R3", ROUND_4: "R4", FINAL: "R5" },
+  CONFIG_GID: "1282196301",
+  VOTES_LIVE_GID: "1729537298",
+  ROUND_GIDS: {
+    PRERANK: "104687807",
+    ROUND_1: "1106919605",
+    ROUND_2: "1528885185",
+    ROUND_3: "1691484337",
+    ROUND_4: "1938080468",
+    FINAL:   "273979330"
+  },
+  FINAL_FALLBACK_R5_GID: "1550037837",
   VOTE_FORM_URL: "https://forms.gle/63aiEEd9ioR8juBL9",
   AUDITION_FORM_URL: "https://forms.gle/q3V1uG6XnYNNQKXf8",
   INSTAGRAM_URL: "https://www.instagram.com/star_kca_academy.svs/",
   CANDIDATE_FOLDER: "candidat",
   NOMINATION_FOLDER: "nomination",
-  REFRESH_MS: 45000,
-  // Easily editable live milestones for the top status ribbon (CET / Paris time +01:00)
-  TIMELINE_EVENTS: [
-    {
-      title: "ROUND 1 SUBMISSION DEADLINE",
-      sub: "Recordings & Round 2 Form close Nov 25 • 23:59 CET",
-      target: "2026-11-25T23:59:59+01:00"
-    },
-    {
-      title: "ROUND 1 PERFORMANCES & JURY RANKING",
-      sub: "Performances posted Nov 26 • Nominations revealed Nov 27",
-      target: "2026-11-27T00:00:00+01:00"
-    },
-    {
-      title: "SHADOW ZONE & THE SCALE PUBLIC VOTE",
-      sub: "Vote open Nov 27 • Official Rankings & Round 2 launch Nov 28",
-      target: "2026-11-28T00:00:00+01:00"
-    }
-  ]
+  REFRESH_MS: 45000
 };
 
 // Round 2 — The Concept Round (12 Exclusive Songs)
@@ -808,12 +1273,22 @@ let rankingChartInstance = null;
 let profileChartInstance = null;
 let radarChartInstance = null;
 let countdownInterval = null;
-let liveCycleInterval = null;
+let liveClocksInterval = null;
 let cardEnterTimeout = null;
 
 const state = {
   data: { contestants: [], rounds: [], submissions: [], scores: [], judge_rankings: [], round_status: [], votes_live: [] },
+  liveConfig: {
+    active_round: "",
+    record_label: "",
+    record_deadline: "",
+    vote_round: "",
+    vote_deadline: "",
+    vote_form_url: "",
+    show_live_votes: true
+  },
   latestRound: "PRERANK",
+  latestScoredRound: "PRERANK",
   selectedRankingsRound: null,
   userPickedRankingsRound: false,
   rankingView: "default",
@@ -905,36 +1380,117 @@ function initCelestialSparks() {
 }
 
 // ==========================================
-// 3. LIVE CYCLE COUNTDOWN RIBBON
+// 3. FLEXIBLE PARIS DATE PARSER & SEPARATE CLOCKS (RECORD + VOTES)
 // ==========================================
-function startLiveCycleClock() {
-  clearInterval(liveCycleInterval);
-  const updateRibbon = () => {
-    const titleEl = document.getElementById('liveCycleTitle');
-    const subEl = document.getElementById('liveCycleSub');
-    const clockEl = document.getElementById('liveCycleClock');
-    if (!titleEl || !subEl || !clockEl) return;
+function parseParisDeadline(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return null;
 
-    const now = Date.now();
-    const nextEvt = (CONFIG.TIMELINE_EVENTS || []).find(ev => new Date(ev.target).getTime() > now);
+  // Already has explicit timezone (+01:00, +02:00, Z)
+  if (/(Z|[+-]\d{2}:?\d{2})$/i.test(s)) {
+    const t = Date.parse(s.replace(' ', 'T'));
+    return Number.isFinite(t) ? t : null;
+  }
 
-    if (nextEvt) {
-      const diff = Math.max(0, new Date(nextEvt.target).getTime() - now);
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-      const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-      const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-      titleEl.textContent = nextEvt.title;
-      subEl.textContent = nextEvt.sub;
-      clockEl.textContent = `${d > 0 ? d + 'D ' : ''}${h}H ${m}M ${s}S`;
+  let year, month, day, hour = 23, minute = 59, second = 59;
+
+  // Format YYYY-MM-DD [HH:MM[:SS]]
+  const isoMatch = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[T\s]+(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?)?$/);
+  // Format DD/MM/YYYY [HH:MM[:SS]] (French Google Sheets format)
+  const frMatch = s.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})(?:[T\s]+(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?)?$/);
+
+  if (isoMatch) {
+    year = Number(isoMatch[1]); month = Number(isoMatch[2]); day = Number(isoMatch[3]);
+    if (isoMatch[4] !== undefined) { hour = Number(isoMatch[4]); minute = Number(isoMatch[5] || 0); second = Number(isoMatch[6] || 0); }
+  } else if (frMatch) {
+    day = Number(frMatch[1]); month = Number(frMatch[2]); year = Number(frMatch[3]);
+    if (frMatch[4] !== undefined) { hour = Number(frMatch[4]); minute = Number(frMatch[5] || 0); second = Number(frMatch[6] || 0); }
+  } else {
+    const fallback = Date.parse(s);
+    return Number.isFinite(fallback) ? fallback : null;
+  }
+
+  // Approximate Paris offset (+02:00 late March to late October, +01:00 otherwise)
+  const isSummer = (month > 3 && month < 10) || (month === 3 && day >= 25) || (month === 10 && day < 25);
+  const offset = isSummer ? '+02:00' : '+01:00';
+  const isoStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}${offset}`;
+  const ts = Date.parse(isoStr);
+  return Number.isFinite(ts) ? ts : null;
+}
+
+function formatRemainingClock(ms) {
+  const diff = Math.max(0, ms);
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+  const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+  const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+  return `${d > 0 ? d + 'D ' : ''}${h}H ${m}M ${s}S`;
+}
+
+function formatDeadlineDisplay(ts) {
+  if (!ts) return '';
+  try {
+    return new Date(ts).toLocaleString('en-US', {
+      timeZone: 'Europe/Paris',
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
+    }) + ' CET';
+  } catch (e) {
+    return '';
+  }
+}
+
+function updateLiveClocksUI() {
+  const now = Date.now();
+  const cfg = state.liveConfig;
+
+  // 1) Top Ribbon — ONLY shows a countdown for the active round's RECORDING deadline
+  const titleEl = document.getElementById('liveCycleTitle');
+  const subEl = document.getElementById('liveCycleSub');
+  const clockEl = document.getElementById('liveCycleClock');
+  if (titleEl && subEl && clockEl) {
+    const recTs = parseParisDeadline(cfg.record_deadline);
+    if (recTs && recTs > now) {
+      const label = cfg.record_label || `${getRoundLabel(state.latestRound).toUpperCase()} RECORDING DEADLINE`;
+      titleEl.textContent = label;
+      subEl.textContent = `Submissions close ${formatDeadlineDisplay(recTs)}`;
+      clockEl.textContent = formatRemainingClock(recTs - now);
     } else {
       titleEl.textContent = `ACTIVE CYCLE : ${getRoundLabel(state.latestRound).toUpperCase()}`;
       subEl.textContent = "KÆOS Project — Live Academy Standings & Performances";
       clockEl.textContent = "✦ LIVE ✦";
     }
-  };
-  updateRibbon();
-  liveCycleInterval = setInterval(updateRibbon, 1000);
+  }
+
+  // 2) Votes Countdown — ONLY inside #votes (The Scale)
+  const vBanner = document.getElementById('voteCountdownBanner');
+  const vTitle  = document.getElementById('voteCdTitle');
+  const vSub    = document.getElementById('voteCdSub');
+  const vClock  = document.getElementById('voteCdClock');
+  if (vBanner && vTitle && vSub && vClock) {
+    const voteTs = parseParisDeadline(cfg.vote_deadline);
+    if (voteTs && voteTs > now) {
+      vBanner.classList.remove('closed');
+      vTitle.textContent = `✦ ${getRoundLabel(state.votesRound).toUpperCase()} — VOTING CLOSES IN`;
+      vSub.textContent = `Public vote deadline: ${formatDeadlineDisplay(voteTs)}`;
+      vClock.textContent = formatRemainingClock(voteTs - now);
+    } else if (voteTs && voteTs <= now) {
+      vBanner.classList.add('closed');
+      vTitle.textContent = `✧ ${getRoundLabel(state.votesRound).toUpperCase()} — VOTING CLOSED`;
+      vSub.textContent = `The Golden Scale closed on ${formatDeadlineDisplay(voteTs)}`;
+      vClock.textContent = "CLOSED";
+    } else {
+      vBanner.classList.add('closed');
+      vTitle.textContent = `✧ ${getRoundLabel(state.votesRound).toUpperCase()} — THE GOLDEN SCALE`;
+      vSub.textContent = "Voting countdown will activate once the Shadow Zone opens";
+      vClock.textContent = "STANDBY";
+    }
+  }
+}
+
+function startLiveClocks() {
+  clearInterval(liveClocksInterval);
+  updateLiveClocksUI();
+  liveClocksInterval = setInterval(updateLiveClocksUI, 1000);
 }
 
 // ==========================================
@@ -1017,7 +1573,7 @@ function retourMenuPrincipale() {
 }
 
 // ==========================================
-// 5. ALL-TERRAIN IMAGE LOADER (CASE & EXTENSION AGNOSTIC)
+// 5. ALL-TERRAIN IMAGE LOADER
 // ==========================================
 function getContestantImagePath(c, isNominee = false) {
   const id = c.id;
@@ -1039,48 +1595,20 @@ function buildFallbackPaths(contestantId, rawName, isNominee) {
   const pushUnique = (p) => { if (!seen.has(p)) { seen.add(p); paths.push(p); } };
 
   if (isNominee) {
-    // 1. Try nomination folder with -nominee / _nominee across cases & extensions
     for (const ext of exts) {
       for (const nv of nameVariants) {
         pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}-nominee.${ext}`);
         pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}_nominee.${ext}`);
       }
     }
-    // 2. Fall back to normal portrait in candidat/
-    for (const ext of exts) {
-      for (const nv of nameVariants) {
-        pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`);
-      }
-    }
-    // 3. Fall back to root folder
-    for (const ext of exts) {
-      for (const nv of nameVariants) {
-        pushUnique(`${nv}-nominee.${ext}`);
-        pushUnique(`${nv}.${ext}`);
-      }
-    }
+    for (const ext of exts) { for (const nv of nameVariants) pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`); }
+    for (const ext of exts) { for (const nv of nameVariants) { pushUnique(`${nv}-nominee.${ext}`); pushUnique(`${nv}.${ext}`); } }
   } else {
-    // 1. Try candidat/ folder across cases & extensions
-    for (const ext of exts) {
-      for (const nv of nameVariants) {
-        pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`);
-      }
-    }
-    // 2. Try root folder
-    for (const ext of exts) {
-      for (const nv of nameVariants) {
-        pushUnique(`${nv}.${ext}`);
-      }
-    }
-    // 3. Fall back to nomination/ folder
-    for (const ext of exts) {
-      for (const nv of nameVariants) {
-        pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}-nominee.${ext}`);
-      }
-    }
+    for (const ext of exts) { for (const nv of nameVariants) pushUnique(`${CONFIG.CANDIDATE_FOLDER}/${nv}.${ext}`); }
+    for (const ext of exts) { for (const nv of nameVariants) pushUnique(`${nv}.${ext}`); }
+    for (const ext of exts) { for (const nv of nameVariants) pushUnique(`${CONFIG.NOMINATION_FOLDER}/${nv}-nominee.${ext}`); }
   }
 
-  // Remove the initial src path (index 0 is already tried by the img tag)
   const initialSrc = isNominee
     ? `${CONFIG.NOMINATION_FOLDER}/${contestantId}-nominee.png`
     : `${CONFIG.CANDIDATE_FOLDER}/${contestantId}.png`;
@@ -1111,9 +1639,7 @@ function handleImageFallback(img) {
   }
 
   if (contestantId) {
-    if (!img._fallbackList) {
-      img._fallbackList = buildFallbackPaths(contestantId, rawName, isNominee);
-    }
+    if (!img._fallbackList) img._fallbackList = buildFallbackPaths(contestantId, rawName, isNominee);
     if (step < img._fallbackList.length) {
       img.dataset.fallbackStep = String(step + 1);
       img.src = img._fallbackList[step];
@@ -1131,7 +1657,7 @@ function handleImageFallback(img) {
 }
 
 // ==========================================
-// 6. GOOGLE SHEETS PARSER & PER-ROUND CIRCLE TRANSFER ENGINE
+// 6. GOOGLE SHEETS BY GID PARSER + LIVE CONFIG LOADER
 // ==========================================
 function getRoundLabel(id) { return ROUND_LABELS[id] || id; }
 function normId(v) { return String(v || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
@@ -1172,9 +1698,7 @@ function getContestantTransfers(c) {
   ROUND_ORDER.forEach(r => {
     const t = c.teamByRound[r];
     if (t && t !== 'theme-global') {
-      if (prevTeam && prevTeam !== t) {
-        out[r] = { from: prevTeam, to: t };
-      }
+      if (prevTeam && prevTeam !== t) out[r] = { from: prevTeam, to: t };
       prevTeam = t;
     }
   });
@@ -1200,8 +1724,11 @@ function parseCSV(text) {
   if (val !== "" || row.length > 0) { row.push(val); rows.push(row); }
   if (rows.length < 1) return [];
   let headerIndex = 0;
-  for (let i = 0; i < Math.min(5, rows.length); i++) {
-    if (rows[i].some(c => typeof c === 'string' && ['contestant', 'name', 'candidat', 'eleve', 'username'].some(k => c.toLowerCase().includes(k)))) { headerIndex = i; break; }
+  for (let i = 0; i < Math.min(10, rows.length); i++) {
+    if (rows[i].some(c => typeof c === 'string' && ['contestant', 'name', 'candidat', 'eleve', 'username', 'key', 'round_id'].some(k => c.toLowerCase().includes(k)))) {
+      headerIndex = i;
+      break;
+    }
   }
   const headers = rows[headerIndex].map(h => String(h).trim().toLowerCase());
   return rows.slice(headerIndex + 1).map(r => {
@@ -1211,26 +1738,20 @@ function parseCSV(text) {
   });
 }
 
-async function fetchSheetTab(sheetName, customSheetId = null) {
+// Fetch directly by exact GID (never silently falls back to PRERANK!)
+async function fetchSheetByGid(gid, customSheetId = null) {
   const targetId = customSheetId || CONFIG.SHEET_ID;
-  if (!targetId) return [];
-  const tryFetch = async (name) => {
-    const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&_=${Date.now()}`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) return null;
-      const txt = await response.text();
-      if (txt.toLowerCase().includes('<!doctype html>')) return null;
-      return parseCSV(txt);
-    } catch (e) { return null; }
-  };
-  let data = await tryFetch(sheetName);
-  if (!data && sheetName === 'R5') data = await tryFetch('FINAL') || await tryFetch('Finale') || await tryFetch('Round 5');
-  if (!data && sheetName.match(/^R\d$/)) {
-    const num = sheetName.replace('R', '');
-    data = await tryFetch(`Round ${num}`) || await tryFetch(`ROUND ${num}`);
+  if (!targetId || gid === null || gid === undefined || String(gid).trim() === '') return [];
+  const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&_=${Date.now()}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return [];
+    const txt = await response.text();
+    if (txt.toLowerCase().includes('<!doctype html>')) return [];
+    return parseCSV(txt);
+  } catch (e) {
+    return [];
   }
-  return data || [];
 }
 
 function keyNorm(k) { return String(k || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
@@ -1281,36 +1802,22 @@ function getPerformanceScoreByRound() {
       const rawScoreRec = state.data.scores.find(s => s.round_id === round && s.contestant_id === c.id);
 
       if (round === 'PRERANK') {
-        let sumJudges10 = 0;
-        let hasJudge10 = false;
+        let sumJudges10 = 0, hasJudge10 = false;
         JUDGE_NAMES.forEach(jn => {
           const jRec = state.data.judge_rankings.find(r => r.round_id === 'PRERANK' && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
-          if (jRec && Number.isFinite(jRec.rank)) {
-            sumJudges10 += jRec.rank;
-            hasJudge10 = true;
-          }
+          if (jRec && Number.isFinite(jRec.rank)) { sumJudges10 += jRec.rank; hasJudge10 = true; }
         });
-        if (rawScoreRec && Number.isFinite(rawScoreRec.total) && rawScoreRec.total > 0) {
-          out[round][c.id] = rawScoreRec.total;
-        } else if (hasJudge10) {
-          out[round][c.id] = Math.round(sumJudges10 * 10) / 10;
-        }
+        if (rawScoreRec && Number.isFinite(rawScoreRec.total) && rawScoreRec.total > 0) out[round][c.id] = rawScoreRec.total;
+        else if (hasJudge10) out[round][c.id] = Math.round(sumJudges10 * 10) / 10;
         return;
       }
 
       const activeCount = getActiveCountForRound(round, getContestantTeamForRound(c, round));
       const pointsBase = activeCount + 1;
-      let totalPoints = 0;
-      let hasData = false;
+      let totalPoints = 0, hasData = false;
 
-      if (rawScoreRec && Number.isFinite(rawScoreRec.total)) {
-        totalPoints += rawScoreRec.total;
-        hasData = true;
-      }
-      if (rawScoreRec && Number.isFinite(rawScoreRec.bonus) && rawScoreRec.bonus > 0) {
-        totalPoints += rawScoreRec.bonus;
-        hasData = true;
-      }
+      if (rawScoreRec && Number.isFinite(rawScoreRec.total)) { totalPoints += rawScoreRec.total; hasData = true; }
+      if (rawScoreRec && Number.isFinite(rawScoreRec.bonus) && rawScoreRec.bonus > 0) { totalPoints += rawScoreRec.bonus; hasData = true; }
       JUDGE_NAMES.forEach(jn => {
         const jRankRec = state.data.judge_rankings.find(r => r.round_id === round && r.contestant_id === c.id && normalizeJudgeName(r.judge_name) === normalizeJudgeName(jn));
         if (jRankRec && Number.isFinite(jRankRec.rank) && jRankRec.rank >= 1) {
@@ -1364,16 +1871,52 @@ function getRankDeltaHtml(rankingMap, roundId, contestantId, isPerformance) {
     if (Number.isFinite(candidatePrev)) { prevVal = candidatePrev; break; }
   }
   if (!Number.isFinite(prevVal)) return '';
-  const diff = prevVal - currVal; // positive means climbed up (e.g., #10 -> #6 = +4)
+  const diff = prevVal - currVal;
   if (diff > 0) return `<span class="rank-delta up" title="Up ${diff} from previous cycle">▲${diff}</span>`;
   if (diff < 0) return `<span class="rank-delta down" title="Down ${Math.abs(diff)} from previous cycle">▼${Math.abs(diff)}</span>`;
   return `<span class="rank-delta same" title="Unchanged">=</span>`;
 }
 
-async function loadDataFromRoundTabs() {
-  const entries = Object.entries(CONFIG.ROUND_TABS);
-  const results = await Promise.all(entries.map(([rid, tab]) => fetchSheetTab(tab).then(rows => [rid, rows])));
+async function loadLiveConfigFromSheet() {
+  const rows = await fetchSheetByGid(CONFIG.CONFIG_GID);
+  const cfg = {
+    active_round: "",
+    record_label: "",
+    record_deadline: "",
+    vote_round: "",
+    vote_deadline: "",
+    vote_form_url: "",
+    show_live_votes: true
+  };
+  rows.forEach(row => {
+    const k = String(pickValue(row, ['key', 'cle', 'setting', 'param']) || '').trim().toLowerCase();
+    const v = String(pickValue(row, ['value', 'valeur', 'val']) || '').trim();
+    if (!k) return;
+    if (k === 'active_round') cfg.active_round = canonicalRoundId(v);
+    else if (k === 'record_label') cfg.record_label = v;
+    else if (k === 'record_deadline') cfg.record_deadline = v;
+    else if (k === 'vote_round') cfg.vote_round = canonicalRoundId(v);
+    else if (k === 'vote_deadline') cfg.vote_deadline = v;
+    else if (k === 'vote_form_url') cfg.vote_form_url = v;
+    else if (k === 'show_live_votes') {
+      const low = v.toLowerCase();
+      cfg.show_live_votes = !['non', 'no', 'false', '0', 'off', 'cache', 'caché', 'hidden', 'masque', 'masqué'].includes(low);
+    }
+  });
+  return cfg;
+}
+
+async function loadDataFromRoundGids() {
+  const entries = Object.entries(CONFIG.ROUND_GIDS);
+  const results = await Promise.all(entries.map(async ([rid, gid]) => {
+    let rows = await fetchSheetByGid(gid);
+    if (rid === 'FINAL' && rows.length === 0 && CONFIG.FINAL_FALLBACK_R5_GID) {
+      rows = await fetchSheetByGid(CONFIG.FINAL_FALLBACK_R5_GID);
+    }
+    return [rid, rows];
+  }));
   const rowsByRound = Object.fromEntries(results);
+
   const contestantsMap = new Map();
   const judge_rankings = []; const scores = []; const submissions = []; const round_status_clean = [];
 
@@ -1384,14 +1927,17 @@ async function loadDataFromRoundTabs() {
       if (!name) return;
       const id = normId(name);
       if (EXCLUDED_NAMES.has(id)) return;
+
       const instagram = String(pickValue(row, ['instagram', 'instagram_handle', 'username']) || '').trim();
       const country = String(pickValue(row, ['country', 'pays', 'origine']) || '').trim();
       const pronouns = String(pickValue(row, ['pronouns', 'pronoms']) || '').trim();
-      const teamRaw = String(pickValue(row, ['team', 'equipe', 'cercle', 'groupe', 'team_name']) || '').toLowerCase();
+      const teamRaw = String(pickValue(row, ['team', 'equipe', 'cercle', 'circle', 'groupe', 'team_name']) || '')
+        .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
       let teamClass = 'theme-global';
       if (teamRaw.includes('sun') || teamRaw.includes('soleil') || teamRaw.includes('neitsu')) teamClass = 'theme-sun';
       else if (teamRaw.includes('moon') || teamRaw.includes('lune') || teamRaw.includes('kaina')) teamClass = 'theme-moon';
-      else if (teamRaw.includes('star') || teamRaw.includes('etoile') || teamRaw.includes('étoile') || teamRaw.includes('aya')) teamClass = 'theme-star';
+      else if (teamRaw.includes('star') || teamRaw.includes('etoile') || teamRaw.includes('aya')) teamClass = 'theme-star';
 
       const performance = String(pickValue(row, ['performance', 'song', 'song_title', 'performance1', 'performance 1']) || '').trim();
       const group_song = String(pickValue(row, ['performance2', 'performance 2']) || '').trim();
@@ -1404,7 +1950,7 @@ async function loadDataFromRoundTabs() {
       
       const statusValueRaw = String(pickValue(row, ['status', 'statut', 'etat']) || '').trim().toLowerCase();
       let statusValue = statusValueRaw;
-      if (statusValueRaw.includes('no record') || statusValueRaw.includes('forfeit') || statusValueRaw.includes('absent') || statusValueRaw.includes('abandon') || statusValueRaw === 'dns' || statusValueRaw === 'dnf') statusValue = 'forfeit';
+      if (statusValueRaw.includes('no record') || statusValueRaw.includes('did not') || statusValueRaw.includes('dnr') || statusValueRaw.includes('forfeit') || statusValueRaw.includes('absent') || statusValueRaw.includes('abandon') || statusValueRaw === 'dns' || statusValueRaw === 'dnf') statusValue = 'forfeit';
       else if (statusValueRaw.includes('public') || statusValueRaw.includes('balance') || statusValueRaw.includes('scale')) statusValue = 'saved_public';
       else if (statusValueRaw.includes('judge') || statusValueRaw.includes('jury') || statusValueRaw.includes('oracle')) statusValue = 'saved_judges';
       else if (statusValueRaw.includes('1st') || statusValueRaw === 'winner' || statusValueRaw.includes('elu') || statusValueRaw.includes('chosen')) statusValue = 'winner';
@@ -1414,14 +1960,9 @@ async function loadDataFromRoundTabs() {
 
       if (!contestantsMap.has(id)) {
         contestantsMap.set(id, {
-          id,
-          name,
+          id, name,
           photo_url: `${CONFIG.CANDIDATE_FOLDER}/${id}.png`,
-          country,
-          bio: '',
-          instagram,
-          pronouns,
-          teamClass,
+          country, bio: '', instagram, pronouns, teamClass,
           teamByRound: teamClass !== 'theme-global' ? { [round_id]: teamClass } : {}
         });
       } else {
@@ -1431,7 +1972,6 @@ async function loadDataFromRoundTabs() {
         if (instagram && !c.instagram) c.instagram = instagram;
         if (teamClass !== 'theme-global') {
           c.teamByRound[round_id] = teamClass;
-          // Always reflect the latest assigned Circle (supports Top 8 Circle Transfers!)
           c.teamClass = teamClass;
         }
       }
@@ -1439,13 +1979,14 @@ async function loadDataFromRoundTabs() {
       if (Number.isFinite(overallRank)) judge_rankings.push({ round_id, judge_name: 'overall', contestant_id: id, rank: overallRank });
       if (Number.isFinite(perfScore) || Number.isFinite(bonusScore)) {
         scores.push({
-          round_id,
-          contestant_id: id,
+          round_id, contestant_id: id,
           total: Number.isFinite(perfScore) ? perfScore : NaN,
           bonus: Number.isFinite(bonusScore) ? bonusScore : 0
         });
       }
-      if (performance || link || link2) submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
+      if (performance || group_song || link || link2) {
+        submissions.push({ round_id, contestant_id: id, song_title: performance, group_song: group_song, bandlab_url: link2, youtube_url: link, notes: '' });
+      }
       if (statusValue) round_status_clean.push({ round_id, contestant_id: id, status: statusValue });
 
       JUDGE_NAMES.forEach(jn => {
@@ -1455,16 +1996,12 @@ async function loadDataFromRoundTabs() {
     });
   });
 
-  // Propagate each contestant's Circle forward for rounds where Team wasn't re-typed, and propagate eliminations/forfeits
   const allIds = [...contestantsMap.keys()];
   contestantsMap.forEach(c => {
     let lastKnownTeam = c.teamClass || 'theme-global';
     for (const r of ROUND_ORDER) {
-      if (c.teamByRound[r] && c.teamByRound[r] !== 'theme-global') {
-        lastKnownTeam = c.teamByRound[r];
-      } else if (lastKnownTeam !== 'theme-global') {
-        c.teamByRound[r] = lastKnownTeam;
-      }
+      if (c.teamByRound[r] && c.teamByRound[r] !== 'theme-global') lastKnownTeam = c.teamByRound[r];
+      else if (lastKnownTeam !== 'theme-global') c.teamByRound[r] = lastKnownTeam;
     }
     if (lastKnownTeam !== 'theme-global') c.teamClass = lastKnownTeam;
   });
@@ -1473,40 +2010,78 @@ async function loadDataFromRoundTabs() {
   ROUND_ORDER.forEach(round => {
     allIds.forEach(id => {
       const existingIndex = round_status_clean.findIndex(r => r.round_id === round && r.contestant_id === id);
-      if (existingIndex >= 0) { lastStatusObj[id] = round_status_clean[existingIndex].status; }
-      else if (isEliminatedStatus(lastStatusObj[id])) { round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' }); }
+      if (existingIndex >= 0) lastStatusObj[id] = round_status_clean[existingIndex].status;
+      else if (isEliminatedStatus(lastStatusObj[id])) round_status_clean.push({ round_id, contestant_id: id, status: 'eliminated' });
     });
   });
 
   return { contestants: [...contestantsMap.values()], rounds: [], submissions, scores, judge_rankings, round_status: round_status_clean, votes_live: [] };
 }
 
+function getLatestScoredRound() {
+  for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
+    const round = ROUND_ORDER[i];
+    if (state.data.scores.some(r => r.round_id === round && (Number.isFinite(r.total) || r.bonus > 0)) ||
+        state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
+        state.data.round_status.some(r => r.round_id === round && r.status !== '' && !isEliminatedStatus(r.status))) {
+      return round;
+    }
+  }
+  return 'PRERANK';
+}
+
+function getLatestActiveRound() {
+  if (state.liveConfig.active_round && ROUND_ORDER.includes(state.liveConfig.active_round)) {
+    return state.liveConfig.active_round;
+  }
+  for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
+    const round = ROUND_ORDER[i];
+    if (state.data.scores.some(r => r.round_id === round && (Number.isFinite(r.total) || r.bonus > 0)) ||
+        state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
+        state.data.round_status.some(r => r.round_id === round && r.status !== '' && !isEliminatedStatus(r.status)) ||
+        state.data.submissions.some(r => r.round_id === round && (r.song_title || r.youtube_url))) {
+      return round;
+    }
+  }
+  return 'PRERANK';
+}
+
 async function hydrate(isBackgroundRefresh = false) {
-  state.data = await loadDataFromRoundTabs();
-  try {
-    let votesRaw = await fetchSheetTab('votes_live', CONFIG.VOTE_SHEET_ID);
-    if (!votesRaw || votesRaw.length === 0) votesRaw = await fetchSheetTab('', CONFIG.VOTE_SHEET_ID);
-    state.data.votes_live = (votesRaw || []).map(r => {
-      const rid = pickValue(r, ['round_id', 'round', 'roundid', 'a']);
-      const cid = pickValue(r, ['contestant_id', 'contestant', 'name', 'candidat', 'b']);
-      let vcount = pickValue(r, ['votes_count', 'votes', 'count', 'total', 'c']);
-      if (vcount === '' && Object.values(r).length >= 3) vcount = Object.values(r)[2];
-      return { round_id: canonicalRoundId(rid), contestant_id: normId(cid), votes_count: parseNum(vcount) || 0 };
-    }).filter(v => v.contestant_id && v.round_id && !v.round_id.includes('ROUNDID'));
-  } catch (e) { console.warn("Votes not loaded:", e); }
+  const [liveCfg, tabsData, votesRaw] = await Promise.all([
+    loadLiveConfigFromSheet(),
+    loadDataFromRoundGids(),
+    fetchSheetByGid(CONFIG.VOTES_LIVE_GID)
+  ]);
+
+  state.liveConfig = liveCfg;
+  state.data = tabsData;
+  state.data.votes_live = (votesRaw || []).map(r => {
+    const rid = pickValue(r, ['round_id', 'round', 'roundid', 'a']);
+    const cid = pickValue(r, ['contestant_id', 'contestant', 'name', 'candidat', 'b']);
+    let vcount = pickValue(r, ['votes_count', 'votes', 'count', 'total', 'c']);
+    if (vcount === '' && Object.values(r).length >= 3) vcount = Object.values(r)[2];
+    return { round_id: canonicalRoundId(rid), contestant_id: normId(cid), votes_count: parseNum(vcount) || 0 };
+  }).filter(v => v.contestant_id && v.round_id && !v.round_id.includes('ROUNDID'));
 
   state.data.contestants = state.data.contestants.filter(c => c.id && !EXCLUDED_NAMES.has(c.id));
-  state.latestRound = getLatestRound();
+  state.latestScoredRound = getLatestScoredRound();
+  state.latestRound = getLatestActiveRound();
 
-  // Preserve the user's manually selected round during 45s auto-refresh!
   if (!isBackgroundRefresh || !state.userPickedRankingsRound) {
-    state.selectedRankingsRound = state.latestRound;
+    state.selectedRankingsRound = state.latestScoredRound;
   }
   if (!isBackgroundRefresh || !state.userPickedVotesRound) {
+    const cfgVoteRd = state.liveConfig.vote_round;
     const roundsWithVotes = ROUND_ORDER.filter(r => r !== 'PRERANK' && state.data.votes_live.some(v => v.round_id === r));
-    const fallbackVoteRound = state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound;
-    state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || fallbackVoteRound;
+    if (cfgVoteRd && cfgVoteRd !== 'PRERANK' && ROUND_ORDER.includes(cfgVoteRd)) {
+      state.votesRound = cfgVoteRd;
+    } else {
+      const fallbackVoteRound = state.latestRound === 'PRERANK' ? 'ROUND_1' : state.latestRound;
+      state.votesRound = roundsWithVotes[roundsWithVotes.length - 1] || fallbackVoteRound;
+    }
   }
+
+  updateLiveClocksUI();
 }
 
 function getJudgeRankingByRound(judgeName) {
@@ -1531,20 +2106,8 @@ function getRankingMapByView(view) {
   return getOfficialRankingByRound(state.activeTeam === 'Global');
 }
 
-function getLatestRound() {
-  for (let i = ROUND_ORDER.length - 1; i >= 0; i--) {
-    const round = ROUND_ORDER[i];
-    if (state.data.scores.some(r => r.round_id === round && (Number.isFinite(r.total) || r.bonus > 0)) ||
-        state.data.judge_rankings.some(r => r.round_id === round && Number.isFinite(r.rank)) ||
-        state.data.round_status.some(r => r.round_id === round && r.status !== '' && !isEliminatedStatus(r.status))) {
-      return round;
-    }
-  }
-  return 'PRERANK';
-}
-
 function sortedContestants(roundOverride = null) {
-  const targetRound = roundOverride || state.latestRound;
+  const targetRound = roundOverride || state.latestScoredRound;
   const officialByRound = getOfficialRankingByRound(state.activeTeam === 'Global');
   const current = officialByRound[targetRound] || {};
   let filtered = state.data.contestants;
@@ -1564,8 +2127,23 @@ function sortedContestants(roundOverride = null) {
   });
 }
 
+// Helper for performance link buttons (Instagram Reels vs BandLab)
+function buildPerformanceLinksHtml(s, compact = false) {
+  const padStyle = compact ? 'padding:0.28rem 0.68rem; font-size:0.72rem;' : 'padding:0.3rem 0.7rem; font-size:0.74rem;';
+  const parts = [];
+  if (s.youtube_url) {
+    const lbl1 = s.bandlab_url ? 'Ritual 1' : 'Observe Ritual';
+    parts.push(`<a class="btn" style="${padStyle}" target="_blank" rel="noopener noreferrer" href="${s.youtube_url}">${lbl1}</a>`);
+  }
+  if (s.bandlab_url) {
+    const lbl2 = s.bandlab_url.toLowerCase().includes('bandlab') ? 'BandLab' : (s.youtube_url ? 'Ritual 2' : 'Observe Ritual');
+    parts.push(`<a class="btn" style="${padStyle}" target="_blank" rel="noopener noreferrer" href="${s.bandlab_url}">${lbl2}</a>`);
+  }
+  return parts.length ? parts.join(' ') : '—';
+}
+
 // ==========================================
-// 7. AUDITION COUNTDOWN & 7 PROPHECY CARDS
+// 7. AUDITION PORTAL & 7 PROPHECY CARDS
 // ==========================================
 function startGlobalCountdown() {
   clearInterval(countdownInterval);
@@ -1573,20 +2151,13 @@ function startGlobalCountdown() {
     const now = new Date();
     const openDate  = new Date(2026, 10, 1, 0, 0, 0);
     const closeDate = new Date(2026, 10, 12, 23, 59, 59);
-
-    let target = closeDate;
-    let phaseLabel = "✦ Auditions Close In ✦";
-    if (now < openDate) {
-      target = openDate;
-      phaseLabel = "✧ Auditions Open In ✧";
-    }
-
+    let target = closeDate, phaseLabel = "✦ Auditions Close In ✦";
+    if (now < openDate) { target = openDate; phaseLabel = "✧ Auditions Open In ✧"; }
     const diff = Math.max(0, target - now);
     const d = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
     const h = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
     const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
     const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-
     document.querySelectorAll('.cd-phase-lbl').forEach(el => el.textContent = phaseLabel);
     document.querySelectorAll('.cd-days').forEach(el => el.textContent = d);
     document.querySelectorAll('.cd-hours').forEach(el => el.textContent = h);
@@ -1605,7 +2176,6 @@ function buildPropheciesHTML() {
     const targetUrl = (p.url && p.url.trim() !== "") ? p.url.trim() : CONFIG.INSTAGRAM_URL;
     const hrefAttr = unlocked ? `href="${targetUrl}" target="_blank" rel="noopener noreferrer"` : '';
     const statusText = unlocked ? `✦ Watch` : `✧ ${p.dateLabel}`;
-
     return `
       <${tag} class="prophecy-card ${unlocked ? 'unlocked' : 'locked'}" ${hrefAttr}>
         <span class="prophecy-num">${p.num}</span>
@@ -1615,7 +2185,6 @@ function buildPropheciesHTML() {
       </${tag}>
     `;
   }).join('');
-
   return `
     <div style="margin-top: 2.6rem; text-align: left;">
       <h3>The Seven Prophecies</h3>
@@ -1655,24 +2224,18 @@ function renderAuditionPortal(root) {
 // ==========================================
 function renderContestants(isBackgroundRefresh = false) {
   const root = document.getElementById('contestants');
-  if (state.data.contestants.length === 0) {
-    renderAuditionPortal(root);
-    return;
-  }
-  // If user is actively typing in the search bar during the 45s auto-refresh, don't disrupt their cursor!
-  if (isBackgroundRefresh && document.activeElement && document.activeElement.id === 'searchContestant') {
-    return;
-  }
+  if (state.data.contestants.length === 0) { renderAuditionPortal(root); return; }
+  if (isBackgroundRefresh && document.activeElement && document.activeElement.id === 'searchContestant') return;
 
-  const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[state.latestRound] || {};
+  const rankRound = state.latestScoredRound;
+  const currentRanks = getOfficialRankingByRound(state.activeTeam === 'Global')[rankRound] || {};
   let teamTitle = "";
   if (state.activeTeam === 'Soleil') teamTitle = ` — ✹ Sun (Neitsu)`;
   if (state.activeTeam === 'Lune') teamTitle = ` — ☾ Moon (Kaina)`;
   if (state.activeTeam === 'Etoile') teamTitle = ` — ✦ Star (Aya)`;
 
-  // Active Survivors KPI calculation per Circle
   const isAliveNow = (c) => {
-    const st = getStatus(state.latestRound, c.id);
+    const st = getStatus(state.latestRound, c.id) || getStatus(rankRound, c.id);
     const elimIdx = getFirstEliminatedRoundIndex(c.id);
     return !isEliminatedStatus(st) && (elimIdx === -1 || elimIdx > ROUND_ORDER.indexOf(state.latestRound));
   };
@@ -1682,7 +2245,6 @@ function renderContestants(isBackgroundRefresh = false) {
   const moonActive = activeAll.filter(c => c.teamClass === 'theme-moon').length;
   const starActive = activeAll.filter(c => c.teamClass === 'theme-star').length;
   const consumedCount = allList.length - activeAll.length;
-
   const safeSearchVal = String(state.searchQuery || '').replace(/"/g, '&quot;');
 
   root.innerHTML = `
@@ -1694,31 +2256,27 @@ function renderContestants(isBackgroundRefresh = false) {
             The stars are aligned for cycle: <span class="chip" style="font-weight:bold; color:var(--bg); background:var(--tarot-gold)">${getRoundLabel(state.latestRound)}</span>
           </p>
         </div>
-        <button class="btn" onclick="location.hash='#performances'" style="padding:0.42rem 0.9rem; font-size:0.72rem;">✦ Round 2 Concept Songs</button>
+        <button class="btn" onclick="location.hash='#performances'" style="padding:0.42rem 0.9rem; font-size:0.72rem;">✦ Songs &amp; Rituals</button>
       </div>
 
       <div class="kpi-strip">
-        <div class="kpi-pill ${state.activeTeam === 'Global' ? 'active-kpi' : ''}" onclick="switchTeam('Global')" title="View all active Initiates">
+        <div class="kpi-pill ${state.activeTeam === 'Global' ? 'active-kpi' : ''}" onclick="switchTeam('Global')">
           <span class="kpi-lbl">☉ Active</span>
           <span class="kpi-val">${activeAll.length}<span style="font-size:0.72rem;color:var(--muted);">/${allList.length}</span></span>
         </div>
-        <div class="kpi-pill ${state.activeTeam === 'Soleil' ? 'active-kpi' : ''}" onclick="switchTeam('Soleil')" title="Filter Circle of the Sun">
+        <div class="kpi-pill ${state.activeTeam === 'Soleil' ? 'active-kpi' : ''}" onclick="switchTeam('Soleil')">
           <span class="kpi-lbl">✹ Sun</span>
           <span class="kpi-val">${sunActive}</span>
         </div>
-        <div class="kpi-pill ${state.activeTeam === 'Lune' ? 'active-kpi' : ''}" onclick="switchTeam('Lune')" title="Filter Circle of the Moon">
+        <div class="kpi-pill ${state.activeTeam === 'Lune' ? 'active-kpi' : ''}" onclick="switchTeam('Lune')">
           <span class="kpi-lbl">☾ Moon</span>
           <span class="kpi-val">${moonActive}</span>
         </div>
-        <div class="kpi-pill ${state.activeTeam === 'Etoile' ? 'active-kpi' : ''}" onclick="switchTeam('Etoile')" title="Filter Circle of the Star">
+        <div class="kpi-pill ${state.activeTeam === 'Etoile' ? 'active-kpi' : ''}" onclick="switchTeam('Etoile')">
           <span class="kpi-lbl">✦ Star</span>
           <span class="kpi-val">${starActive}</span>
         </div>
-        ${consumedCount > 0 ? `
-        <div class="kpi-pill kpi-consumed">
-          <span class="kpi-lbl">Consumed</span>
-          <span class="kpi-val">${consumedCount}</span>
-        </div>` : ''}
+        ${consumedCount > 0 ? `<div class="kpi-pill kpi-consumed"><span class="kpi-lbl">Consumed</span><span class="kpi-val">${consumedCount}</span></div>` : ''}
       </div>
 
       <div class="filters" style="margin-top:1.4rem; margin-bottom:0;">
@@ -1743,8 +2301,8 @@ function renderContestants(isBackgroundRefresh = false) {
     state.statusFilter = f;
 
     const qNorm = q.toLowerCase().trim();
-    const list = sortedContestants().filter(c => c.name.toLowerCase().includes(qNorm)).filter(c => {
-      let status = getStatus(state.latestRound, c.id);
+    const list = sortedContestants(rankRound).filter(c => c.name.toLowerCase().includes(qNorm)).filter(c => {
+      let status = getStatus(state.latestRound, c.id) || getStatus(rankRound, c.id);
       if (!status && getFirstEliminatedRoundIndex(c.id) !== -1 && getFirstEliminatedRoundIndex(c.id) <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
       if (f === 'all') return true;
       if (f === 'eliminated') return isEliminatedStatus(status);
@@ -1755,7 +2313,7 @@ function renderContestants(isBackgroundRefresh = false) {
       document.getElementById('contestantsGrid').innerHTML = '<p class="small">No card found for this filter.</p>';
     } else {
       document.getElementById('contestantsGrid').innerHTML = list.map((c) => {
-        let status = getStatus(state.latestRound, c.id);
+        let status = getStatus(state.latestRound, c.id) || getStatus(rankRound, c.id);
         const elimRound = getFirstEliminatedRoundIndex(c.id);
         if (!status && elimRound !== -1 && elimRound <= ROUND_ORDER.indexOf(state.latestRound)) status = 'eliminated';
         const rank = currentRanks[c.id];
@@ -1801,7 +2359,7 @@ function renderRankings() {
   const viewOptions = getRankingViewOptions();
   const rankingMap = getRankingMapByView(state.rankingView);
   const isPerformance = state.rankingView === 'performance_score';
-  const activeRound = state.selectedRankingsRound || state.latestRound;
+  const activeRound = state.selectedRankingsRound || state.latestScoredRound;
   const isGlobal = state.activeTeam === 'Global';
 
   const list = sortedContestants(activeRound).sort((a, b) => {
@@ -1901,7 +2459,6 @@ function renderRankings() {
     const ctx = document.getElementById('rankingChart');
     if (!ctx || typeof Chart === 'undefined') return;
     Chart.defaults.color = '#888888'; Chart.defaults.borderColor = '#2E2E2E';
-
     const hasFocus = state.webFocusContestant && state.webFocusContestant !== 'all';
 
     rankingChartInstance = new Chart(ctx, {
@@ -1923,23 +2480,19 @@ function renderRankings() {
               const v = rankingMap[r]?.[c.id];
               return Number.isFinite(v) ? v : null;
             }),
-            borderColor: color,
-            backgroundColor: color,
+            borderColor: color, backgroundColor: color,
             borderWidth: (hasFocus && isFocused) ? 4.5 : (isEliminated || !isFocused ? 1.2 : 3),
             borderDash: isEliminated ? [5, 5] : [],
             pointRadius: (hasFocus && isFocused) ? 6 : (!isFocused || isEliminated ? 2 : 4.5),
-            tension: 0.25,
-            spanGaps: true
+            tension: 0.25, spanGaps: true
           };
         })
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: true,
-            position: 'bottom',
+            display: true, position: 'bottom',
             labels: { color: '#F0EDE5', boxWidth: 12, padding: 14, usePointStyle: true },
             onClick: (e, legendItem, legend) => {
               const clickedDataset = legend.chart.data.datasets[legendItem.datasetIndex];
@@ -1990,13 +2543,12 @@ function renderPerformances() {
     </div>
   `).join('');
 
-  // Dynamic Performances Archive pulled from Google Sheet submissions
   const teamIds = new Set(sortedContestants().map(c => c.id));
   const roundFilter = state.perfRoundFilter || 'all';
   const filteredSubs = state.data.submissions.filter(s => {
     if (!teamIds.has(s.contestant_id)) return false;
     if (roundFilter !== 'all' && s.round_id !== roundFilter) return false;
-    return Boolean(s.song_title || s.youtube_url || s.bandlab_url);
+    return Boolean(s.song_title || s.group_song || s.youtube_url || s.bandlab_url);
   }).sort((a, b) => {
     const rd = ROUND_ORDER.indexOf(b.round_id) - ROUND_ORDER.indexOf(a.round_id);
     if (rd !== 0) return rd;
@@ -2015,34 +2567,17 @@ function renderPerformances() {
         <td><a href="#profile/${s.contestant_id}">${getContestantName(s.contestant_id)}</a></td>
         <td><span class="chip" style="font-size:0.68rem;">${cTeamLbl}</span></td>
         <td>${s.song_title || '—'}${s.group_song ? `<br><span class="small">${s.group_song}</span>` : ''}</td>
-        <td>
-          ${s.youtube_url ? `<a class="btn" style="padding:0.28rem 0.68rem; font-size:0.72rem;" target="_blank" rel="noopener noreferrer" href="${s.youtube_url}">Observe Ritual</a>` : ''}
-          ${s.bandlab_url ? ` <a class="btn" style="padding:0.28rem 0.68rem; font-size:0.72rem;" target="_blank" rel="noopener noreferrer" href="${s.bandlab_url}">BandLab</a>` : ''}
-          ${!s.youtube_url && !s.bandlab_url ? '—' : ''}
-        </td>
+        <td>${buildPerformanceLinksHtml(s, true)}</td>
       </tr>
     `;
-  }).join('') : `<tr><td colspan="5" class="small" style="text-align:center; padding:1.4rem;">No recorded rituals published yet for this filter. Round 1 performances arrive November 26!</td></tr>`;
+  }).join('') : `<tr><td colspan="5" class="small" style="text-align:center; padding:1.4rem;">No recorded rituals published yet for this filter.</td></tr>`;
 
   root.innerHTML = `
     <div class="card-paper">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <h2 style="margin-bottom:0.3rem;">Round 2 — The Concept Round Songs</h2>
-          <p class="small" style="color:var(--tarot-gold); margin:0;">
-            Each Celestial Circle has 4 exclusive Concept Songs (3 teams of 3 &amp; 1 team of 4 per Circle • No duplicate Concept or Artist).
-          </p>
-        </div>
-        ${!isGlobal ? `<button class="btn" onclick="switchTeam('Global')" style="padding:0.42rem 0.9rem; font-size:0.72rem;">☉ Show All 3 Circles</button>` : ''}
-      </div>
-      <div class="concept-circles-grid">${conceptCardsHtml}</div>
-    </div>
-
-    <div class="card-paper">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
         <div>
-          <h3 style="border:none; margin:0; padding:0;">Recorded Rituals Archive</h3>
-          <p class="small" style="margin:4px 0 0 0;">Direct links to every published performance across the season.</p>
+          <h2 style="margin:0 0 0.25rem 0;">Recorded Rituals Archive</h2>
+          <p class="small" style="margin:0;">Direct links to every published performance across the season (${filteredSubs.length} entries).</p>
         </div>
         <select id="perfRoundSelect">${roundFilterOptions}</select>
       </div>
@@ -2052,6 +2587,19 @@ function renderPerformances() {
           <tbody>${archiveRowsHtml}</tbody>
         </table>
       </div>
+    </div>
+
+    <div class="card-paper">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h3 style="border:none; padding:0; margin:0 0 0.3rem 0;">Round 2 — The Concept Round Songs</h3>
+          <p class="small" style="color:var(--tarot-gold); margin:0;">
+            Each Celestial Circle has 4 exclusive Concept Songs (3 teams of 3 &amp; 1 team of 4 per Circle • No duplicate Concept or Artist).
+          </p>
+        </div>
+        ${!isGlobal ? `<button class="btn" onclick="switchTeam('Global')" style="padding:0.42rem 0.9rem; font-size:0.72rem;">☉ Show All 3 Circles</button>` : ''}
+      </div>
+      <div class="concept-circles-grid">${conceptCardsHtml}</div>
     </div>
   `;
 
@@ -2117,9 +2665,7 @@ function renderProfile(contestantId) {
 
     let pScoreStr = Number.isFinite(pScore) ? (pScore % 1 === 0 ? pScore.toString() : pScore.toFixed(1)) : '—';
     let vocalStr = Number.isFinite(rawVocal) ? `${rawVocal}/100` : '—';
-    if (rawBonus > 0) {
-      vocalStr += ` <span class="bonus-pill" title="Theme Song Bonus (Max +15 pts)">+${rawBonus} Bonus</span>`;
-    }
+    if (rawBonus > 0) vocalStr += ` <span class="bonus-pill" title="Theme Song Bonus (Max +15 pts)">+${rawBonus} Bonus</span>`;
     const jCellsHtml = JUDGE_NAMES.map(j => `<td>${judgesByName[j]?.[r]?.[c.id] ?? '—'}</td>`).join('');
     return `<tr><td><strong>${getRoundLabel(r)}</strong>${trBadge}</td><td>${rkVal ?? '—'}${deltaHtml}</td>${jCellsHtml}<td>${vocalStr}</td><td><strong style="color:var(--tarot-gold)">${pScoreStr}</strong></td><td><span class="pill ${statusClass(st)}">${statusLabel(st)}</span></td></tr>`;
   }).join('');
@@ -2128,19 +2674,16 @@ function renderProfile(contestantId) {
     <tr>
       <td><strong>${getRoundLabel(s.round_id) || s.round_id}</strong></td>
       <td>${s.song_title || 'Pending'}${s.group_song ? `<br><span style="color:var(--muted); font-size:0.85em">${s.group_song}</span>` : ''}</td>
-      <td>
-        ${s.youtube_url ? `<a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" rel="noopener noreferrer" href="${s.youtube_url}">Observe Ritual</a>` : '—'}
-        ${s.bandlab_url ? ` <a class="btn" style="padding:0.3rem 0.7rem; font-size:0.74rem;" target="_blank" rel="noopener noreferrer" href="${s.bandlab_url}">BandLab</a>` : ''}
-      </td>
+      <td>${buildPerformanceLinksHtml(s, false)}</td>
     </tr>`).join('') : `<tr><td colspan="3">No visions recorded.</td></tr>`;
 
   const dynamicRankLabel = isGlobalView ? 'Global Arcana (/48)' : 'Circle Arcana (/16)';
-  const latestSt = getStatus(state.latestRound, c.id);
+  const latestSt = getStatus(state.latestRound, c.id) || getStatus(state.latestScoredRound, c.id);
   const isNom = latestSt === 'nominee';
   const isElim = isEliminatedStatus(latestSt);
   const profileImgSrc = getContestantImagePath(c, isNom);
 
-  const r = state.latestRound;
+  const r = state.latestScoredRound;
   const activeVocalRec = state.data.scores.find(s => s.round_id === r && s.contestant_id === c.id);
   const hasRealPentagramData = (r !== 'PRERANK') && (
     (activeVocalRec && Number.isFinite(activeVocalRec.total)) ||
@@ -2254,17 +2797,11 @@ function renderProfile(contestantId) {
           }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#F0EDE5' } } },
           scales: {
             x: { ticks: { color: '#888' } },
-            y: {
-              reverse: true,
-              min: 1,
-              max: fluctuationMaxRank,
-              ticks: { color: '#AAA', stepSize: isGlobalView ? 4 : 1 }
-            }
+            y: { reverse: true, min: 1, max: fluctuationMaxRank, ticks: { color: '#AAA', stepSize: isGlobalView ? 4 : 1 } }
           }
         }
       });
@@ -2308,10 +2845,7 @@ function renderVotes() {
     const cObj = state.data.contestants.find(x => x.id === id);
     const record = state.data.votes_live.find(v => v.round_id === state.votesRound && v.contestant_id === id);
     const cTeam = getContestantTeamForRound(cObj, state.votesRound);
-    let teamBadge = "";
-    if (isGlobal && cObj) {
-      teamBadge = `<span class="chip" style="margin-left:8px; font-size:0.65rem;">${teamClassToShortLabel(cTeam)}</span>`;
-    }
+    const teamBadge = (isGlobal && cObj) ? `<span class="chip" style="margin-left:8px; font-size:0.65rem;">${teamClassToShortLabel(cTeam)}</span>` : "";
     return { id, name: getContestantName(id), teamClass: cTeam, teamBadge, votes: Number(record?.votes_count || 0) };
   }).sort((a, b) => b.votes - a.votes);
 
@@ -2327,23 +2861,49 @@ function renderVotes() {
   const totalVotes = rows.reduce((sum, r) => sum + r.votes, 0);
   const maxVotes = rows.length > 0 ? rows[0].votes : 0;
 
-  let votesListHtml = rows.length ? rows.map((r, idx) => {
-    const pct = totalVotes > 0 ? (r.votes / totalVotes) * 100 : 0;
-    const barPct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
-    const inPublicSaveZone = savedByScaleIds.has(r.id);
-    return `
-      <div class="vote-row" style="${inPublicSaveZone ? 'border-color:var(--tarot-gold);' : ''}">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <strong style="font-family:'Cinzel', serif; font-size:1.15rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
-            ${r.teamBadge}
-            ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.6rem;">Scale's Grace</span>` : ''}
+  // Dynamic Form URL from CONFIG tab (with fallback)
+  const activeFormUrl = (state.liveConfig.vote_form_url && state.liveConfig.vote_form_url.trim()) || CONFIG.VOTE_FORM_URL;
+  const showLiveBars = state.liveConfig.show_live_votes !== false;
+
+  let votesBlockHtml = '';
+  if (!showLiveBars) {
+    // Suspense mode (show_live_votes = NON in CONFIG): alphabetical chips, zero spoiler!
+    const alphaRows = [...rows].sort((a, b) => a.name.localeCompare(b.name));
+    votesBlockHtml = `
+      <div class="veiled-votes-box">
+        <div style="font-size:1.7rem; color:var(--tarot-gold); margin-bottom:0.4rem;">✦ ⚖ ✦</div>
+        <h3 style="border:none; margin:0 0 0.45rem 0; padding:0;">The Scale is Veiled</h3>
+        <p class="small" style="max-width:560px; margin:0 auto; line-height:1.6;">
+          Live vote counts are hidden to preserve suspense until the official reveal. Every vote submitted through the form is counted in real time!
+        </p>
+        ${alphaRows.length ? `
+          <div class="veiled-nominees-chips">
+            ${alphaRows.map(r => `<a class="veiled-nominee-chip" href="#profile/${r.id}">${r.name}${isGlobal ? ` · ${teamClassToShortLabel(r.teamClass)}` : ''}</a>`).join('')}
           </div>
-          <div style="font-weight:600;">${r.votes} votes (${pct.toFixed(1)}%)</div>
-        </div>
-        <div class="bar"><span style="width:${barPct}%"></span></div>
-      </div>`;
-  }).join('') : `<p class="small" style="text-align:center; margin:1.5rem 0;">Silence reigns on the Scale for ${circleScopeTitle} during ${getRoundLabel(state.votesRound)}.</p>`;
+        ` : ''}
+      </div>
+    `;
+  } else if (rows.length) {
+    votesBlockHtml = `<div style="margin-top:1.8rem;">` + rows.map((r, idx) => {
+      const pct = totalVotes > 0 ? (r.votes / totalVotes) * 100 : 0;
+      const barPct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
+      const inPublicSaveZone = savedByScaleIds.has(r.id);
+      return `
+        <div class="vote-row" style="${inPublicSaveZone ? 'border-color:var(--tarot-gold);' : ''}">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+              <strong style="font-family:'Cinzel', serif; font-size:1.15rem; color:var(--tarot-gold)">#${idx + 1} ${r.name}</strong>
+              ${r.teamBadge}
+              ${inPublicSaveZone ? `<span class="pill saved_public" style="margin-left:8px; font-size:0.6rem;">Scale's Grace</span>` : ''}
+            </div>
+            <div style="font-weight:600;">${r.votes} votes (${pct.toFixed(1)}%)</div>
+          </div>
+          <div class="bar"><span style="width:${barPct}%"></span></div>
+        </div>`;
+    }).join('') + `</div>`;
+  } else {
+    votesBlockHtml = `<p class="small" style="text-align:center; margin:1.5rem 0;">Silence reigns on the Scale for ${circleScopeTitle} during ${getRoundLabel(state.votesRound)}.</p>`;
+  }
 
   const scaleHtml = `
     <div class="scale-showcase">
@@ -2370,8 +2930,8 @@ function renderVotes() {
     </div>
   `;
 
-  let roundsOptionsHtml = validVoteRounds.map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
-  const mainVoteContent = rows.length > 0 ? `<div style="margin-top:2rem;">${votesListHtml}</div>${scaleHtml}` : `${scaleHtml}<div style="margin-top:1.5rem;">${votesListHtml}</div>`;
+  const roundsOptionsHtml = validVoteRounds.map(r => `<option value="${r}" ${r === state.votesRound ? 'selected' : ''}>${getRoundLabel(r)}</option>`).join('');
+  const mainVoteContent = (rows.length > 0 && showLiveBars) ? `${votesBlockHtml}${scaleHtml}` : `${votesBlockHtml}${scaleHtml}`;
 
   root.innerHTML = `
     <div class="card-paper">
@@ -2382,20 +2942,32 @@ function renderVotes() {
         </div>
         <div class="filters" style="margin:0;">
           <select id="votesRoundSelect">${roundsOptionsHtml}</select>
-          ${CONFIG.VOTE_FORM_URL ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${CONFIG.VOTE_FORM_URL}">✦ Tip the Scale</a>` : ''}
+          ${activeFormUrl ? `<a class="btn btn-primary" target="_blank" rel="noopener noreferrer" href="${activeFormUrl}">✦ Tip the Scale</a>` : ''}
         </div>
       </div>
+
+      <!-- DEDICATED VOTE COUNTDOWN (DRIVEN BY CONFIG.vote_deadline) -->
+      <div class="vote-countdown-banner" id="voteCountdownBanner">
+        <div>
+          <div class="vote-cd-title" id="voteCdTitle">✦ VOTING COUNTDOWN</div>
+          <div class="small" id="voteCdSub" style="margin-top:2px;">Loading schedule...</div>
+        </div>
+        <div class="vote-cd-clock" id="voteCdClock">—</div>
+      </div>
+
       ${mainVoteContent}
-      <p class="small" style="margin-top:2rem; color:var(--tarot-gold)">
-        Total votes (${circleScopeTitle}): ${totalVotes} · Last vision: ${new Date().toLocaleTimeString('en-US')}
+      <p class="small" style="margin-top:1.6rem; color:var(--tarot-gold)">
+        ${showLiveBars ? `Total votes (${circleScopeTitle}): ${totalVotes} · ` : ''}Last vision: ${new Date().toLocaleTimeString('en-US')}
       </p>
     </div>
   `;
+
   document.getElementById('votesRoundSelect').addEventListener('change', (e) => {
     state.votesRound = e.target.value;
     state.userPickedVotesRound = true;
     renderVotes();
   });
+  updateLiveClocksUI();
 }
 
 function renderGrimoire() {
@@ -2551,16 +3123,16 @@ async function boot() {
     initCelestialSparks();
     initMobileScrollCardFlip();
     updateCircleSwitcherUI();
-    startLiveCycleClock();
+    startLiveClocks();
     setupNav();
     await hydrate(false);
     renderAll(false);
 
-    let lastDataSignature = JSON.stringify(state.data);
+    let lastDataSignature = JSON.stringify({ data: state.data, cfg: state.liveConfig });
     clearInterval(state.votesTimer);
     state.votesTimer = setInterval(async () => {
       await hydrate(true);
-      const nextSignature = JSON.stringify(state.data);
+      const nextSignature = JSON.stringify({ data: state.data, cfg: state.liveConfig });
       if (nextSignature !== lastDataSignature) {
         lastDataSignature = nextSignature;
         renderAll(true);
