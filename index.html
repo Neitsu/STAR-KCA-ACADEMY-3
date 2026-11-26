@@ -1304,16 +1304,42 @@ function parseCSV(text) {
 async function fetchSheetByGid(gid, customSheetId = null) {
   const targetId = customSheetId || CONFIG.SHEET_ID;
   if (!targetId || gid === null || gid === undefined || String(gid).trim() === '') return [];
-  const url = `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&headers=1&_=${Date.now()}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return [];
-    const txt = await response.text();
-    if (txt.toLowerCase().includes('<!doctype html>')) return [];
-    return parseCSV(txt);
-  } catch (e) {
-    return [];
+
+  const gidToTabName = {
+    [CONFIG.CONFIG_GID]: "CONFIG",
+    [CONFIG.VOTES_LIVE_GID]: "votes_live",
+    [CONFIG.ROUND_GIDS.PRERANK]: "PRERANK",
+    [CONFIG.ROUND_GIDS.ROUND_1]: "R1",
+    [CONFIG.ROUND_GIDS.ROUND_2]: "R2",
+    [CONFIG.ROUND_GIDS.ROUND_3]: "R3",
+    [CONFIG.ROUND_GIDS.ROUND_4]: "R4",
+    [CONFIG.ROUND_GIDS.FINAL]: "FINAL",
+    [CONFIG.FINAL_FALLBACK_R5_GID]: "R5"
+  };
+  const tabName = gidToTabName[String(gid)] || "";
+  const ts = Date.now();
+
+  const urls = [
+    `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&headers=1&_=${ts}`,
+    `https://docs.google.com/spreadsheets/d/${targetId}/export?format=csv&gid=${encodeURIComponent(gid)}`,
+    `https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid)}&_=${ts}`,
+    ...(tabName ? [`https://docs.google.com/spreadsheets/d/${targetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&_=${ts}`] : [])
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const txt = await response.text();
+      if (!txt || txt.trim() === '' || txt.toLowerCase().includes('<!doctype html>')) continue;
+      const parsed = parseCSV(txt);
+      if (parsed.length > 0) return parsed;
+    } catch (e) {
+      console.warn("Tentative Sheets échouée :", url, e);
+    }
   }
+  return [];
+}
 }
 
 function keyNorm(k) { return String(k || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
